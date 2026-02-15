@@ -25,3 +25,36 @@ See https://docs.arc42.org/section-11/[Risks and Technical Debt] in the arc42 do
 
 ****
 endif::arc42help[]
+
+=== Riesgos
+
+Para valorar la importancia de cada riesgo se utiliza una escala de impacto en tres niveles:
+**Alto**, **Medio**, **Bajo**.
+
+[cols="1,1,1", options="header"]
+|===
+| Riesgo | Estrategia de mitigación | Impacto
+
+| Experiencia limitada en determinadas herramientas o lenguajes
+| La falta de dominio homogéneo en las tecnologías seleccionadas puede generar retrasos o errores de implementación. Se priorizarán tecnologías conocidas por la mayoría del equipo y se fomentará el intercambio de conocimientos mediante sesiones internas y trabajo colaborativo.
+| Bajo
+
+| Posibles modificaciones en los requisitos funcionales o no funcionales
+| La estructura modular del proyecto ayudará a mitigar este riesgo.
+| Medio
+
+| Escasa experiencia previa de trabajo conjunto
+| Al no haber colaborado anteriormente, pueden surgir dificultades iniciales de coordinación. Para minimizar este riesgo se definirán canales de comunicación claros y seguimiento continuo del progreso.
+| Bajo
+
+| Plazos de entrega junto a otras asignaturas
+| En determinados periodos de tiempo es probable que se junten entregas de avrais asignaturas a la vez, esto se mitigará a través de un trabajo organizado y con tiempo.
+| Alto
+
+| Tamaño amplio del equipo
+| Un número elevado de integrantes puede dificultar la sincronización del trabajo y la toma de decisiones. Se establecerán roles definidos, reuniones estructuradas y documentación compartida para mantener la organización.
+| Medio
+|===
+
+=== Deuda Técnica
+Al encontrarnos en la fase inicial del proyecto, no se ha contraído deuda técnica significativa. Se están siguiendo los estándares de codificación y diseño definidos. No obstante, se realizará un seguimiento periódico para identificar posibles atajos tomados durante la implementación de los primeros prototipos.
