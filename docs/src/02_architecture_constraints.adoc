@@ -27,3 +27,39 @@ See https://docs.arc42.org/section-2/[Architecture Constraints] in the arc42 doc
 
 ****
 endif::arc42help[]
+
+Restricciones Técnicas
+[cols="1,3", options="header"]
+|===
+| Restricción | Descripción
+| Lógica del Juego Y | El sistema debe implementar las reglas del Juego Y: conexión de tres lados de un tablero triangular/hexagonal.
+| Modos de Juego | La aplicación debe soportar partidas de dos jugadores (local o red) y un modo de un jugador contra la IA.
+| Interfaz Gráfica | El tablero debe representarse de forma clara y permitir la interacción táctil o mediante ratón para colocar las fichas.
+| Despliegue con Docker | El sistema completo (Frontend y Backend) debe estar encapsulados en contenedores y ser desplegable mediante Docker.
+|===
+
+Restricciones Organizativas
+[cols="1,3", options="header"]
+|===
+| Restricción | Descripción
+| Gestión de Tareas | Uso obligatorio de GitHub Issues para el seguimiento de las tareas.
+| Registro de Decisiones | La Wiki de GitHub será el repositorio oficial para las actas de reuniones que se vayan haciendo a lo largo del desarrollo.
+| Control de Versiones | Uso de GitHub como plataforma centralizada, aplicando una estrategia de ramas por cada funcionalidad para no romper la lógica principal del juego.
+|===
+
+Restricciones del Equipo de Desarrollo
+[cols="1,3", options="header"]
+|===
+| Restricción | Descripción
+| Curva de aprendizaje | El equipo debe afrontar el aprendizaje e implementación de tecnologías no utilizados previamente (Rust, Docker, ...).
+| Coordinación Inicial | Al no haber trabajado juntos antes, se enfatizará la comunicación constante para evitar conflictos.
+|===
+
+Restricciones Políticas y Convenciones
+[cols="1,3", options="header"]
+|===
+| Restricción | Descripción
+| Estándar arc42 | Seguimiento estricto de la estructura arc42 para documentar la arquitectura del juego.
+| Interoperabilidad | El motor del juego debe estar separado de la interfaz para permitir posibles cambios de UI en el futuro.
+| Idioma | Documentación técnica en español y código fuente/comentarios en inglés.
+|===
