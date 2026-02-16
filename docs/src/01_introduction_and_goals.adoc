@@ -1,71 +1,121 @@
 ifndef::imagesdir[:imagesdir: ../images]
 
 [[section-introduction-and-goals]]
-== Introduction and Goals
+== Introducción y Metas
+
+Yovi es una implementación digital del juego "Y".
+El juego se desarrolla en un tablero triangular con casillas hexagonal, donde el objetivo es conectar los tres lados del tablero mediante una cadena de fichas del mismo color.
+
+El propósito de este proyecto es diseñar y construir un software completo que simule la experiencia de este juego de mesa en un entorno web. El sistema permitirá:
+
+* **Modo Multijugador:** Permitir que dos usuarios jueguen en tiempo real.
+* **Modo Un Jugador:** Permitir que un usuario pueda enfrentarse a la IA.
+
+Desde un punto de vista de diseño del software, el proyecto busca aplicar patrones de diseño robustos, asegurar la calidad del código y el uso de contenedores.
 
 ifdef::arc42help[]
 [role="arc42help"]
 ****
-Describes the relevant requirements and the driving forces that software architects and development team must consider. 
-These include
+Describe los requisitos relevantes y los factores impulsores que los arquitectos de software y el equipo de desarrollo deben tener en cuenta. 
+Entre ellos se incluyen
 
-* underlying business goals, 
-* essential features, 
-* essential functional requirements, 
-* quality goals for the architecture and
-* relevant stakeholders and their expectations
+* Objetivos empresariales subyacentes
+* Características esenciales, 
+* Requisitos funcionales esenciales, 
+* Objetivos de calidad para la arquitectura y
+* Las partes interesadas relevantes y sus expectativas.
 ****
 endif::arc42help[]
 
-=== Requirements Overview
+=== Resumen de Requisitos
+
+A continuación se describen los requisitos funcionales esenciales agrupados por funcionalidad:
+
+* **Mecánica del Juego:** El sistema debe representar un tablero triangular dividido en casillas hexagonales. Debe permitir la colocación de fichas por turnos y detectar automáticamente si un jugador ha conectado los tres lados del tablero (victoria) o si se produce un empate matemático.
+
+* **Modos de Juego:** Se requiere soportar dos tipos de partidas:
+** **Jugador vs Jugador:** Partidas en tiempo real entre dos usuarios humanos.
+** **Jugador vs Máquina:** Un usuario humano contra una Inteligencia Artificial con una dificultad básica.
+
+* **Gestión de Usuarios:** Los usuarios deben poder registrarse e iniciar sesión para acceder a las partidas. El sistema debe mantener un perfil persistente de cada jugador.
+
+* **Historial y Persistencia:** El sistema debe almacenar el resultado de las partidas finalizadas, permitiendo a los usuarios consultar su historial de victorias y derrotas.
+
+* **Plataforma:** La aplicación debe ser accesible desde navegadores web modernos, siendo desplegable en cualquier entorno que soporte contenedores Docker.
 
 ifdef::arc42help[]
 [role="arc42help"]
 ****
-.Contents
-Short description of the functional requirements, driving forces, extract (or abstract)
-of requirements. Link to (hopefully existing) requirements documents
-(with version number and information where to find it).
+.Contenido
+Breve descripción de los requisitos funcionales, factores impulsores, extracto (o resumen)
+de los requisitos. Enlace a los documentos de requisitos (que esperamos que existan)
+(con número de versión e información sobre dónde encontrarlos).
 
-.Motivation
-From the point of view of the end users a system is created or modified to
-improve support of a business activity and/or improve the quality.
+.Motivación
+Desde el punto de vista de los usuarios finales, un sistema se crea o modifica para
+mejorar el soporte de una actividad empresarial y/o mejorar la calidad.
 
-.Form
-Short textual description, probably in tabular use-case format.
-If requirements documents exist this overview should refer to these documents.
+.Formulario
+Breve descripción textual, probablemente en formato tabular de casos de uso.
+Si existen documentos de requisitos, esta descripción general debe hacer referencia a dichos documentos.
 
-Keep these excerpts as short as possible. Balance readability of this document with potential redundancy w.r.t to requirements documents.
+Mantenga estos extractos lo más breves posible. Equilibre la legibilidad de este documento con la posible redundancia con respecto a los documentos de requisitos.
 
+.Más información
 
-.Further Information
-
-See https://docs.arc42.org/section-1/[Introduction and Goals] in the arc42 documentation.
+Consulte https://docs.arc42.org/section-1/[Introducción y objetivos] en la documentación de arc42.
 
 ****
 endif::arc42help[]
 
-=== Quality Goals
+=== Objetivos de Calidad
+
+A continuación se detallan los objetivos de calidad prioritarios para el sistema Yovi:
+
+[options="header",cols="1,2,4"]
+|===
+|Prioridad |Objetivo de Calidad |Motivación
+
+| 1
+| **Usabilidad**
+| La aplicación presenta un tablero hexagonal que puede resultar visualmente complejo al inicio. Por ello, se debe priorizar una interfaz clara que resalte los movimientos válidos para reducir la curva de aprendizaje y hacer el juego accesible a todos los públicos.
+
+| 2
+| **Mantenibilidad**
+| Al ser un proyecto desarrollado en equipo y basado en microservicios, el código debe ser modular y fácil de entender. Esto facilitará la corrección de errores y la incorporación de nuevas funcionalidades sin romper el sistema existente.
+
+| 3
+| **Rendimiento**
+| El tiempo de respuesta de la aplicación debe ser el mínimo posible. Una latencia baja es fundamental para ofrecer una experiencia de juego fluida y evitar que el usuario abandone la partida.
+
+| 4
+| **Seguridad**
+| Se debe garantizar la integridad de las partidas y la privacidad de los usuarios. El sistema debe validar todas las acciones en el servidor para impedir trampas y proteger las credenciales de los jugadores.
+
+| 5
+| **Transferibilidad**
+| Gracias al uso de contenedores Docker, la aplicación debe poder desplegarse y funcionar correctamente en cualquier sistema operativo sin requerir configuraciones complejas.
+|===
 
 ifdef::arc42help[]
 [role="arc42help"]
 ****
-.Contents
-The top three (max five) quality goals for the architecture whose fulfillment is of highest importance to the major stakeholders. 
-We really mean quality goals for the architecture. Don't confuse them with project goals.
-They are not necessarily identical.
+.Contenido
+Los tres objetivos de calidad principales (máximo cinco) para la arquitectura cuyo cumplimiento es de suma importancia para las principales partes interesadas. 
+Nos referimos realmente a los objetivos de calidad para la arquitectura. No los confunda con los objetivos del proyecto.
+No son necesariamente idénticos.
 
-Consider this overview of potential topics (based upon the ISO 25010 standard):
+Considere esta descripción general de posibles temas (basada en la norma ISO 25010):
 
 image::01_2_iso-25010-topics-EN.drawio.png["Categories of Quality Requirements"]
 
-.Motivation
-You should know the quality goals of your most important stakeholders, since they will influence fundamental architectural decisions. 
-Make sure to be very concrete about these qualities, avoid buzzwords.
-If you as an architect do not know how the quality of your work will be judged...
+.Motivación
+Debes conocer los objetivos de calidad de tus partes interesadas más importantes, ya que influirán en las decisiones arquitectónicas fundamentales. 
+Asegúrate de ser muy concreto sobre estas cualidades, evita las palabras de moda.
+Si tú, como arquitecto, no sabes cómo se juzgará la calidad de tu trabajo...
 
-.Form
-A table with quality goals and concrete scenarios, ordered by priorities
+.Forma
+Una tabla con objetivos de calidad y escenarios concretos, ordenados por prioridades.
 ****
 endif::arc42help[]
 
@@ -74,28 +124,53 @@ endif::arc42help[]
 ifdef::arc42help[]
 [role="arc42help"]
 ****
-.Contents
-Explicit overview of stakeholders of the system, i.e. all person, roles or organizations that
+.Contenido
+Descripción explícita de las partes interesadas del sistema, es decir, todas las personas, funciones u organizaciones que
 
-* should know the architecture
-* have to be convinced of the architecture
-* have to work with the architecture or with code
-* need the documentation of the architecture for their work
-* have to come up with decisions about the system or its development
+* deben conocer la arquitectura
+* deben estar convencidos de la arquitectura
+* deben trabajar con la arquitectura o con el código
+* necesitan la documentación de la arquitectura para su trabajo
+* deben tomar decisiones sobre el sistema o su desarrollo
 
-.Motivation
-You should know all parties involved in development of the system or affected by the system.
-Otherwise, you may get nasty surprises later in the development process.
-These stakeholders determine the extent and the level of detail of your work and its results.
+.Motivación
+Debe conocer a todas las partes implicadas en el desarrollo del sistema o afectadas por él.
+De lo contrario, podría encontrarse con sorpresas desagradables más adelante en el proceso de desarrollo.
+Estas partes interesadas determinan el alcance y el nivel de detalle de su trabajo y sus resultados.
 
-.Form
-Table with role names, person names, and their expectations with respect to the architecture and its documentation.
+.Formulario
+Tabla con nombres de roles, nombres de personas y sus expectativas con respecto a la arquitectura y su documentación.
 ****
 endif::arc42help[]
-
-[options="header",cols="1,2,2"]
 |===
-|Role/Name|Contact|Expectations
-| Prueba 
-| Sergio González Martínez
+|Rol |Miembros y contacto |Expectativa
+
+.5+a| **Equipo de Desarrollo**
+a| * Sergio González Martínez
+uo300798@uniovi.es
+.5+| Desarrollar la aplicación asignada utilizando buenas prácticas, trabajar correctamente en equipo siguiendo la metodología ágil y lograr una solución basada en microservicios que sea mantenible, escalable y usable, y cumplir con los requisitos de calidad del sistema.
+
+a| * Pablo Arias Fernández
+uo3000007@uniovi.es
+
+a| * Iyán Díaz Pereda
+uo3000006@uniovi.es
+
+a| * Enol de la Calle Iglesias
+uo3000888@uniovi.es
+
+a| * Iyán Álvarez Casasnovas
+uo3009006@uniovi.es
+
+| **Profesores (Product Owners)**
+a| * Jose Emilio Labra Gayo - labra@uniovi.es
+* Celia Melendi Lavandera - melendicelia@uniovi.es
+* Diego Martín Fernández - martinfdiego@uniovi.es
+* Pablo González González - gonzalezgpablo@uniovi.es
+| Actuar como Product Owners definiendo los requisitos de alto nivel, proporcionar feedback al equipo y evaluar la calidad de la arquitectura, la documentación y el despliegue final en Docker.
+
+| **Usuarios Finales**
+| Jugadores de la aplicación
+| Disfrutar de una buena experiencia de usuario, pudiendo jugar partidas de forma fluida, utilizar diferentes estrategias en el tablero hexagonal y consultar sus estadísticas.
+
 |===
