@@ -461,9 +461,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#section-solution-strategy">4. Solution Strategy</a>
 <ul class="sectlevel2">
-<li><a href="#_4_1_resumen_de_la_estrategia">4.1. 4.1. Resumen de la Estrategia</a></li>
-<li><a href="#_4_2_decisiones_tecnológicas">4.2. 4.2. Decisiones Tecnológicas</a></li>
-<li><a href="#_4_3_decisiones_de_organización">4.3. 4.3. Decisiones de Organización</a></li>
+<li><a href="#_resumen_de_la_estrategia">4.1. Resumen de la Estrategia</a></li>
+<li><a href="#_decisiones_tecnológicas">4.2. Decisiones Tecnológicas</a></li>
+<li><a href="#_decisiones_de_organización">4.3. Decisiones de Organización</a></li>
 </ul>
 </li>
 <li><a href="#section-building-block-view">5. Building Block View</a>
@@ -494,11 +494,16 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_concept_n">8.3. <em>&lt;Concept n&gt;</em></a></li>
 </ul>
 </li>
-<li><a href="#section-design-decisions">9. Architecture Decisions</a></li>
+<li><a href="#section-design-decisions">9. Architecture Decisions</a>
+<ul class="sectlevel2">
+<li><a href="#_introducción">9.1. Introducción</a></li>
+</ul>
+</li>
 <li><a href="#section-quality-scenarios">10. Quality Requirements</a>
 <ul class="sectlevel2">
-<li><a href="#_quality_tree">10.1. Quality Tree</a></li>
-<li><a href="#_quality_scenarios">10.2. Quality Scenarios</a></li>
+<li><a href="#_introducción_2">10.1. Introducción</a></li>
+<li><a href="#_quality_tree">10.2. Quality Tree</a></li>
+<li><a href="#_quality_scenarios">10.3. Quality Scenarios</a></li>
 </ul>
 </li>
 <li><a href="#section-technical-risks">11. Risks and Technical Debts</a>
@@ -1170,7 +1175,7 @@ Refer to details in the following sections.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_4_1_resumen_de_la_estrategia">4.1. 4.1. Resumen de la Estrategia</h3>
+<h3 id="_resumen_de_la_estrategia">4.1. Resumen de la Estrategia</h3>
 <div class="paragraph">
 <p>Nuestra estrategia principal se centra en crear un entorno donde la lógica pesada del juego (rendimiento crítico) esté completamente desacoplada de la gestión de usuarios y la interfaz (experiencia de usuario).</p>
 </div>
@@ -1179,7 +1184,7 @@ Refer to details in the following sections.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_4_2_decisiones_tecnológicas">4.2. 4.2. Decisiones Tecnológicas</h3>
+<h3 id="_decisiones_tecnológicas">4.2. Decisiones Tecnológicas</h3>
 <div class="paragraph">
 <p>Basándonos en los requisitos del proyecto, se han seleccionado las siguientes tecnologías para cubrir las necesidades de cada módulo:</p>
 </div>
@@ -1232,7 +1237,7 @@ Refer to details in the following sections.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_4_3_decisiones_de_organización">4.3. 4.3. Decisiones de Organización</h3>
+<h3 id="_decisiones_de_organización">4.3. Decisiones de Organización</h3>
 <div class="paragraph">
 <p>Para asegurar el correcto desarrollo del proyecto, el equipo ha tomado las siguientes decisiones conjuntas respecto a la metodología y gestión:</p>
 </div>
@@ -1989,7 +1994,16 @@ There you will find links and examples about ADR.</p>
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_introducción">9.1. Introducción</h3>
+<div class="paragraph">
+<p>En esta sección documentamos las decisiones arquitectónicas significativas que darán forma a la estructura, el despliegue y la tecnología del sistema YOVI. Estas decisiones se tomarán considerando los requisitos no funcionales, las restricciones del proyecto y la experiencia del equipo de desarrollo.</p>
+</div>
+<div class="paragraph">
+<p>El objetivo de este registro es proporcionar trazabilidad y justificación sobre por qué se eligieron ciertas soluciones frente a otras alternativas disponibles, utilizando el formato de registros de decisión (ADR).</p>
+</div>
 <div style="page-break-after: always;"></div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -2018,7 +2032,26 @@ concrete and measurable.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_quality_tree">10.1. Quality Tree</h3>
+<h3 id="_introducción_2">10.1. Introducción</h3>
+<div class="paragraph">
+<p>El objetivo principal de esta sección es definir las metas de calidad que el sistema YOVI debe cumplir para asegurar una experiencia de usuario satisfactoria. Mientras que los requisitos funcionales describen qué hace el sistema, los requerimientos de calidad describen cómo de bien debe funcionar bajo condiciones específicas.</p>
+</div>
+<div class="paragraph">
+<p>Para estructurar estas metas, utilizamos las herramientas detalladas en los siguientes apartados:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Árbol de Calidad:</strong> Una representación jerárquica que desglosa los atributos de calidad de alto nivel.</p>
+</li>
+<li>
+<p><strong>Escenarios de Calidad:</strong> Descripciones detalladas que permiten evaluar si el sistema cumple con las expectativas de los stakeholders.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_quality_tree">10.2. Quality Tree</h3>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
@@ -2050,7 +2083,7 @@ concrete and measurable.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_quality_scenarios">10.2. Quality Scenarios</h3>
+<h3 id="_quality_scenarios">10.3. Quality Scenarios</h3>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
