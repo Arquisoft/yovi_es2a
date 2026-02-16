@@ -32,3 +32,47 @@ See https://docs.arc42.org/section-4/[Solution Strategy] in the arc42 documentat
 
 ****
 endif::arc42help[]
+
+=== Resumen de la Estrategia
+
+Nuestra estrategia principal se centra en crear un entorno donde la lógica pesada del juego (rendimiento crítico) esté completamente desacoplada de la gestión de usuarios y la interfaz (experiencia de usuario).
+
+Esta separación nos permite asegurar que el cálculo intensivo del motor no afecte a la fluidez de la navegación web, y viceversa. A continuación, se detallan las decisiones tecnológicas y organizativas tomadas para cumplir este objetivo.
+
+=== Decisiones Tecnológicas
+
+Basándonos en los requisitos del proyecto, se han seleccionado las siguientes tecnologías para cubrir las necesidades de cada módulo:
+
+* **Frontend:**
+** _React:_ Seleccionado para construir una interfaz de usuario rápida.
+** _TypeScript:_ Se añade para incorporar tipado estático, reduciendo errores durante el desarrollo.
+
+* **Backend:**
+** _Node.js:_ Seleccionado como el entorno idóneo para gestionar la lógica de usuarios.
+
+* **Motor de Juego:**
+** _Rust:_ Elegido específicamente por su seguridad de memoria y su capacidad de ofrecer un alto rendimiento en los cálculos del juego.
+
+* **Persistencia y Datos:**
+** _MySQL:_ Base de datos relacional elegida para garantizar la integridad de los datos de usuarios y mantener un registro fiable de los historiales de partidas.
+
+=== Decisiones de Organización
+
+Para asegurar el correcto desarrollo del proyecto, el equipo ha tomado las siguientes decisiones conjuntas respecto a la metodología y gestión:
+
+[cols="1,3", options="header"]
+|===
+| Ámbito | Decisión y Motivación
+
+| **Metodología**
+| Seguiremos una metodología basada en **reuniones semanales**. Estas sesiones se utilizarán para ponerse al día, definir objetivos a corto plazo (1 semana) y tomar las decisiones importantes o cruciales para el rumbo general del proyecto.
+
+| **Gestión del Proyecto**
+| Usaremos **GitHub** como herramienta central, tanto para el control de versiones del código como para la gestión de tareas y trabajo en equipo, utilizando principalmente los _Issues_.
+
+| **Roles**
+| Hemos decidido dividirnos en **subgrupos especializados**, encargándose cada uno de una parte específica del proyecto (Frontend, Backend, Motor). No obstante, se mantiene la premisa de que todos los miembros deben tener un conocimiento general del proyecto completo, no solo de su parte asignada.
+
+| **Comunicación**
+| Además de las reuniones presenciales, mantendremos una comunicación constante y fluida a través de canales digitales como **WhatsApp** y **Discord**.
+|===

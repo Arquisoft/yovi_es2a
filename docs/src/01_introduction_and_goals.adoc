@@ -96,6 +96,7 @@ endif::arc42help[]
 [options="header",cols="1,2,2"]
 |===
 |Role/Name|Contact|Expectations
-| Prueba 
+| Prueba
 | Sergio González Martínez
+| Nada
 |===
