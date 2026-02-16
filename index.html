@@ -445,10 +445,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#section-introduction-and-goals">1. Introduction and Goals</a>
+<li><a href="#section-introduction-and-goals">1. Introducción y Metas</a>
 <ul class="sectlevel2">
-<li><a href="#_requirements_overview">1.1. Requirements Overview</a></li>
-<li><a href="#_quality_goals">1.2. Quality Goals</a></li>
+<li><a href="#_resumen_de_requisitos">1.1. Resumen de Requisitos</a></li>
+<li><a href="#_objetivos_de_calidad">1.2. Objetivos de Calidad</a></li>
 <li><a href="#_stakeholders">1.3. Stakeholders</a></li>
 </ul>
 </li>
@@ -459,13 +459,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_technical_context">3.2. Technical Context</a></li>
 </ul>
 </li>
-<li><a href="#section-solution-strategy">4. Solution Strategy</a>
-<ul class="sectlevel2">
-<li><a href="#_resumen_de_la_estrategia">4.1. Resumen de la Estrategia</a></li>
-<li><a href="#_decisiones_tecnológicas">4.2. Decisiones Tecnológicas</a></li>
-<li><a href="#_decisiones_de_organización">4.3. Decisiones de Organización</a></li>
-</ul>
-</li>
+<li><a href="#section-solution-strategy">4. Solution Strategy</a></li>
 <li><a href="#section-building-block-view">5. Building Block View</a>
 <ul class="sectlevel2">
 <li><a href="#_whitebox_overall_system">5.1. Whitebox Overall System</a></li>
@@ -487,23 +481,20 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_infrastructure_level_2">7.2. Infrastructure Level 2</a></li>
 </ul>
 </li>
-<li><a href="#section-concepts">8. Cross-cutting Concepts</a>
+<li><a href="#section-concepts">8. Conceptos transversales</a>
 <ul class="sectlevel2">
-<li><a href="#_concept_1">8.1. <em>&lt;Concept 1&gt;</em></a></li>
-<li><a href="#_concept_2">8.2. <em>&lt;Concept 2&gt;</em></a></li>
-<li><a href="#_concept_n">8.3. <em>&lt;Concept n&gt;</em></a></li>
+<li><a href="#_conceptos_de_dominio">8.1. Conceptos de Dominio</a></li>
+<li><a href="#_experiencia_de_usuario_ux">8.2. Experiencia de Usuario (UX)</a></li>
+<li><a href="#_seguridad">8.3. Seguridad</a></li>
+<li><a href="#_arquitectura">8.4. Arquitectura</a></li>
+<li><a href="#_desarrollo_y_operaciones">8.5. Desarrollo y Operaciones</a></li>
 </ul>
 </li>
-<li><a href="#section-design-decisions">9. Architecture Decisions</a>
-<ul class="sectlevel2">
-<li><a href="#_introducción">9.1. Introducción</a></li>
-</ul>
-</li>
+<li><a href="#section-design-decisions">9. Architecture Decisions</a></li>
 <li><a href="#section-quality-scenarios">10. Quality Requirements</a>
 <ul class="sectlevel2">
-<li><a href="#_introducción_2">10.1. Introducción</a></li>
-<li><a href="#_quality_tree">10.2. Quality Tree</a></li>
-<li><a href="#_quality_scenarios">10.3. Quality Scenarios</a></li>
+<li><a href="#_quality_tree">10.1. Quality Tree</a></li>
+<li><a href="#_quality_scenarios">10.2. Quality Scenarios</a></li>
 </ul>
 </li>
 <li><a href="#section-technical-risks">11. Risks and Technical Debts</a>
@@ -566,77 +557,173 @@ For documentation of your own system you use better the <em>plain</em> version.<
 </div>
 </div>
 <div class="sect1">
-<h2 id="section-introduction-and-goals">1. Introduction and Goals</h2>
+<h2 id="section-introduction-and-goals">1. Introducción y Metas</h2>
 <div class="sectionbody">
-<div class="sidebarblock arc42help">
-<div class="content">
 <div class="paragraph">
-<p>Describes the relevant requirements and the driving forces that software architects and development team must consider.
-These include</p>
+<p>Yovi es una implementación digital del juego "Y".
+El juego se desarrolla en un tablero triangular con casillas hexagonal, donde el objetivo es conectar los tres lados del tablero mediante una cadena de fichas del mismo color.</p>
+</div>
+<div class="paragraph">
+<p>El propósito de este proyecto es diseñar y construir un software completo que simule la experiencia de este juego de mesa en un entorno web. El sistema permitirá:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>underlying business goals,</p>
+<p><strong>Modo Multijugador:</strong> Permitir que dos usuarios jueguen en tiempo real.</p>
 </li>
 <li>
-<p>essential features,</p>
+<p><strong>Modo Un Jugador:</strong> Permitir que un usuario pueda enfrentarse a la IA.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Desde un punto de vista de diseño del software, el proyecto busca aplicar patrones de diseño robustos, asegurar la calidad del código y el uso de contenedores.</p>
+</div>
+<div class="sidebarblock arc42help">
+<div class="content">
+<div class="paragraph">
+<p>Describe los requisitos relevantes y los factores impulsores que los arquitectos de software y el equipo de desarrollo deben tener en cuenta.
+Entre ellos se incluyen</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Objetivos empresariales subyacentes</p>
 </li>
 <li>
-<p>essential functional requirements,</p>
+<p>Características esenciales,</p>
 </li>
 <li>
-<p>quality goals for the architecture and</p>
+<p>Requisitos funcionales esenciales,</p>
 </li>
 <li>
-<p>relevant stakeholders and their expectations</p>
+<p>Objetivos de calidad para la arquitectura y</p>
+</li>
+<li>
+<p>Las partes interesadas relevantes y sus expectativas.</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_requirements_overview">1.1. Requirements Overview</h3>
+<h3 id="_resumen_de_requisitos">1.1. Resumen de Requisitos</h3>
+<div class="paragraph">
+<p>A continuación se describen los requisitos funcionales esenciales agrupados por funcionalidad:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Mecánica del Juego:</strong> El sistema debe representar un tablero triangular dividido en casillas hexagonales. Debe permitir la colocación de fichas por turnos y detectar automáticamente si un jugador ha conectado los tres lados del tablero (victoria) o si se produce un empate matemático.</p>
+</li>
+<li>
+<p><strong>Modos de Juego:</strong> Se requiere soportar dos tipos de partidas:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Jugador vs Jugador:</strong> Partidas en tiempo real entre dos usuarios humanos.</p>
+</li>
+<li>
+<p><strong>Jugador vs Máquina:</strong> Un usuario humano contra una Inteligencia Artificial con una dificultad básica.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Gestión de Usuarios:</strong> Los usuarios deben poder registrarse e iniciar sesión para acceder a las partidas. El sistema debe mantener un perfil persistente de cada jugador.</p>
+</li>
+<li>
+<p><strong>Historial y Persistencia:</strong> El sistema debe almacenar el resultado de las partidas finalizadas, permitiendo a los usuarios consultar su historial de victorias y derrotas.</p>
+</li>
+<li>
+<p><strong>Plataforma:</strong> La aplicación debe ser accesible desde navegadores web modernos, siendo desplegable en cualquier entorno que soporte contenedores Docker.</p>
+</li>
+</ul>
+</div>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
-<div class="title">Contents</div>
-<p>Short description of the functional requirements, driving forces, extract (or abstract)
-of requirements. Link to (hopefully existing) requirements documents
-(with version number and information where to find it).</p>
+<div class="title">Contenido</div>
+<p>Breve descripción de los requisitos funcionales, factores impulsores, extracto (o resumen)
+de los requisitos. Enlace a los documentos de requisitos (que esperamos que existan)
+(con número de versión e información sobre dónde encontrarlos).</p>
 </div>
 <div class="paragraph">
-<div class="title">Motivation</div>
-<p>From the point of view of the end users a system is created or modified to
-improve support of a business activity and/or improve the quality.</p>
+<div class="title">Motivación</div>
+<p>Desde el punto de vista de los usuarios finales, un sistema se crea o modifica para
+mejorar el soporte de una actividad empresarial y/o mejorar la calidad.</p>
 </div>
 <div class="paragraph">
-<div class="title">Form</div>
-<p>Short textual description, probably in tabular use-case format.
-If requirements documents exist this overview should refer to these documents.</p>
+<div class="title">Formulario</div>
+<p>Breve descripción textual, probablemente en formato tabular de casos de uso.
+Si existen documentos de requisitos, esta descripción general debe hacer referencia a dichos documentos.</p>
 </div>
 <div class="paragraph">
-<p>Keep these excerpts as short as possible. Balance readability of this document with potential redundancy w.r.t to requirements documents.</p>
+<p>Mantenga estos extractos lo más breves posible. Equilibre la legibilidad de este documento con la posible redundancia con respecto a los documentos de requisitos.</p>
 </div>
 <div class="paragraph">
-<div class="title">Further Information</div>
-<p>See <a href="https://docs.arc42.org/section-1/">Introduction and Goals</a> in the arc42 documentation.</p>
+<div class="title">Más información</div>
+<p>Consulte <a href="https://docs.arc42.org/section-1/">Introducción y objetivos</a> en la documentación de arc42.</p>
 </div>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_quality_goals">1.2. Quality Goals</h3>
+<h3 id="_objetivos_de_calidad">1.2. Objetivos de Calidad</h3>
+<div class="paragraph">
+<p>A continuación se detallan los objetivos de calidad prioritarios para el sistema Yovi:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 14.2857%;">
+<col style="width: 28.5714%;">
+<col style="width: 57.1429%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Prioridad</th>
+<th class="tableblock halign-left valign-top">Objetivo de Calidad</th>
+<th class="tableblock halign-left valign-top">Motivación</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Usabilidad</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">La aplicación presenta un tablero hexagonal que puede resultar visualmente complejo al inicio. Por ello, se debe priorizar una interfaz clara que resalte los movimientos válidos para reducir la curva de aprendizaje y hacer el juego accesible a todos los públicos.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Mantenibilidad</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Al ser un proyecto desarrollado en equipo y basado en microservicios, el código debe ser modular y fácil de entender. Esto facilitará la corrección de errores y la incorporación de nuevas funcionalidades sin romper el sistema existente.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Rendimiento</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">El tiempo de respuesta de la aplicación debe ser el mínimo posible. Una latencia baja es fundamental para ofrecer una experiencia de juego fluida y evitar que el usuario abandone la partida.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Seguridad</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Se debe garantizar la integridad de las partidas y la privacidad de los usuarios. El sistema debe validar todas las acciones en el servidor para impedir trampas y proteger las credenciales de los jugadores.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Transferibilidad</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Gracias al uso de contenedores Docker, la aplicación debe poder desplegarse y funcionar correctamente en cualquier sistema operativo sin requerir configuraciones complejas.</p></td>
+</tr>
+</tbody>
+</table>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
-<div class="title">Contents</div>
-<p>The top three (max five) quality goals for the architecture whose fulfillment is of highest importance to the major stakeholders.
-We really mean quality goals for the architecture. Don&#8217;t confuse them with project goals.
-They are not necessarily identical.</p>
+<div class="title">Contenido</div>
+<p>Los tres objetivos de calidad principales (máximo cinco) para la arquitectura cuyo cumplimiento es de suma importancia para las principales partes interesadas.
+Nos referimos realmente a los objetivos de calidad para la arquitectura. No los confunda con los objetivos del proyecto.
+No son necesariamente idénticos.</p>
 </div>
 <div class="paragraph">
-<p>Consider this overview of potential topics (based upon the ISO 25010 standard):</p>
+<p>Considere esta descripción general de posibles temas (basada en la norma ISO 25010):</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -644,14 +731,14 @@ They are not necessarily identical.</p>
 </div>
 </div>
 <div class="paragraph">
-<div class="title">Motivation</div>
-<p>You should know the quality goals of your most important stakeholders, since they will influence fundamental architectural decisions.
-Make sure to be very concrete about these qualities, avoid buzzwords.
-If you as an architect do not know how the quality of your work will be judged&#8230;&#8203;</p>
+<div class="title">Motivación</div>
+<p>Debes conocer los objetivos de calidad de tus partes interesadas más importantes, ya que influirán en las decisiones arquitectónicas fundamentales.
+Asegúrate de ser muy concreto sobre estas cualidades, evita las palabras de moda.
+Si tú, como arquitecto, no sabes cómo se juzgará la calidad de tu trabajo&#8230;&#8203;</p>
 </div>
 <div class="paragraph">
-<div class="title">Form</div>
-<p>A table with quality goals and concrete scenarios, ordered by priorities</p>
+<div class="title">Forma</div>
+<p>Una tabla con objetivos de calidad y escenarios concretos, ordenados por prioridades.</p>
 </div>
 </div>
 </div>
@@ -661,58 +748,132 @@ If you as an architect do not know how the quality of your work will be judged&#
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
-<div class="title">Contents</div>
-<p>Explicit overview of stakeholders of the system, i.e. all person, roles or organizations that</p>
+<div class="title">Contenido</div>
+<p>Descripción explícita de las partes interesadas del sistema, es decir, todas las personas, funciones u organizaciones que</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>should know the architecture</p>
+<p>deben conocer la arquitectura</p>
 </li>
 <li>
-<p>have to be convinced of the architecture</p>
+<p>deben estar convencidos de la arquitectura</p>
 </li>
 <li>
-<p>have to work with the architecture or with code</p>
+<p>deben trabajar con la arquitectura o con el código</p>
 </li>
 <li>
-<p>need the documentation of the architecture for their work</p>
+<p>necesitan la documentación de la arquitectura para su trabajo</p>
 </li>
 <li>
-<p>have to come up with decisions about the system or its development</p>
+<p>deben tomar decisiones sobre el sistema o su desarrollo</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<div class="title">Motivation</div>
-<p>You should know all parties involved in development of the system or affected by the system.
-Otherwise, you may get nasty surprises later in the development process.
-These stakeholders determine the extent and the level of detail of your work and its results.</p>
+<div class="title">Motivación</div>
+<p>Debe conocer a todas las partes implicadas en el desarrollo del sistema o afectadas por él.
+De lo contrario, podría encontrarse con sorpresas desagradables más adelante en el proceso de desarrollo.
+Estas partes interesadas determinan el alcance y el nivel de detalle de su trabajo y sus resultados.</p>
 </div>
 <div class="paragraph">
-<div class="title">Form</div>
-<p>Table with role names, person names, and their expectations with respect to the architecture and its documentation.</p>
+<div class="title">Formulario</div>
+<p>Tabla con nombres de roles, nombres de personas y sus expectativas con respecto a la arquitectura y su documentación.</p>
 </div>
 </div>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 20%;">
-<col style="width: 40%;">
-<col style="width: 40%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top">Role/Name</th>
-<th class="tableblock halign-left valign-top">Contact</th>
-<th class="tableblock halign-left valign-top">Expectations</th>
+<th class="tableblock halign-left valign-top">Rol</th>
+<th class="tableblock halign-left valign-top">Miembros y contacto</th>
+<th class="tableblock halign-left valign-top">Expectativa</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Prueba</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sergio González Martínez</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Nada</p></td>
+<td class="tableblock halign-left valign-top" rowspan="5"><div class="content"><div class="paragraph">
+<p><strong>Equipo de Desarrollo</strong></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>Sergio González Martínez
+<a href="mailto:uo300798@uniovi.es">uo300798@uniovi.es</a></p>
+</li>
+</ul>
+</div></div></td>
+<td class="tableblock halign-left valign-top" rowspan="5"><p class="tableblock">Desarrollar la aplicación asignada utilizando buenas prácticas, trabajar correctamente en equipo siguiendo la metodología ágil y lograr una solución basada en microservicios que sea mantenible, escalable y usable, y cumplir con los requisitos de calidad del sistema.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>Pablo Arias Fernández
+<a href="mailto:uo3000007@uniovi.es">uo3000007@uniovi.es</a></p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>Iyán Díaz Pereda
+<a href="mailto:uo3000006@uniovi.es">uo3000006@uniovi.es</a></p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>Enol de la Calle Iglesias
+<a href="mailto:uo3000888@uniovi.es">uo3000888@uniovi.es</a></p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>Iyán Álvarez Casasnovas
+<a href="mailto:uo3009006@uniovi.es">uo3009006@uniovi.es</a></p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Profesores (Product Owners)</strong></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>Jose Emilio Labra Gayo - <a href="mailto:labra@uniovi.es">labra@uniovi.es</a></p>
+</li>
+<li>
+<p>Celia Melendi Lavandera - <a href="mailto:melendicelia@uniovi.es">melendicelia@uniovi.es</a></p>
+</li>
+<li>
+<p>Diego Martín Fernández - <a href="mailto:martinfdiego@uniovi.es">martinfdiego@uniovi.es</a></p>
+</li>
+<li>
+<p>Pablo González González - <a href="mailto:gonzalezgpablo@uniovi.es">gonzalezgpablo@uniovi.es</a></p>
+</li>
+</ul>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Actuar como Product Owners definiendo los requisitos de alto nivel, proporcionar feedback al equipo y evaluar la calidad de la arquitectura, la documentación y el despliegue final en Docker.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Usuarios Finales</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jugadores de la aplicación</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Disfrutar de una buena experiencia de usuario, pudiendo jugar partidas de forma fluida, utilizar diferentes estrategias en el tablero hexagonal y consultar sus estadísticas.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1174,105 +1335,7 @@ Refer to details in the following sections.</p>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_resumen_de_la_estrategia">4.1. Resumen de la Estrategia</h3>
-<div class="paragraph">
-<p>Nuestra estrategia principal se centra en crear un entorno donde la lógica pesada del juego (rendimiento crítico) esté completamente desacoplada de la gestión de usuarios y la interfaz (experiencia de usuario).</p>
-</div>
-<div class="paragraph">
-<p>Esta separación nos permite asegurar que el cálculo intensivo del motor no afecte a la fluidez de la navegación web, y viceversa. A continuación, se detallan las decisiones tecnológicas y organizativas tomadas para cumplir este objetivo.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_decisiones_tecnológicas">4.2. Decisiones Tecnológicas</h3>
-<div class="paragraph">
-<p>Basándonos en los requisitos del proyecto, se han seleccionado las siguientes tecnologías para cubrir las necesidades de cada módulo:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Frontend:</strong></p>
-<div class="ulist">
-<ul>
-<li>
-<p><em>React:</em> Seleccionado para construir una interfaz de usuario rápida.</p>
-</li>
-<li>
-<p><em>TypeScript:</em> Se añade para incorporar tipado estático, reduciendo errores durante el desarrollo.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p><strong>Backend:</strong></p>
-<div class="ulist">
-<ul>
-<li>
-<p><em>Node.js:</em> Seleccionado como el entorno idóneo para gestionar la lógica de usuarios.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p><strong>Motor de Juego:</strong></p>
-<div class="ulist">
-<ul>
-<li>
-<p><em>Rust:</em> Elegido específicamente por su seguridad de memoria y su capacidad de ofrecer un alto rendimiento en los cálculos del juego.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p><strong>Persistencia y Datos:</strong></p>
-<div class="ulist">
-<ul>
-<li>
-<p><em>MySQL:</em> Base de datos relacional elegida para garantizar la integridad de los datos de usuarios y mantener un registro fiable de los historiales de partidas.</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_decisiones_de_organización">4.3. Decisiones de Organización</h3>
-<div class="paragraph">
-<p>Para asegurar el correcto desarrollo del proyecto, el equipo ha tomado las siguientes decisiones conjuntas respecto a la metodología y gestión:</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 25%;">
-<col style="width: 75%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Ámbito</th>
-<th class="tableblock halign-left valign-top">Decisión y Motivación</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Metodología</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Seguiremos una metodología basada en <strong>reuniones semanales</strong>. Estas sesiones se utilizarán para ponerse al día, definir objetivos a corto plazo (1 semana) y tomar las decisiones importantes o cruciales para el rumbo general del proyecto.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Gestión del Proyecto</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Usaremos <strong>GitHub</strong> como herramienta central, tanto para el control de versiones del código como para la gestión de tareas y trabajo en equipo, utilizando principalmente los <em>Issues</em>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Roles</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Hemos decidido dividirnos en <strong>subgrupos especializados</strong>, encargándose cada uno de una parte específica del proyecto (Frontend, Backend, Motor). No obstante, se mantiene la premisa de que todos los miembros deben tener un conocimiento general del proyecto completo, no solo de su parte asignada.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Comunicación</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Además de las reuniones presenciales, mantendremos una comunicación constante y fluida a través de canales digitales como <strong>WhatsApp</strong> y <strong>Discord</strong>.</p></td>
-</tr>
-</tbody>
-</table>
 <div style="page-break-after: always;"></div>
-</div>
 </div>
 </div>
 <div class="sect1">
@@ -1822,95 +1885,174 @@ when your infrastructure is more complex.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="section-concepts">8. Cross-cutting Concepts</h2>
+<h2 id="section-concepts">8. Conceptos transversales</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_conceptos_de_dominio">8.1. Conceptos de Dominio</h3>
+<div class="paragraph">
+<p>El modelo de dominio gira en torno al juego de estrategia "Y".</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Partida:</strong> La entidad central que mantiene el estado del tablero triangular, el turno actual y la validación de las reglas. Utiliza algoritmos de búsqueda para detectar si se han conectado los tres lados del tablero.</p>
+</li>
+<li>
+<p><strong>Tablero:</strong> Un tablero triangular dividio en celdas hexagonales.</p>
+</li>
+<li>
+<p><strong>Coordenadas:</strong> Debido a la naturaleza hexagonal del tablero, se utiliza un sistema de coordenadas específico para identificar cada celda y calcular adyacencias de forma eficiente.</p>
+</li>
+<li>
+<p><strong>Jugador:</strong> Puede ser un usuario humano autenticado o un Bot.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_experiencia_de_usuario_ux">8.2. Experiencia de Usuario (UX)</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Visualización del Tablero:</strong> Dado que el tablero hexagonal no es común, la interfaz debe traducir las coordenadas lógicas (x, y, z) a una posición visual en pantalla (píxeles). Se emplearán ayudas visuales para resaltar las celdas adyacentes y los movimientos válidos.</p>
+</li>
+<li>
+<p><strong>Feedback Inmediato:</strong> La interfaz bloquea visualmente acciones ilegales antes de enviarlas al servidor para mejorar la reactividad, aunque la validación final siempre reside en el backend.</p>
+</li>
+<li>
+<p><strong>Diseño Adaptable:</strong> La interfaz se adapta a diferentes tamaños de pantalla, asegurando que el tablero triangular sea jugable tanto en escritorio como en dispositivos móviles.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_seguridad">8.3. Seguridad</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Validación en el Servidor:</strong> Aunque la web avise de errores. Todas las jugadas se validan de nuevo en el servidor para evitar trampas.</p>
+</li>
+<li>
+<p><strong>Autoridad del Servidor:</strong> El frontend es solo una capa de presentación. El estado real de la partida reside en los microservicios. Esto evita que los usuarios manipulen el cliente para ganar.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_arquitectura">8.4. Arquitectura</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Microservicios:</strong> El sistema no es un único bloque, sino que está dividido en servicios independientes. Esto permite que si una parte falla o necesita cambios, no afecte a todo el sistema.</p>
+</li>
+<li>
+<p><strong>API Gateway:</strong> Para facilitar la comunicación, el cliente web (frontend) solo se conecta a una única dirección (puerta de enlace). Esta se encarga de redirigir internamente los datos al microservicio correcto, simplificando la red.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_desarrollo_y_operaciones">8.5. Desarrollo y Operaciones</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Comunicación (JSON):</strong> Todas las partes del sistema intercambian información utilizando el formato estándar JSON, lo que garantiza la compatibilidad entre el frontend y el backend.</p>
+</li>
+<li>
+<p><strong>Gestión de Errores:</strong> Se utilizan los códigos estándar de la web para indicar claramente si una acción ha funcionado o por qué ha fallado, facilitando la corrección de problemas.</p>
+</li>
+<li>
+<p><strong>Persistencia de Datos:</strong> La información crítica, como los usuarios registrados y el historial de partidas terminadas, se almacena de forma segura en una base de datos MongoDB.</p>
+</li>
+</ul>
+</div>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
-<div class="title">Content</div>
-<p>This section describes overall, principal regulations and solution ideas that are relevant in multiple parts (= cross-cutting) of your system.
-Such concepts are often related to multiple building blocks.
-They can include many different topics, such as</p>
+<div class="title">Contenido</div>
+<p>En esta sección se describen las principales normativas generales y las ideas de solución que son relevantes en múltiples partes (= transversales) de su sistema.
+Estos conceptos suelen estar relacionados con múltiples componentes básicos.
+Pueden incluir muchos temas diferentes, tales como</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>models, especially domain models</p>
+<p>modelos, especialmente modelos de dominio</p>
 </li>
 <li>
-<p>architecture or design patterns</p>
+<p>patrones de arquitectura o diseño</p>
 </li>
 <li>
-<p>rules for using specific technology</p>
+<p>reglas para el uso de tecnología específica</p>
 </li>
 <li>
-<p>principal, often technical decisions of an overarching (= cross-cutting) nature</p>
+<p>decisiones principales, a menudo de carácter técnico, de naturaleza global (= transversal)</p>
 </li>
 <li>
-<p>implementation rules</p>
+<p>reglas de implementación</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<div class="title">Motivation</div>
-<p>Concepts form the basis for <em>conceptual integrity</em> (consistency, homogeneity) of the architecture.
-Thus, they are an important contribution to achieve inner qualities of your system.</p>
+<div class="title">Motivación</div>
+<p>Los conceptos constituyen la base de la <em>integridad conceptual</em> (coherencia, homogeneidad) de la arquitectura.
+Por lo tanto, son una contribución importante para lograr las cualidades internas de su sistema.</p>
 </div>
 <div class="paragraph">
-<p>Some of these concepts cannot be assigned to individual building blocks, e.g. security or safety.</p>
+<p>Algunos de estos conceptos no pueden asignarse a bloques de construcción individuales, por ejemplo, la seguridad o la protección.</p>
 </div>
 <div class="paragraph">
-<div class="title">Form</div>
-<p>The form can be varied:</p>
+<div class="title">Formato</div>
+<p>El formato puede variar:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>concept papers with any kind of structure</p>
+<p>documentos conceptuales con cualquier tipo de estructura</p>
 </li>
 <li>
-<p>cross-cutting model excerpts or scenarios using notations of the architecture views</p>
+<p>extractos de modelos transversales o escenarios que utilicen notaciones de las vistas de la arquitectura</p>
 </li>
 <li>
-<p>sample implementations, especially for technical concepts</p>
+<p>ejemplos de implementación, especialmente para conceptos técnicos</p>
 </li>
 <li>
-<p>reference to typical usage of standard frameworks (e.g. using Hibernate for object/relational mapping)</p>
+<p>referencias al uso típico de marcos estándar (por ejemplo, el uso de Hibernate para el mapeo objeto/relacional)</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<div class="title">Structure</div>
-<p>A potential (but not mandatory) structure for this section could be:</p>
+<div class="title">Estructura</div>
+<p>Una estructura posible (pero no obligatoria) para esta sección podría ser:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Domain concepts</p>
+<p>Conceptos de dominio</p>
 </li>
 <li>
-<p>User Experience concepts (UX)</p>
+<p>Conceptos de experiencia de usuario (UX)</p>
 </li>
 <li>
-<p>Safety and security concepts</p>
+<p>Conceptos de seguridad y protección</p>
 </li>
 <li>
-<p>Architecture and design patterns</p>
+<p>Arquitectura y patrones de diseño</p>
 </li>
 <li>
-<p>"Under-the-hood"</p>
+<p>«Bajo el capó»</p>
 </li>
 <li>
-<p>development concepts</p>
+<p>Conceptos de desarrollo</p>
 </li>
 <li>
-<p>operational concepts</p>
+<p>Conceptos operativos</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>Note: it might be difficult to assign individual concepts to one specific topic
-on this list.</p>
+<p>Nota: puede resultar difícil asignar conceptos individuales a un tema específico
+de esta lista.</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -1918,30 +2060,10 @@ on this list.</p>
 </div>
 </div>
 <div class="paragraph">
-<div class="title">Further Information</div>
-<p>See <a href="https://docs.arc42.org/section-8/">Concepts</a> in the arc42 documentation.</p>
+<div class="title">Más Información</div>
+<p>Consulte <a href="https://docs.arc42.org/section-8/">Concepts</a> en la documentación de arc42.</p>
 </div>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_concept_1">8.1. <em>&lt;Concept 1&gt;</em></h3>
-<div class="paragraph">
-<p><em>&lt;explanation&gt;</em></p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_concept_2">8.2. <em>&lt;Concept 2&gt;</em></h3>
-<div class="paragraph">
-<p><em>&lt;explanation&gt;</em></p>
-</div>
-<div class="paragraph">
-<p>&#8230;&#8203;</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_concept_n">8.3. <em>&lt;Concept n&gt;</em></h3>
-<div class="paragraph">
-<p><em>&lt;explanation&gt;</em></p>
 </div>
 <div style="page-break-after: always;"></div>
 </div>
@@ -1994,16 +2116,7 @@ There you will find links and examples about ADR.</p>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_introducción">9.1. Introducción</h3>
-<div class="paragraph">
-<p>En esta sección documentamos las decisiones arquitectónicas significativas que darán forma a la estructura, el despliegue y la tecnología del sistema YOVI. Estas decisiones se tomarán considerando los requisitos no funcionales, las restricciones del proyecto y la experiencia del equipo de desarrollo.</p>
-</div>
-<div class="paragraph">
-<p>El objetivo de este registro es proporcionar trazabilidad y justificación sobre por qué se eligieron ciertas soluciones frente a otras alternativas disponibles, utilizando el formato de registros de decisión (ADR).</p>
-</div>
 <div style="page-break-after: always;"></div>
-</div>
 </div>
 </div>
 <div class="sect1">
@@ -2032,26 +2145,7 @@ concrete and measurable.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_introducción_2">10.1. Introducción</h3>
-<div class="paragraph">
-<p>El objetivo principal de esta sección es definir las metas de calidad que el sistema YOVI debe cumplir para asegurar una experiencia de usuario satisfactoria. Mientras que los requisitos funcionales describen qué hace el sistema, los requerimientos de calidad describen cómo de bien debe funcionar bajo condiciones específicas.</p>
-</div>
-<div class="paragraph">
-<p>Para estructurar estas metas, utilizamos las herramientas detalladas en los siguientes apartados:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Árbol de Calidad:</strong> Una representación jerárquica que desglosa los atributos de calidad de alto nivel.</p>
-</li>
-<li>
-<p><strong>Escenarios de Calidad:</strong> Descripciones detalladas que permiten evaluar si el sistema cumple con las expectativas de los stakeholders.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_quality_tree">10.2. Quality Tree</h3>
+<h3 id="_quality_tree">10.1. Quality Tree</h3>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
@@ -2083,7 +2177,7 @@ concrete and measurable.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_quality_scenarios">10.3. Quality Scenarios</h3>
+<h3 id="_quality_scenarios">10.2. Quality Scenarios</h3>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
@@ -2276,7 +2370,7 @@ more precisely down to a level of scenarios that can be discussed and evaluated.
 <div id="footer">
 <div id="footer-text">
 Version 8.2 EN<br>
-Last updated 2026-02-15 13:48:11 +0100
+Last updated 2026-02-11 18:10:17 +0100
 </div>
 </div>
 </body>
