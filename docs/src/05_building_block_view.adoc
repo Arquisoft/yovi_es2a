@@ -1,87 +1,19 @@
 ifndef::imagesdir[:imagesdir: ../images]
 
 [[section-building-block-view]]
-
-
-== Building Block View
-
-ifdef::arc42help[]
-[role="arc42help"]
-****
-.Content
-The building block view shows the static decomposition of the system into building blocks (modules, components, subsystems, classes, interfaces, packages, libraries, frameworks, layers, partitions, tiers, functions, macros, operations, data structures, ...) as well as their dependencies (relationships, associations, ...)
-
-This view is mandatory for every architecture documentation.
-In analogy to a house this is the _floor plan_.
-
-.Motivation
-Maintain an overview of your source code by making its structure understandable through
-abstraction.
-
-This allows you to communicate with your stakeholder on an abstract level without disclosing implementation details.
-
-.Form
-The building block view is a hierarchical collection of black boxes and white boxes
-(see figure below) and their descriptions.
-
-image::05_building_blocks-EN.png["Hierarchy of building blocks"]
-
-*Level 1* is the white box description of the overall system together with black
-box descriptions of all contained building blocks.
-
-*Level 2* zooms into some building blocks of level 1.
-Thus it contains the white box description of selected building blocks of level 1, together with black box descriptions of their internal building blocks.
-
-*Level 3* zooms into selected building blocks of level 2, and so on.
-
-
-.Further Information
-
-See https://docs.arc42.org/section-5/[Building Block View] in the arc42 documentation.
-
-****
-endif::arc42help[]
-
-=== Whitebox Overall System
-
-ifdef::arc42help[]
-[role="arc42help"]
-****
-Here you describe the decomposition of the overall system using the following white box template. It contains
-
- * an overview diagram
- * a motivation for the decomposition
- * black box descriptions of the contained building blocks. For these we offer you alternatives:
-
-   ** use _one_ table for a short and pragmatic overview of all contained building blocks and their interfaces
-   ** use a list of black box descriptions of the building blocks according to the black box template (see below).
-   Depending on your choice of tool this list could be sub-chapters (in text files), sub-pages (in a Wiki) or nested elements (in a modeling tool).
-
-
- * (optional:) important interfaces, that are not explained in the black box templates of a building block, but are very important for understanding the white box.
-Since there are so many ways to specify interfaces why do not provide a specific template for them.
- In the worst case you have to specify and describe syntax, semantics, protocols, error handling,
- restrictions, versions, qualities, necessary compatibilities and many things more.
-In the best case you will get away with examples or simple signatures.
-
-****
-endif::arc42help[]
-ifndef::imagesdir[:imagesdir: ../images]
-
-[[section-building-block-view]]
 == Vista de Bloques
 
 ifdef::arc42help[]
 [role="arc42help"]
-****
+
 .Contenido
-La vista de bloques muestra la descomposición estática del sistema...
-****
+La vista de bloques muestra la descomposición estática del sistema en bloques de construcción así como sus dependencias.
+
 endif::arc42help[]
 
 === Sistema General de Caja Blanca (Nivel 1)
 
-En este nivel se presenta la descomposición de más alto nivel del sistema **Yovi**, mostrando cómo interactúa con los usuarios y los sistemas externos.
+En este nivel se presenta la descomposición de más alto nivel del sistema Yovi, mostrando cómo interactúa con los usuarios y los sistemas externos.
 
 [plantuml, target=diagrama-contexto, format=svg]
 ....
@@ -89,44 +21,45 @@ En este nivel se presenta la descomposición de más alto nivel del sistema **Yo
 actor "Jugador Humano" as User
 actor "Bot Externo" as Bot
 component "Sistema Yovi" as System
-database "MySQL" as DB
+database "MongoDB" as DB
 
 User --> System : HTTPS (Navegador)
 Bot --> System : API REST
-System --> DB : JDBC/SQL
+System --> DB : Protocolo NoSQL
 @enduml
 ....
 
 ==== Motivación
-
 El sistema Yovi está diseñado para permitir la gestión y ejecución de partidas del juego "Y" en un entorno web. La arquitectura debe soportar concurrencia y dos tipos de actores principales:
-* **Usuarios Humanos:** Que requieren una interfaz gráfica interactiva.
-* **Bots:** Que requieren una API para automatizar el juego.
+
+Usuarios Humanos: Que requieren una interfaz gráfica interactiva.
+
+Bots: Que requieren una API para automatizar el juego.
 
 ==== Bloques de construcción contenidos
 
 [cols="1,2" options="header"]
 |===
-| **Nombre** | **Responsabilidad**
-| **Sistema Yovi** | El núcleo del proyecto. Es la caja negra que contiene toda la lógica de presentación, negocio y reglas del juego.
-| **Usuario (Actor)** | Jugador humano que interactúa con el sistema a través de un navegador web moderno.
-| **Bot Externo (Actor)** | Sistema automatizado (desarrollado por terceros o interno) que consume la API pública para jugar partidas contra la máquina o contra humanos.
-| **Base de Datos (MySQL)** | Sistema externo encargado de la persistencia de usuarios, historiales de partidas, rankings y estadísticas.
+| Nombre | Responsabilidad
+| Sistema Yovi | El núcleo del proyecto. Es la caja negra que contiene toda la lógica de presentación, negocio y reglas del juego.
+| Usuario (Actor) | Jugador humano que interactúa con el sistema a través de un navegador web moderno.
+| Bot Externo (Actor) | Sistema automatizado que consume la API pública para jugar partidas contra la máquina o contra humanos.
+| Base de Datos (MongoDB) | Sistema externo encargado de la persistencia de usuarios, historiales de partidas, rankings y estadísticas. Base de datos no relacional.
 |===
 
 ==== Interfaces Importantes
 
-* **Interfaz Web (HTTPS):** Acceso para usuarios humanos.
-* **API Pública (REST/JSON):** Acceso programático para los bots.
+Interfaz Web (HTTPS): Acceso para usuarios humanos.
 
+API Pública (REST/JSON): Acceso programático para los bots y comunicación interna.
 
-=== Nivel 2 (Zoom en Sistema Yovi)
+=== Nivel 2
 
 ifdef::arc42help[]
 [role="arc42help"]
-****
+
 Aquí se especifica la estructura interna del bloque principal "Sistema Yovi".
-****
+
 endif::arc42help[]
 
 ==== Caja Blanca: Sistema Yovi
@@ -145,40 +78,48 @@ Back --> Engine : Llamadas a funciones
 @enduml
 ....
 
-**Motivación:**
+Motivación:
 Se ha optado por una arquitectura cliente-servidor desacoplada para permitir que la interfaz web evolucione independientemente de la lógica y para facilitar la integración de los bots directamente contra el Backend.
 
-**Bloques de construcción contenidos:**
+Bloques de construcción contenidos:
 
 [cols="1,2" options="header"]
 |===
-| **Nombre** | **Responsabilidad**
-| **Frontend Web** | Aplicación de Página Única (SPA). Renderiza el tablero de juego, gestiona la interacción del usuario y comunica las acciones al Backend.
-| **Backend API** | Servidor de aplicaciones. Gestiona la autenticación, el matchmaking (emparejamiento), la persistencia de datos y orquesta el flujo de la partida.
-| **Motor de Juego (Game Engine)** | Librería o módulo puro. Contiene estrictamente las reglas del juego "Y", validación de movimientos y detección de victoria/derrota. No tiene estado ni acceso a BD.
+| Nombre | Responsabilidad
+| Frontend Web | Aplicación de Página Única (SPA). Renderiza el tablero de juego y gestiona la interacción del usuario.
+| Backend API | Servidor de aplicaciones. Gestiona la autenticación, matchmaking, persistencia y orquesta el flujo de la partida.
+| Motor de Juego (Game Engine) | Librería o módulo puro. Contiene estrictamente las reglas del juego "Y", validación de movimientos y detección de victoria.
 |===
 
 ==== Frontend Web
-* **Propósito:** Proveer una interfaz visual amigable para los jugadores humanos.
-* **Interfaces:** Consume la API REST del Backend y utiliza WebSockets para actualizaciones de la partida en tiempo real.
-* **Tecnología:** HTML5/JS (Framework tipo React/Angular/Vue).
+
+Propósito: Proveer una interfaz visual amigable para los jugadores humanos.
+
+Interfaces: Consume la API REST del Backend y utiliza WebSockets para actualizaciones en tiempo real.
+
+Tecnología: HTML5/JS (React/Angular/Vue).
 
 ==== Backend API
-* **Propósito:** Centralizar la lógica de negocio y seguridad. Actúa como intermediario entre los actores, la base de datos y el motor de reglas.
-* **Interfaces:** Expone endpoints REST para gestión de usuarios y WebSockets para el gameplay.
-* **Tecnología:** Java Spring Boot / Node.js / Python (según implementación).
+
+Propósito: Centralizar la lógica de negocio y seguridad. Actúa como intermediario entre los actores, la base de datos y el motor de reglas.
+
+Interfaces: Expone endpoints REST y WebSockets para el gameplay.
+
+Tecnología: Node.js / Java Spring Boot.
 
 ==== Motor de Juego (Game Engine)
-* **Propósito:** Encapsular la complejidad algorítmica del juego "Y". Asegura que las reglas se cumplan rigurosamente.
-* **Características:** Debe ser determinista y testeable unitariamente.
 
-=== Nivel 3 (Zoom en Backend API)
+Propósito: Encapsular la complejidad algorítmica del juego "Y". Asegura que las reglas se cumplan rigurosamente.
+
+Características: Módulo independiente, testeable unitariamente y sin estado.
+
+=== Nivel 3
 
 ifdef::arc42help[]
 [role="arc42help"]
-****
-Aquí especificamos la estructura interna del Backend, ya que es el componente más complejo del sistema.
-****
+
+Aquí especificamos la estructura interna del Backend API, detallando sus componentes internos.
+
 endif::arc42help[]
 
 ==== Caja Blanca: Backend API
@@ -189,37 +130,41 @@ El Backend se organiza siguiendo un patrón de capas (Controller - Service - Rep
 ....
 @startuml
 package "Backend API" {
-  [Game Controller] --> [Matchmaking Service]
-  [Game Controller] --> [Game Service]
-  [User Controller] --> [User Service]
-  
-  [Game Service] ..> [Motor de Juego] : usa
-  [Matchmaking Service] --> [Game Service] : inicia
-  
-  [Game Service] --> [Persistence Layer]
-  [User Service] --> [Persistence Layer]
+[Game Controller] --> [Matchmaking Service]
+[Game Controller] --> [Game Service]
+[User Controller] --> [User Service]
+
+[Game Service] ..> [Motor de Juego] : usa
+[Matchmaking Service] --> [Game Service] : inicia
+
+[Game Service] --> [Persistence Layer]
+[User Service] --> [Persistence Layer]
 }
 @enduml
 ....
 
-**Bloques de construcción contenidos:**
+Bloques de construcción contenidos:
 
 [cols="1,2" options="header"]
 |===
-| **Nombre** | **Responsabilidad**
-| **Game Controller** | Gestiona las peticiones HTTP/Socket relacionadas con los movimientos de la partida.
-| **User Controller** | Gestiona el registro, login y perfil de usuario.
-| **Matchmaking Service** | Lógica para emparejar jugadores en espera o asignar un Bot si no hay humanos disponibles.
-| **Game Service** | Orquestador de la partida. Mantiene el estado actual de la partida en memoria, llama al *Motor de Juego* para validar movimientos y actualiza la persistencia.
-| **Persistence Layer** | Capa de abstracción (DAO/Repository) para comunicar con la base de datos MySQL.
+| Nombre | Responsabilidad
+| Game Controller | Gestiona las peticiones de red (HTTP/Sockets) relacionadas con el juego.
+| User Controller | Gestiona el registro, login y perfil de usuario.
+| Matchmaking Service | Lógica para emparejar jugadores en espera o asignar un Bot si es necesario.
+| Game Service | Orquestador de la partida. Mantiene el estado en memoria y valida movimientos con el Motor de Juego.
+| Persistence Layer | Capa de abstracción (DAO/Repository) para comunicar con MongoDB.
 |===
 
 ==== Game Service
-* **Propósito:** Es el cerebro de la ejecución. Recibe un intento de movimiento, pregunta al *Motor de Juego* si es válido, y si lo es, actualiza el estado y notifica a los jugadores.
-* **Colaboradores:** Motor de Juego, Persistence Layer.
+
+Propósito: Cerebro de la ejecución. Recibe intentos de movimiento, consulta validez al motor, actualiza el estado y notifica a los jugadores.
+
+Colaboradores: Motor de Juego, Persistence Layer.
 
 ==== Matchmaking Service
-* **Propósito:** Gestionar una cola de jugadores. Cuando hay suficientes jugadores para una partida de "Y", instancia un nuevo juego a través del Game Service.
+
+Propósito: Gestionar la cola de jugadores. Instancia nuevos juegos a través del Game Service cuando se cumplen las condiciones de emparejamiento.
 
 ==== Persistence Layer
-* **Propósito:** Aislar las consultas SQL del resto de la lógica de negocio.
+
+Propósito: Aislar las consultas y el mapeo de datos de MongoDB del resto de la lógica de negocio.
