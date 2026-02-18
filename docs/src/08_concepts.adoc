@@ -1,74 +1,92 @@
 ifndef::imagesdir[:imagesdir: ../images]
 
 [[section-concepts]]
-== Cross-cutting Concepts
+== Conceptos transversales
 
+
+=== Conceptos de Dominio
+
+El modelo de dominio gira en torno al juego de estrategia "Y".
+
+* **Partida:** La entidad central que mantiene el estado del tablero triangular, el turno actual y la validación de las reglas. Utiliza algoritmos de búsqueda para detectar si se han conectado los tres lados del tablero.
+* **Tablero:** Un tablero triangular dividio en celdas hexagonales.
+* **Coordenadas:** Debido a la naturaleza hexagonal del tablero, se utiliza un sistema de coordenadas específico para identificar cada celda y calcular adyacencias de forma eficiente.
+* **Jugador:** Puede ser un usuario humano autenticado o un Bot.
+
+
+
+=== Experiencia de Usuario (UX)
+
+* **Visualización del Tablero:** Dado que el tablero hexagonal no es común, la interfaz debe traducir las coordenadas lógicas (x, y, z) a una posición visual en pantalla (píxeles). Se emplearán ayudas visuales para resaltar las celdas adyacentes y los movimientos válidos.
+* **Feedback Inmediato:** La interfaz bloquea visualmente acciones ilegales antes de enviarlas al servidor para mejorar la reactividad, aunque la validación final siempre reside en el backend.
+* **Diseño Adaptable:** La interfaz se adapta a diferentes tamaños de pantalla, asegurando que el tablero triangular sea jugable tanto en escritorio como en dispositivos móviles.
+
+=== Seguridad
+
+* **Validación en el Servidor:** Aunque la web avise de errores. Todas las jugadas se validan de nuevo en el servidor para evitar trampas.
+* **Autoridad del Servidor:** El frontend es solo una capa de presentación. El estado real de la partida reside en los microservicios. Esto evita que los usuarios manipulen el cliente para ganar.
+
+=== Arquitectura
+
+* **Microservicios:** El sistema no es un único bloque, sino que está dividido en servicios independientes. Esto permite que si una parte falla o necesita cambios, no afecte a todo el sistema.
+* **API Gateway:** Para facilitar la comunicación, el cliente web (frontend) solo se conecta a una única dirección (puerta de enlace). Esta se encarga de redirigir internamente los datos al microservicio correcto, simplificando la red.
+
+=== Desarrollo y Operaciones
+
+* **Comunicación (JSON):** Todas las partes del sistema intercambian información utilizando el formato estándar JSON, lo que garantiza la compatibilidad entre el frontend y el backend.
+* **Gestión de Errores:** Se utilizan los códigos estándar de la web para indicar claramente si una acción ha funcionado o por qué ha fallado, facilitando la corrección de problemas.
+* **Persistencia de Datos:** La información crítica, como los usuarios registrados y el historial de partidas terminadas, se almacena de forma segura en una base de datos MongoDB.
 
 ifdef::arc42help[]
 [role="arc42help"]
 ****
-.Content
-This section describes overall, principal regulations and solution ideas that are relevant in multiple parts (= cross-cutting) of your system.
-Such concepts are often related to multiple building blocks.
-They can include many different topics, such as
+.Contenido
+En esta sección se describen las principales normativas generales y las ideas de solución que son relevantes en múltiples partes (= transversales) de su sistema.
+Estos conceptos suelen estar relacionados con múltiples componentes básicos.
+Pueden incluir muchos temas diferentes, tales como
 
-* models, especially domain models
-* architecture or design patterns
-* rules for using specific technology
-* principal, often technical decisions of an overarching (= cross-cutting) nature
-* implementation rules
-
-
-.Motivation
-Concepts form the basis for _conceptual integrity_ (consistency, homogeneity) of the architecture. 
-Thus, they are an important contribution to achieve inner qualities of your system.
-
-Some of these concepts cannot be assigned to individual building blocks, e.g. security or safety. 
+* modelos, especialmente modelos de dominio
+* patrones de arquitectura o diseño
+* reglas para el uso de tecnología específica
+* decisiones principales, a menudo de carácter técnico, de naturaleza global (= transversal)
+* reglas de implementación
 
 
-.Form
-The form can be varied:
+.Motivación
+Los conceptos constituyen la base de la _integridad conceptual_ (coherencia, homogeneidad) de la arquitectura. 
+Por lo tanto, son una contribución importante para lograr las cualidades internas de su sistema.
 
-* concept papers with any kind of structure
-* cross-cutting model excerpts or scenarios using notations of the architecture views
-* sample implementations, especially for technical concepts
-* reference to typical usage of standard frameworks (e.g. using Hibernate for object/relational mapping)
+Algunos de estos conceptos no pueden asignarse a bloques de construcción individuales, por ejemplo, la seguridad o la protección.
 
-.Structure
-A potential (but not mandatory) structure for this section could be:
+.Formato
+El formato puede variar:
 
-* Domain concepts
-* User Experience concepts (UX)
-* Safety and security concepts
-* Architecture and design patterns
-* "Under-the-hood"
-* development concepts
-* operational concepts
+* documentos conceptuales con cualquier tipo de estructura
+* extractos de modelos transversales o escenarios que utilicen notaciones de las vistas de la arquitectura
+* ejemplos de implementación, especialmente para conceptos técnicos
+* referencias al uso típico de marcos estándar (por ejemplo, el uso de Hibernate para el mapeo objeto/relacional)
 
-Note: it might be difficult to assign individual concepts to one specific topic
-on this list.
+.Estructura
+Una estructura posible (pero no obligatoria) para esta sección podría ser:
+
+* Conceptos de dominio
+* Conceptos de experiencia de usuario (UX)
+* Conceptos de seguridad y protección
+* Arquitectura y patrones de diseño
+* «Bajo el capó»
+* Conceptos de desarrollo
+* Conceptos operativos
+
+Nota: puede resultar difícil asignar conceptos individuales a un tema específico
+de esta lista.
 
 image::08-concepts-EN.drawio.png["Possible topics for crosscutting concepts"]
 
 
-.Further Information
+.Más Información
 
-See https://docs.arc42.org/section-8/[Concepts] in the arc42 documentation.
+Consulte https://docs.arc42.org/section-8/[Concepts] en la documentación de arc42.
 ****
 endif::arc42help[]
 
-=== _<Concept 1>_
 
-_<explanation>_
-
-
-
-=== _<Concept 2>_
-
-_<explanation>_
-
-...
-
-=== _<Concept n>_
-
-_<explanation>_

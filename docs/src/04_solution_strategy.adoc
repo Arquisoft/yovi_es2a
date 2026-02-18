@@ -54,7 +54,7 @@ Basándonos en los requisitos del proyecto, se han seleccionado las siguientes t
 ** _Rust:_ Elegido específicamente por su seguridad de memoria y su capacidad de ofrecer un alto rendimiento en los cálculos del juego.
 
 * **Persistencia y Datos:**
-** _MySQL:_ Base de datos relacional elegida para garantizar la integridad de los datos de usuarios y mantener un registro fiable de los historiales de partidas.
+** _MongoDB:_ Base de datos no relacional elegida para garantizar la integridad de los datos de usuarios y mantener un registro fiable de los historiales de partidas.
 
 === Decisiones de Organización
 
