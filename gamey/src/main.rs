@@ -22,7 +22,7 @@
 use clap::Parser;
 use gamey::{self, CliArgs, Mode, run_bot_server, run_cli_game};
 use tracing_subscriber::prelude::*;
-
+mod database;
 /// Main entry point for the GameY application.
 ///
 /// Parses command-line arguments and runs either the CLI game or the HTTP server
@@ -31,6 +31,8 @@ use tracing_subscriber::prelude::*;
 async fn main() {
     tracing_subscriber::registry().init();
     let args = CliArgs::parse();
+
+    let _client = database::db::init_db().await;
 
     if args.mode == Mode::Server {
         if let Err(e) = run_bot_server(args.port).await {
