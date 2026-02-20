@@ -1,23 +1,22 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import request from 'supertest'
 
-vi.mock('../src/models/User.js', () => {  // <-- ruta relativa al test
+vi.mock('../src/models/User.js', () => {
     const mockSave = vi.fn().mockResolvedValue(true);
-    const MockUser = vi.fn().mockImplementation(() => ({ save: mockSave }));
+    function MockUser() {
+        this.save = mockSave;
+    }
     return { default: MockUser };
 });
 
 vi.mock('mongoose', async () => {
+    function Schema() {}
     return {
         default: {
-            Schema: class Schema {
-                constructor() {}
-            },
-            model: vi.fn().mockReturnValue(
-                vi.fn().mockImplementation(() => ({
-                    save: vi.fn().mockResolvedValue(true)
-                }))
-            ),
+            Schema,
+            model: vi.fn().mockReturnValue(function MockModel() {
+                this.save = vi.fn().mockResolvedValue(true);
+            }),
             connect: vi.fn().mockResolvedValue(true),
         }
     }
