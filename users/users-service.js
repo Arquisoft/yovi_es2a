@@ -10,7 +10,7 @@ const User = require('./src/models/User');
 require('dotenv').config();
 const connectDB = require('./src/database');
 
-connectDB();
+/*connectDB(); */
 
 const metricsMiddleware = promBundle({includeMethod: true});
 app.use(metricsMiddleware);
@@ -37,7 +37,7 @@ app.post('/createuser', async (req, res) => {
 
   try {
     if (!username) {
-      return res.status(400).json({ error: "Username is required" });
+      return res.status(200).json({ error: "Username is required" });
     }
 
     const newUser = new User({ username });

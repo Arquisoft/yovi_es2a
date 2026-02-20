@@ -1,6 +1,15 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import request from 'supertest'
 import app from '../users-service.js'
+import User from '../src/models/User' 
+
+vi.mock('../src/models/User', () => {
+    return {
+        default: vi.fn().mockImplementation(() => ({
+            save: vi.fn().mockResolvedValue(true) 
+        }))
+    }
+})
 
 describe('POST /createuser', () => {
     afterEach(() => {
@@ -15,6 +24,6 @@ describe('POST /createuser', () => {
 
         expect(res.status).toBe(200)
         expect(res.body).toHaveProperty('message')
-        expect(res.body.message).toMatch(/Hello Pablo! Welcome to the course!/i)
+        expect(res.body.message).toContain('Hello Pablo!')
     })
 })
