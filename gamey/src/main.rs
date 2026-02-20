@@ -32,7 +32,10 @@ async fn main() {
     tracing_subscriber::registry().init();
     let args = CliArgs::parse();
 
-    let _client = database::db::init_db().await;
+    let client = database::db::init_db().await;
+
+    //Esto es de prueba
+    //database::db::registrar_usuario(&client, "Sergio_Test").await;
 
     if args.mode == Mode::Server {
         if let Err(e) = run_bot_server(args.port).await {

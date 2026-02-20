@@ -1,6 +1,7 @@
 use mongodb::{Client, options::ClientOptions, bson::doc};
 use std::env;
 use dotenv::dotenv;
+use mongodb::bson::Document;
 
 pub async fn init_db() -> Client {
     dotenv().ok();
@@ -23,4 +24,19 @@ pub async fn init_db() -> Client {
     println!("Conexión a MongoDB establecida con éxito.");
 
     client
+}
+
+pub async fn registrar_usuario(client: &Client, nombre_usuario: &str) {
+    let collection = client.database("yovi_es2a").collection::<Document>("usuarios");
+
+    let nuevo_usuario = doc! {
+        "username": nombre_usuario,
+        "partidas_jugadas": 0,
+        "partidas_ganadas": 0
+    };
+
+    match collection.insert_one(nuevo_usuario, None).await {
+        Ok(_) => println!("Usuario '{}' guardado correctamente en Atlas.", nombre_usuario),
+        Err(e) => println!("Error al guardar el usuario: {}", e),
+    }
 }
