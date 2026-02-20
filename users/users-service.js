@@ -1,18 +1,19 @@
-const express = require('express');
+import express from 'express';
+import swaggerUi from 'swagger-ui-express';
+import fs from 'node:fs';
+import YAML from 'js-yaml';
+import promBundle from 'express-prom-bundle';
+import User from './src/models/User.js';
+import dotenv from 'dotenv';
+import { createRequire } from 'module';
+import { fileURLToPath } from 'url';
+
+dotenv.config();
+
 const app = express();
 const port = 3000;
-const swaggerUi = require('swagger-ui-express');
-const fs = require('node:fs');
-const YAML = require('js-yaml');
-const promBundle = require('express-prom-bundle');
-const User = require('./src/models/User');
 
-require('dotenv').config();
-const connectDB = require('./src/database');
-
-/*connectDB(); */
-
-const metricsMiddleware = promBundle({includeMethod: true});
+const metricsMiddleware = promBundle({ includeMethod: true });
 app.use(metricsMiddleware);
 
 try {
@@ -53,11 +54,12 @@ app.post('/createuser', async (req, res) => {
   }
 });
 
-
-if (require.main === module) {
+// ESM equivalent of require.main === module
+const __filename = fileURLToPath(import.meta.url);
+if (process.argv[1] === __filename) {
   app.listen(port, () => {
     console.log(`User Service listening at http://localhost:${port}`)
-  })
+  });
 }
 
-export default app
+export default app;
