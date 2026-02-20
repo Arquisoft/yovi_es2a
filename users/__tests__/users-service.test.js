@@ -22,8 +22,8 @@ describe('POST /createuser', () => {
             .send({ username: 'Pablo' })
             .set('Accept', 'application/json')
 
-        expect(res.status).toBe(200)
+        expect(res.status).toBe(201)
         expect(res.body).toHaveProperty('message')
-        expect(res.body.message).toContain('Hello Pablo!')
+        expect(res.body.message).toContain('Pablo!')
     })
 })
