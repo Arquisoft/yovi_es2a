@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import request from 'supertest'
 
-vi.mock('./src/models/User.js', () => {
+vi.mock('../src/models/User.js', () => {  // <-- ruta relativa al test
     const mockSave = vi.fn().mockResolvedValue(true);
     const MockUser = vi.fn().mockImplementation(() => ({ save: mockSave }));
     return { default: MockUser };
