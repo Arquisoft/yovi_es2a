@@ -13,6 +13,13 @@ dotenv.config();
 const app = express();
 const port = 3000;
 
+if (process.env.NODE_ENV === 'test') {
+  app.delete('/testing/deleteuser/:username', async (req, res) => {
+    await User.deleteOne({ username: req.params.username });
+    res.status(200).json({ message: 'User deleted' });
+  });
+}
+
 const metricsMiddleware = promBundle({ includeMethod: true });
 app.use(metricsMiddleware);
 
@@ -45,7 +52,7 @@ app.post('/createuser', async (req, res) => {
     await newUser.save();
 
     res.status(201).json({
-      message: `User ${username} created successfully`,
+      message: `Hello ${username}!`,
       user: newUser
     });
 

@@ -11,7 +11,11 @@ class CustomWorld {
 setWorldConstructor(CustomWorld)
 
 Before(async function () {
-  // Allow turning off headless mode and enabling slow motion/devtools via env vars
+  try {
+    await fetch('http://localhost:3000/testing/deleteuser/Alice', { method: 'DELETE' });
+  } catch (e) {
+  }
+
   const headless = true
   const slowMo = 0
   const devtools = false
