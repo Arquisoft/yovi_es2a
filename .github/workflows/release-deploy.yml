@@ -1,5 +1,6 @@
 name: Release — Test, Build, Publish, Deploy
 
+
 on:
   release:
     types: [published]
@@ -56,6 +57,11 @@ jobs:
     name: Run E2E tests
     runs-on: ubuntu-latest
     needs: [test-node, test-rust]
+    services:
+      mongodb:
+        image: mongo:6
+        ports:
+          - 27017:27017
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -79,6 +85,8 @@ jobs:
         run: |
           cd webapp
           npm run test:e2e
+        env:
+          MONGODB_STRING: mongodb://localhost:27017/test
 
   docker-push-users:
     name: Publish users image
