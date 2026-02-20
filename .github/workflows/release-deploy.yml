@@ -161,6 +161,8 @@ jobs:
           user: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_KEY }}
           command: |
+            echo "DEPLOY_HOST=${{ secrets.DEPLOY_HOST }}" > .env
+            echo "MONGODB_STRING=${{ secrets.MONGODB_STRING }}" >> users_env.env
             wget https://raw.githubusercontent.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/master/docker-compose.yml -O docker-compose.yml
             docker compose down
             docker compose up -d --pull always

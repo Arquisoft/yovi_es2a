@@ -1,12 +1,11 @@
 services:
   users:
-    build: ./users
-    container_name: users
     image: ghcr.io/arquisoft/yovi_es2a-users:latest
+    container_name: users
     ports:
       - "3000:3000"
     env_file:
-      - ./users/.env
+      - ./users_env.env
     networks:
       - monitor-net
 
