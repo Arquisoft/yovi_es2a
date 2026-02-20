@@ -31,8 +31,6 @@ pub async fn registrar_usuario(client: &Client, nombre_usuario: &str) {
 
     let nuevo_usuario = doc! {
         "username": nombre_usuario,
-        "partidas_jugadas": 0,
-        "partidas_ganadas": 0
     };
 
     match collection.insert_one(nuevo_usuario, None).await {
