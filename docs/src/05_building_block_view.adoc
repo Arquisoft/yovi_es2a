@@ -1,7 +1,7 @@
 ifndef::imagesdir[:imagesdir: ../images]
 
 [[section-building-block-view]]
-== Vista de Bloques
+== Vista de Bloques de Construcción
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -155,16 +155,16 @@ Bloques de construcción contenidos:
 | Persistence Layer | Capa de abstracción (DAO/Repository) para comunicar con MongoDB.
 |===
 
-==== Game Service
+==== Servicio de Juego
 
 Propósito: Cerebro de la ejecución. Recibe intentos de movimiento, consulta validez al motor, actualiza el estado y notifica a los jugadores.
 
 Colaboradores: Motor de Juego, Persistence Layer.
 
-==== Matchmaking Service
+==== Servicio de Emparejamiento (Matchmaking)
 
 Propósito: Gestionar la cola de jugadores. Instancia nuevos juegos a través del Game Service cuando se cumplen las condiciones de emparejamiento.
 
-==== Persistence Layer
+==== Capa de Persistencia
 
 Propósito: Aislar las consultas y el mapeo de datos de MongoDB del resto de la lógica de negocio.
