@@ -1,7 +1,7 @@
 ifndef::imagesdir[:imagesdir: ../images]
 
 [[section-context-and-scope]]
-== Context and Scope
+== Contexto y Alcance
 
 
 ifdef::arc42help[]
@@ -30,7 +30,7 @@ See https://docs.arc42.org/section-3/[Context and Scope] in the arc42 documentat
 ****
 endif::arc42help[]
 
-=== Business Context
+=== Contexto de negocio
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -80,7 +80,7 @@ a|
     * Información de partidas
 |===
 
-=== Technical Context
+=== Contexto Técnico
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -106,7 +106,7 @@ endif::arc42help[]
 | Consulta de usuarios | Información de usuarios | JSON / HTTPS
 |===
 
-.Web Interface (Jugadores, HTTPS)
+.Interfaz Web (Jugadores, HTTPS)
 |===
 | Input al sistema | Output del sistema | Formato / Canal
 | Registro de usuario | Confirmación de registro | HTML / JSON / HTTPS
@@ -122,7 +122,7 @@ endif::arc42help[]
 * Funciones principales: gestión de usuarios e historicos y pruebas de partidas entre bots (método play).
 * Notación YEN: usada para intercambiar posiciones y movimientos del juego Y.
 
-.**Web Interface (Jugadores)**
+.**Interfaz Web (Jugadores)**
 
 * Protocolo: HTTPS, HTML y JSON.
 * Soporta la interacción directa de los usuarios con el frontend web.

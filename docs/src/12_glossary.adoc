@@ -1,7 +1,7 @@
 ifndef::imagesdir[:imagesdir: ../images]
 
 [[section-glossary]]
-== Glossary
+== Glosario
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -36,9 +36,27 @@ endif::arc42help[]
 |===
 |Term |Definition
 
-|<Term-1>
-|<definition-1>
+| Backend API
+| Servicio que centraliza la lógica de negocio, autenticación, gestión de partidas y comunicación con el motor de juego.
 
-|<Term-2>
-|<definition-2>
+| Notación YEN
+| Formato estructurado utilizado para representar posiciones y movimientos del juego Y en la comunicación entre sistemas.
+
+| JSON (JavaScript Object Notation)
+| Formato ligero de intercambio de datos utilizado para la comunicación entre frontend, backend y bots a través de la API REST.
+
+| WebSocket
+| Protocolo de comunicación bidireccional en tiempo real utilizado para actualizar el estado de la partida sin recargar la página.
+
+| HTTPS
+| Protocolo seguro de comunicación utilizado para proteger la transmisión de datos entre clientes y servidores.
+
+| Microservicio
+| Servicio independiente que implementa una funcionalidad específica y puede desplegarse de forma autónoma.
+
+| Docker
+| Plataforma de contenedorización utilizada para empaquetar y desplegar los componentes del sistema de forma portable.
+
+| ADR (Architecture Decision Record)
+| Documento que registra decisiones arquitectónicas relevantes junto con su justificación.
 |===
