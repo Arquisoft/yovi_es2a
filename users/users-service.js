@@ -23,7 +23,9 @@ connectDB();
 //E2E, evitando errores de duplicado en la base de datos
 if (process.env.NODE_ENV === 'test') {
   app.delete('/testing/deleteuser/:username', async (req, res) => {
-    await User.deleteOne({ username: req.params.username });
+    //Miramos el parámetro para evitar inyección en la query, por el aviso de SonarCloud
+    const username = String(req.params.username);
+    await User.deleteOne({ username: username });
     res.status(200).json({ message: 'User deleted' });
   });
 }
