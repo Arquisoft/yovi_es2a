@@ -1,7 +1,7 @@
 {
   "name": "users",
   "version": "1.0.0",
-  "type": "module",
+  "type": "module",  
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.15",
-    "supertest": "^7.1.4",
+    "supertest": "^7.1.4",    
     "vitest": "^4.0.15"
   }
 }
