@@ -105,7 +105,7 @@ Propósito: Centralizar la lógica de negocio y seguridad. Actúa como intermedi
 
 Interfaces: Expone endpoints REST y WebSockets para el gameplay.
 
-Tecnología: Node.js / Java Spring Boot.
+Tecnología: Node.js / Express.
 
 ==== Motor de Juego (Game Engine)
 
