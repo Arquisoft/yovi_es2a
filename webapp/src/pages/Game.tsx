@@ -1,6 +1,6 @@
 import './styles/App.css'
-import RegisterForm from './pages/RegisterForm';
-import { GameBoard } from './components/gameBoard/GameBoard';
+import RegisterForm from './RegisterForm';
+import { GameBoard } from '../components/gameBoard/GameBoard';
 
 function App() {
   return (
