@@ -1,4 +1,4 @@
-import './styles/App.css'
+import '../styles/App.css'
 import RegisterForm from './RegisterForm';
 import { GameBoard } from '../components/gameBoard/GameBoard';
 
