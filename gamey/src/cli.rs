@@ -7,7 +7,7 @@
 //! - Server: Run as an HTTP server for bot API
 
 use crate::{
-    Coordinates, GameAction, Movement, RandomBot, RenderOptions, YBot, YBotRegistry, game,
+    Coordinates, GameAction, Movement, PositionalBot, RandomBot, RenderOptions, YBot, YBotRegistry, game
 };
 use crate::bot::{Difficulty, OffensiveBot, DefensiveBot};
 
@@ -95,6 +95,10 @@ pub fn run_cli_game() -> Result<()> {
             difficulty: parsed_difficulty,
         }))
         .with_bot(Arc::new(DefensiveBot {
+            my_player_id: PlayerId::new(1),
+            opponent_id: PlayerId::new(0),
+            difficulty: parsed_difficulty,
+        })).with_bot(Arc::new(PositionalBot {
             my_player_id: PlayerId::new(1),
             opponent_id: PlayerId::new(0),
             difficulty: parsed_difficulty,
