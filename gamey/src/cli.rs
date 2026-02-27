@@ -9,8 +9,7 @@
 use crate::{
     Coordinates, GameAction, Movement, RandomBot, RenderOptions, YBot, YBotRegistry, game,
 };
-use crate::bot::offensive_bot::{OffensiveBot, Difficulty};
-
+use crate::bot::{Difficulty, OffensiveBot, DefensiveBot};
 
 use crate::{GameStatus, GameY, PlayerId};
 use anyhow::Result;
@@ -93,6 +92,11 @@ pub fn run_cli_game() -> Result<()> {
         .with_bot(Arc::new(RandomBot))
         .with_bot(Arc::new(OffensiveBot {
             my_player_id: PlayerId::new(1),
+            difficulty: parsed_difficulty,
+        }))
+        .with_bot(Arc::new(DefensiveBot {
+            my_player_id: PlayerId::new(1),
+            opponent_id: PlayerId::new(0),
             difficulty: parsed_difficulty,
         }));
 

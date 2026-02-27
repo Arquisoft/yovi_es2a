@@ -1,11 +1,5 @@
 use crate::{Coordinates, GameStatus, GameY, Movement, PlayerId, YBot};
-
-//Niveles de dificultad disponibles
-pub enum Difficulty {
-    Easy,
-    Medium,
-    Hard,
-}
+use crate::bot::Difficulty;
 
 //El Bot Ofensivo: solo quiere conectar los 3 lados ignorando al rival.
 pub struct OffensiveBot {   //El nombre que pongamos aqui es importante para cli.rs
