@@ -10,6 +10,15 @@
 pub mod random;
 pub mod ybot;
 pub mod ybot_registry;
+
+//La estrategia ofensiva
+pub mod offensive_bot;
+
+//Expongo el contenido directamente en la raiz de bot:: para que otros archivos puedan importarlos
+//con una ruta mas corta
+pub use offensive_bot::*;
+
+
 pub use random::*;
 pub use ybot::*;
 pub use ybot_registry::*;
