@@ -1,0 +1,42 @@
+.table-cell {
+  width: 56px;
+  height: 56px;
+
+    clip-path: polygon(
+        50% 0%,      /* punta superior */
+        100% 25%,    /* esquina superior derecha */
+        100% 75%,    /* esquina inferior derecha */
+        50% 100%,    /* punta inferior */
+        0% 75%,      /* esquina inferior izquierda */
+        0% 25%       /* esquina superior izquierda */
+    );
+
+  background-color: lightgray; /* color por defecto */
+  cursor: pointer;
+
+  /*define la capacidad de un elemento para reducir su tamaño 
+  si el contenedor es más pequeño que la suma de sus hijos.*/  
+  flex-shrink: 0;
+  transition: background-color 0.2s ease, filter 0.2s ease;
+
+    margin: 3px;
+}
+
+/* La primera celda de cada fila no se desplaza hacia la izquierda,
+   solo las celdas 2, 3, 4... llevan el margen negativo. */
+.table-cell:first-child {
+    margin-left: 0;
+}
+
+.table-cell:hover {
+  filter: brightness(0.85);
+}
+
+
+.table-cell.player_one {
+  background-color: crimson;
+}
+
+.table-cell.player_two {
+  background-color: royalblue;
+}

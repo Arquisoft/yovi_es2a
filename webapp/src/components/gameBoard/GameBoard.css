@@ -1,0 +1,12 @@
+.game-board {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* esto centra cada fila horizontalmente */
+    margin-top: 40px;
+}
+
+.row {
+    display: flex;
+    justify-content: center; /* centra las celdas dentro de la fila */
+    margin-top: -15px; /* overlap vertical para encaje de hexágonos */
+}
