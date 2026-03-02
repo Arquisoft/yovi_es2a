@@ -21,10 +21,14 @@
 
 pub mod choose;
 pub mod error;
+pub mod game_routes;
 pub mod state;
 pub mod version;
+
 use axum::response::IntoResponse;
 use std::sync::Arc;
+// Si falla añade y usa el CORS
+
 pub use choose::MoveResponse;
 pub use error::ErrorResponse;
 pub use version::*;
@@ -37,10 +41,17 @@ use crate::{GameYError, RandomBot, YBotRegistry, state::AppState};
 pub fn create_router(state: AppState) -> axum::Router {
     axum::Router::new()
         .route("/status", axum::routing::get(status))
+        // ── API de bots (original) ───────────────────────────────────────────
         .route(
             "/{api_version}/ybot/choose/{bot_id}",
             axum::routing::post(choose::choose),
         )
+    
+        // ── API de juego (nueva) ─────────────────────────────────────────────
+        // En un fichero aparte por el principio de responsabilidad unica
+        .route("/v1/game",                          axum::routing::post(game_routes::create_game))
+        .route("/v1/game/{game_id}",                axum::routing::get(game_routes::get_game))
+        .route("/v1/game/{game_id}/move",           axum::routing::post(game_routes::make_move))
         .with_state(state)
 }
 
