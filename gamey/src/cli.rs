@@ -7,8 +7,10 @@
 //! - Server: Run as an HTTP server for bot API
 
 use crate::{
-    Coordinates, GameAction, Movement, RandomBot, RenderOptions, YBot, YBotRegistry, game,
+    Coordinates, GameAction, Movement, PositionalBot, RandomBot, RenderOptions, YBot, YBotRegistry, game
 };
+use crate::bot::{Difficulty, OffensiveBot, DefensiveBot};
+
 use crate::{GameStatus, GameY, PlayerId};
 use anyhow::Result;
 use clap::{Parser, ValueEnum};
@@ -33,6 +35,11 @@ pub struct CliArgs {
     /// The bot to use (only used with --mode=computer), default = random_bot
     #[arg(short, long, default_value = "random_bot")]
     pub bot: String,
+
+    // --> ESTO ES LO NUEVO:
+    /// Difficulty level for the bot (easy, medium, hard). Default = easy
+    #[arg(short, long, default_value = "easy")]
+    pub diff: String,
 
     /// Port to run the server on (only used with --mode=server)
     #[arg(short, long, default_value_t = 3000)]
@@ -67,9 +74,37 @@ impl Display for Mode {
 /// and runs the main game loop where players enter moves via the terminal.
 pub fn run_cli_game() -> Result<()> {
     let args = CliArgs::parse();
+    
+    // 1. Lógica de deducción: miramos si el nombre del bot contiene la palabra clave
+    let parsed_difficulty = if args.bot.contains("hard") {
+        Difficulty::Hard
+    } else if args.bot.contains("medium") {
+        Difficulty::Medium
+    } else {
+        Difficulty::Easy
+    };
+
     let mut render_options = crate::RenderOptions::default();
     let mut rl = DefaultEditor::new()?;
-    let bots_registry = YBotRegistry::new().with_bot(Arc::new(RandomBot));
+
+    // 2. Registro de bots usando la dificultad que acabamos de deducir
+    let bots_registry = YBotRegistry::new()
+        .with_bot(Arc::new(RandomBot))
+        .with_bot(Arc::new(OffensiveBot {
+            my_player_id: PlayerId::new(1),
+            difficulty: parsed_difficulty,
+        }))
+        .with_bot(Arc::new(DefensiveBot {
+            my_player_id: PlayerId::new(1),
+            opponent_id: PlayerId::new(0),
+            difficulty: parsed_difficulty,
+        })).with_bot(Arc::new(PositionalBot {
+            my_player_id: PlayerId::new(1),
+            opponent_id: PlayerId::new(0),
+            difficulty: parsed_difficulty,
+        }));
+
+
     let bot: Arc<dyn YBot> = match bots_registry.find(&args.bot) {
         Some(b) => b,
         None => {

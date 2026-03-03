@@ -5,5 +5,10 @@ lcov.info
 docs/build
 .env
 webapp/.env
+<<<<<<< HEAD
+.vscode/
+docker-compose.override.yml
+=======
 webapp/*.env
 .vscode/
+>>>>>>> c9f4dbae1a2ff56f1a4059f656485fda0e108f8e
