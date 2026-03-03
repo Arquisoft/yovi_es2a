@@ -7,7 +7,7 @@ function App() {
     <div className="App">
       <div>
         <h1>Tablero de Y</h1>
-        <GameBoard size={6}/>
+        <GameBoard size={7} mode="human" />
       </div>
     </div>
   );
