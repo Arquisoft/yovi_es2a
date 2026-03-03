@@ -1,14 +1,20 @@
+// Esta clase contiene los hooks relacionados con la lógica del juego
+
 import { useState, useEffect, useCallback } from "react";
 import type { TableCell, Player } from "../types/game";
 import { createGame, placeToken, resign as resignService } from "../services/gameService";
-import type { ApiGameState } from "../services/gameService";
+import type { ApiGameState } from "../types/gameApi";
 
+//  ────────────────────Tipos────────────────────────────────────────────────────────────
+
+// Opciones de configuración de la partida
 interface UseGameOptions {
     size?: number;
     mode?: "human" | "computer";
     botId?: string;
 }
 
+// Lo que devuelve el hook useGame
 interface UseGameReturn {
     cells: TableCell[];
     currentPlayer: Player;
@@ -20,6 +26,8 @@ interface UseGameReturn {
     handleResign: () => void;
     resetGame: () => void;
 }
+
+//  ───────────────Funciones útiles de conversión────────────────────────────────────────────────
 
 // Convierte el estado de la API al formato de TableCell que usa React
 function apiStateToCell(apiState: ApiGameState): TableCell[] {
@@ -36,12 +44,16 @@ function apiStateToCell(apiState: ApiGameState): TableCell[] {
     }));
 }
 
+// Convierte el ID de jugador de la API a nuestro tipo Player
 function playerIdToPlayer(id: number | null): Player {
     if (id === 0) return "PLAYER_ONE";
     if (id === 1) return "PLAYER_TWO";
     return null;
 }
 
+//  ───────────────Hooks────────────────────────────────────────────────
+
+// Hook de React que maneja toda la lógica del juego
 export function useGame({
     size = 7,
     mode = "human",

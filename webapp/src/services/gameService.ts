@@ -1,3 +1,5 @@
+// Esta clase contiene todas las conexiones entre la API de rust y la lógica del juego en React.
+
 // Sobre el flujo desde React:
 //1. React arranca → POST /v1/game
 //                   El servidor crea un GameY, le asigna un ID único (uuid)
@@ -12,46 +14,12 @@
 //3. React consulta → GET /v1/game/{id}
 //                    El servidor busca la partida y devuelve su estado actual.
 
-// Poner una url que varíe el host para el despliegue
+// Importamos los tipos de la API
+import type { ApiGameState, ApiMakeMoveResponse } from "../types/gameApi";
+
+// Si está vacío usamos localHost, en otro caso funciona con la ip. Debería funcionar en el despliegue
 const BACKEND_URL = "http://localhost:4000";
 
-// ─── Tipos que devuelve la API ─────────────────────────────────────────────
-
-// Celda devuelta por la API
-export interface ApiCell {
-    index: number;
-    coords: [number, number, number]; // [x, y, z]
-    player: number | null;            // 0, 1, o null
-}
-
-// Estado completo del juego devuelto por la API
-export interface ApiGameState {
-    game_id: string;
-    board_size: number;
-    total_cells: number;
-    cells: ApiCell[];
-    available_cells: number[];
-    status: "ongoing" | "finished";
-    next_player: number | null;
-    winner: number | null;
-}
-
-// Respuesta de la API al hacer un movimiento
-export interface ApiMakeMoveResponse {
-    applied_move: {
-        player: number;
-        action: string;
-        cell_index: number | null;
-    };
-    bot_move: {
-        player: number;
-        action: string;
-        cell_index: number | null;
-    } | null;
-    game_state: ApiGameState;
-}
-
-// ─── Llamadas HTTP ─────────────────────────────────────────────────────────
 
 // Llamada que crea el juego
 export async function createGame(
@@ -63,6 +31,7 @@ export async function createGame(
     const response = await fetch(`${BACKEND_URL}/v1/game`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        // Añade al JSON tamaño, moodo y bot usando stringify para convertirlo a texto
         body: JSON.stringify({ size, mode, bot }),
     });
     if (!response.ok) {
@@ -74,11 +43,14 @@ export async function createGame(
 
 // Obtiene el estado de la partida por su ID
 export async function getGame(gameId: string): Promise<ApiGameState> {
+    // Llamamos a la API de rust y le pedimos que nos devuelva el estado de la partida con ese ID
     const response = await fetch(`${BACKEND_URL}/v1/game/${gameId}`);
+    // Si sale mal obtenemos el error y lo mostramos
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error ?? "Partida no encontrada");
     }
+    // En cualquier otro caso obtenemos el Json (YEN)
     return response.json();
 }
 
@@ -89,11 +61,13 @@ export async function placeToken(
     cellIndex: number,
     botId?: string
 ): Promise<ApiMakeMoveResponse> {
+
     const body: Record<string, unknown> = {
         player,
         action: "place",
         cell_index: cellIndex,
     };
+
     if (botId) body.bot = botId;
 
     const response = await fetch(`${BACKEND_URL}/v1/game/${gameId}/move`, {
@@ -108,6 +82,7 @@ export async function placeToken(
     return response.json();
 }
 
+// Método para que un jugador se rinda en una partida
 export async function resign(
     gameId: string,
     player: number

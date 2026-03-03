@@ -1,30 +1,20 @@
 import "./GameBoard.css";
 import { TableCell } from "./Cell";
-import { useGame } from "../../hooks/useGame";
+import type { TableCell as TableCellModel } from "../../types/game";
 
 interface GameBoardProps {
+    cells: TableCellModel[];
     size: number;
-    mode: "human" | "computer";
+    onCellClick: (id: number) => void;
 }
 
 // Función que crea el componente del tablero de juego
-export function GameBoard({ size = 7, mode = "human" }: GameBoardProps): JSX.Element {
+export function GameBoard({ cells, size, onCellClick }: GameBoardProps): JSX.Element {
 
-    const { cells, currentPlayer, winner, status, error, handleCellClick, handleResign, resetGame } = useGame({ size, mode });
-
+    // Si el estado es "loading" mostramos un mensaje de carga, por si tarda más de lo esperado
     if (status === "loading") return <div>Cargando partida...</div>;
 
     return (
-        <div>
-            <div className="game-info">
-                {winner
-                    ? <p>¡Ganador: {winner}!</p>
-                    : <p>Turno: {currentPlayer}</p>
-                }
-                {error && <p className="error">{error}</p>}
-                <button onClick={handleResign} disabled={status !== "ongoing"}>Rendirse</button>
-                <button onClick={resetGame}>Nueva partida</button>
-            </div>
         
             <div className="game-board">
                 {Array.from({ length: size }).map((_, rowIndex) => {
@@ -43,13 +33,12 @@ export function GameBoard({ size = 7, mode = "human" }: GameBoardProps): JSX.Ele
                                 <TableCell
                                     key={cell.id}
                                     {...cell}
-                                    onClick={handleCellClick}
+                                    onClick={() => onCellClick(cell.id)}
                                 />
                             ))}
                         </div>
                     );
                 })}
             </div>
-        </div>
     );
 }
