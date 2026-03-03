@@ -18,9 +18,9 @@ export function GameBoard({ size }: GameBoardProps): JSX.Element {
         let id = 0;
         for (let row = 0; row < size; row++) {
             for (let col = 0; col <= row; col++) {
-                const x = col;
-                const y = row - col;
-                const z = size - 1 - row;
+                const x = size - 1 - row;
+                const y = col;
+                const z = (size-1) - x - y;
                 temp.push({ id, x, y, z, owner: null });
                 id++;
             }

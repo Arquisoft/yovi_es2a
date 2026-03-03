@@ -1,15 +1,27 @@
-use crate::YBotRegistry;
+// A nivel de rust mod declara ficheros que forman parte del modulo
+use crate::{GameY, YBotRegistry};
+use std::collections::HashMap;
 use std::sync::Arc;
+use tokio::sync::Mutex;
+// Usamos uuid y lo importamos para identificar cada partida
+use uuid::Uuid;
+
+/// Como explica abajo este archivo gestiona la información 
+/// compartida para las interacciones con los endpoints
 
 /// Shared application state for the bot server.
 ///
 /// This struct holds the bot registry and is shared across all request handlers
 /// via Axum's state extraction. It uses `Arc` internally to allow cheap cloning
 /// for concurrent request handling.
+
 #[derive(Clone)]
 pub struct AppState {
     /// The registry of available bots, wrapped in Arc for thread-safe sharing.
     bots: Arc<YBotRegistry>,
+    /// Añadimos también la logica de la partida para poder acceder a ella con la API REST
+    /// Esto para poder mantener el estado de una partida entre peticiones
+    games: Arc<Mutex<HashMap<Uuid, GameY>>>,
 }
 
 impl AppState {
@@ -17,12 +29,19 @@ impl AppState {
     pub fn new(bots: YBotRegistry) -> Self {
         Self {
             bots: Arc::new(bots),
+            // Lo añadimos con un mutex para gestionar acceso concurrente
+            games: Arc::new(Mutex::new(HashMap::new())),
         }
     }
 
     /// Returns a clone of the Arc-wrapped bot registry.
     pub fn bots(&self) -> Arc<YBotRegistry> {
         Arc::clone(&self.bots)
+    }
+
+    /// Devuelve el almacén de partidas (protegido por Mutex async).
+    pub fn games(&self) -> Arc<Mutex<HashMap<Uuid, GameY>>> {
+        Arc::clone(&self.games)
     }
 }
 

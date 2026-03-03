@@ -1,6 +1,19 @@
 import type {TableCell} from "../types/game";
 
-// src/services/gameService.ts
+// Sobre el flujo desde React:
+//1. React arranca → POST /v1/game
+//                   El servidor crea un GameY, le asigna un ID único (uuid)
+//                   y lo guarda en el HashMap de AppState.
+//                   Devuelve el estado inicial del tablero.
+//
+//2. El jugador mueve → POST /v1/game/{id}/move
+//                      El servidor busca la partida por ID en el HashMap,
+//                      aplica el movimiento, y si hay bot, lo hace jugar.
+//                      Devuelve el tablero actualizado.
+//
+//3. React consulta → GET /v1/game/{id}
+//                    El servidor busca la partida y devuelve su estado actual.
+
 
 const BACKEND_URL = "http://localhost:4000";
 
@@ -23,22 +36,3 @@ export function cellsToYENLayout(cells: TableCell[], size: number): string {
     }
     return rows.join("/");
 }
-
-// Llama al backend con el estado actual y devuelve la respuesta YEN
-// export async function sendMove(cells: TableCell[], size: number): Promise<YENResponse> {
-//     const layout = cellsToYENLayout(cells, size);
-//     const body = {
-//         size,
-//         turn: "R",           // tras el movimiento del humano, toca la máquina (R)
-//         players: ["B", "R"],
-//         layout
-//     };
-//     
-//     const res = await fetch(`${BACKEND_URL}/play`, {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(body)
-//     });
-//     
-//     return res.json();
-// }

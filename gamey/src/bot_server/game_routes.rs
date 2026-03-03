@@ -1,5 +1,6 @@
 // Este fichero contiene las rutas de la API HTTP para gestionar partidas.
-// Cada función pública corresponde a un endpoint REST que la UI React puede llamar.
+// Cada función pública corresponde a un endpoint REST 
+
 use axum::{
     Json,
     extract::{Path, State},
@@ -14,7 +15,7 @@ use crate::{
     bot_server::state::AppState,
 };
 
-// ─── Tipos de Request / Response ─────────────────────────────────────────────
+// ─── Tipos de Request  ─────────────────────────────────────────────
 
 /// Cuerpo de la petición para crear un nuevo juego.
 /// Todos los campos son opcionales: si no se envían se usan los valores por defecto.
@@ -32,7 +33,7 @@ pub struct CreateGameRequest {
 }
 
 fn default_board_size() -> u32 { 7 }
-fn default_mode() -> String { "human".to_string() }
+fn default_mode() -> String { "computer".to_string() }
 fn default_bot() -> String { "random_bot".to_string() }
 
 /// Estado de una celda individual del tablero.
@@ -175,7 +176,8 @@ pub async fn create_game(
     let game_id = Uuid::new_v4();
     let game = GameY::new(req.size);
 
-    let mut games = state.games().lock().await;
+    let games_arc = state.games();
+    let mut games = games_arc.lock().await;
     games.insert(game_id, game);
     let response = build_game_state(game_id, &games[&game_id]);
     (StatusCode::CREATED, Json(response))
@@ -188,7 +190,8 @@ pub async fn get_game(
     State(state): State<AppState>,
     Path(game_id): Path<Uuid>,
 ) -> impl IntoResponse {
-    let games = state.games().lock().await;
+    let games_arc = state.games();
+    let games = games_arc.lock().await;
     match games.get(&game_id) {
         None => (
             StatusCode::NOT_FOUND,
@@ -221,7 +224,8 @@ pub async fn make_move(
     Path(game_id): Path<Uuid>,
     Json(req): Json<MakeMoveRequest>,
 ) -> impl IntoResponse {
-    let mut games = state.games().lock().await;
+    let games_arc = state.games();
+    let mut games = games_arc.lock().await;
 
     let game = match games.get_mut(&game_id) {
         None => {

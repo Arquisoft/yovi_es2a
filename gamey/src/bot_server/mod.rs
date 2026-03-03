@@ -21,9 +21,9 @@
 
 pub mod choose;
 pub mod error;
-pub mod game_routes;
 pub mod state;
 pub mod version;
+pub mod game_routes;
 
 use axum::response::IntoResponse;
 use std::sync::Arc;
@@ -46,7 +46,6 @@ pub fn create_router(state: AppState) -> axum::Router {
             "/{api_version}/ybot/choose/{bot_id}",
             axum::routing::post(choose::choose),
         )
-    
         // ── API de juego (nueva) ─────────────────────────────────────────────
         // En un fichero aparte por el principio de responsabilidad unica
         .route("/v1/game",                          axum::routing::post(game_routes::create_game))
