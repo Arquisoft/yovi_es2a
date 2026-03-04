@@ -23,8 +23,15 @@ pub mod choose;
 pub mod error;
 pub mod state;
 pub mod version;
+pub mod game_routes;
+
+use axum::http::Method;
+
 use axum::response::IntoResponse;
 use std::sync::Arc;
+// CORS (Cross-Origin Resource Sharing)
+use tower_http::cors::{Any, CorsLayer};
+
 pub use choose::MoveResponse;
 pub use error::ErrorResponse;
 pub use version::*;
@@ -35,12 +42,25 @@ use crate::{GameYError, RandomBot, YBotRegistry, state::AppState};
 ///
 /// This is useful for testing the API without binding to a network port.
 pub fn create_router(state: AppState) -> axum::Router {
+    // CConfiguramos el cors para permitir que se pueda acceder a la API desde cualquier origen.
+    let cors = CorsLayer::new()
+        .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
+        .allow_headers(Any)
+        .allow_origin(Any);
+
     axum::Router::new()
         .route("/status", axum::routing::get(status))
+        // ── API de bots (original) ───────────────────────────────────────────
         .route(
             "/{api_version}/ybot/choose/{bot_id}",
             axum::routing::post(choose::choose),
         )
+        // ── API de juego (nueva) ─────────────────────────────────────────────
+        // En un fichero aparte por el principio de responsabilidad unica
+        .route("/v1/game",                          axum::routing::post(game_routes::create_game))
+        .route("/v1/game/{game_id}",                axum::routing::get(game_routes::get_game))
+        .route("/v1/game/{game_id}/move",           axum::routing::post(game_routes::make_move))
+        .layer(cors)
         .with_state(state)
 }
 

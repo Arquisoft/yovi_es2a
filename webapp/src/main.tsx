@@ -5,6 +5,6 @@ import Game from './pages/Game.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Game />
+    <Game size={7} mode="human" botId="random_bot" />
   </StrictMode>,
 )
