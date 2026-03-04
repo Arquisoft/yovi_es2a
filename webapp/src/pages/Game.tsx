@@ -1,6 +1,7 @@
 import '../styles/App.css';
 import '../styles/Game.css';
 import { GameBoard } from '../components/gameBoard/GameBoard';
+import { EndGameOverlay as Overlay } from '../components/gameBoard/EndGameOverlay';
 import { useGame } from '../hooks/useGame';
 
 interface GameProps {
@@ -9,6 +10,7 @@ interface GameProps {
     botId?: string;
 }
 
+// Aquí se le deberían pasar las opciones de juego
 export function Game({ size = 7, mode = "computer", botId = "random_bot" }: GameProps): JSX.Element {
 
     const { cells, currentPlayer, winner, status, error, handleCellClick, handleResign, resetGame } = useGame({ size, mode, botId });
@@ -17,16 +19,7 @@ export function Game({ size = 7, mode = "computer", botId = "random_bot" }: Game
 
     return (
         <>
-            {/* Overlay de fin de partida */}
-            {status === "finished" && (
-                <div className="overlay">
-                    <div className="overlay-content">
-                        <h1>{winner === "PLAYER_ONE" ? "¡Has ganado!" : "¡Has perdido!"}</h1>
-                        <button onClick={resetGame}>Volver a jugar</button>
-                        <button disabled>Volver al menú</button>
-                    </div>
-                </div>
-            )}
+            {status === "finished" && <Overlay winner={winner} onResetClick={resetGame} />}
 
             <div className="game-container">
 
