@@ -1,0 +1,97 @@
+/* Contenedor del Formulario */
+.register-form {
+  max-width: 350px;
+  margin: 50px auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  overflow: hidden;
+}
+
+/* Pestañas */
+.auth-tabs-container {
+  display: flex;
+  background-color: #e0e0e0;
+  border-bottom: 1px solid #ccc;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 16px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: #666;
+  background-color: #e0e0e0;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+  border-radius: 0px;
+}
+
+/* Pestaña Seleccionada: Se vuelve BLANCA y se desactiva */
+.auth-tab.selected {
+  background-color: #fff !important;
+  color: #333;
+  cursor: default;
+  margin-bottom: -1px; /* Oculta la línea de unión */
+  border-bottom: 1px solid #fff;
+  position: relative;
+  z-index: 1;
+}
+
+.auth-tab:not(.selected):hover {
+  background-color: #d8d8d8;
+  color: #000;
+}
+
+/* Cuerpo del Formulario */
+.form-content {
+  padding: 25px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.form-group label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+.form-input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Botón principal: Relleno total azul al pasar el ratón */
+.submit-button {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid transparent; /* Evita saltos visuales */
+  border-radius: 4px;
+  background-color: #03080e; /* Color oscuro base */
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  outline: none; /* Elimina el borde de selección por defecto */
+}
+
+.submit-button:hover {
+  background-color: #0056b3 !important; /* Relleno azul sólido */
+  border-color: #0056b3; /* El borde también se vuelve azul */
+  box-shadow: 0 4px 8px rgba(0, 86, 179, 0.3); /* Sombra suave azul para dar profundidad */
+}
+
+/* Si el botón está desactivado (durante la carga) */
+.submit-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
