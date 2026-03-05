@@ -1,8 +1,10 @@
 import './AuthForm.css'
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AuthForm: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -33,8 +35,8 @@ const AuthForm: React.FC = () => {
       const data = await res.json();
 
       if (res.ok) {
-        alert(isLogin ? 'Welcome back!' : 'Account created!');
-        // Aquí normalmente guardarías el Token y redirigirías al juego
+        localStorage.setItem("username", username);
+        navigate('/game');
       } else {
         setError(data.error || 'Something went wrong');
       }

@@ -3,6 +3,7 @@ import '../styles/Game.css';
 import { GameBoard } from '../components/gameBoard/GameBoard';
 import { EndGameOverlay as Overlay } from '../components/gameBoard/EndGameOverlay';
 import { useGame } from '../hooks/useGame';
+import { useNavigate } from 'react-router-dom';
 
 interface GameProps {
     size?: number;
@@ -12,11 +13,15 @@ interface GameProps {
 
 // Aquí se le deberían pasar las opciones de juego
 export function Game({ size = 7, mode = "computer", botId = "random_bot" }: GameProps): JSX.Element {
-
+    const username = localStorage.getItem("username");
+    const navigate = useNavigate();
     const { cells, currentPlayer, winner, status, error, handleCellClick, handleResign, resetGame } = useGame({ size, mode, botId });
 
     if (status === "loading") return <div>Cargando partida...</div>;
 
+    if (username == null) {
+        navigate('/');;
+    }
     return (
         <>
             {status === "finished" && <Overlay winner={winner} onResetClick={resetGame} />}
@@ -41,6 +46,10 @@ export function Game({ size = 7, mode = "computer", botId = "random_bot" }: Game
                         Rendirse
                     </button>
                 </div>
+            </div>
+
+            <div className="user-info">
+                <p>Jugador Loggeado: {username}</p>
             </div>
         </>    
     );
