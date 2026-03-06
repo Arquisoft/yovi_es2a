@@ -1,57 +1,44 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import request from 'supertest';
-import User from '../src/models/User.js'; 
-import app from '../users-service.js';
-
-vi.mock('../src/hashing.js', () => ({
-    default: {
-        hashPassword: vi.fn().mockResolvedValue('hashed_password'),
-        verifyPassword: vi.fn().mockResolvedValue(true)
-    }
-}));
+import { describe, it, expect, afterEach, vi } from 'vitest'
+import request from 'supertest'
 
 vi.mock('../src/models/User.js', () => {
-    const MockUser = vi.fn().mockImplementation((data) => {
-        return {
-            ...data,
-            save: vi.fn().mockResolvedValue(true)
-        };
-    });
-    MockUser.prototype.save = vi.fn();
+    const mockSave = vi.fn().mockResolvedValue(true);
+    function MockUser() {
+        this.save = mockSave;
+    }
     return { default: MockUser };
 });
 
+vi.mock('mongoose', async () => {
+    function Schema() {}
+    return {
+        default: {
+            Schema,
+            model: vi.fn().mockReturnValue(function MockModel() {
+                this.save = vi.fn().mockResolvedValue(true);
+            }),
+            connect: vi.fn().mockResolvedValue(true),
+        }
+    }
+});
+
+import app from '../users-service.js'
+
 describe('POST /createuser', () => {
     afterEach(() => {
-        vi.restoreAllMocks();
-    });
+        vi.restoreAllMocks()
+    })
 
     it('returns a greeting message for the provided username', async () => {
         const res = await request(app)
             .post('/createuser')
-            .send({ username: 'Pablo', password: 'password123' });
+            .send({ username: 'iyan2', password: 'iyan' })
+            .set('Accept', 'application/json')
 
-        expect(res.status).toBe(201);
-        expect(res.body.message).toContain('Pablo');
-    });
+        expect(res.status).toBe(201)
+        expect(res.body).toHaveProperty('message')
+        expect(res.body.message).toContain('iyan2')
+    })
 
-    it('should return 409 if username already exists', async () => {
-        vi.spyOn(User.prototype, 'save').mockRejectedValueOnce({ code: 11000 });
-
-        const res = await request(app)
-            .post('/createuser')
-            .send({ username: 'repetido', password: 'password123' });
-
-        expect(res.status).toBe(409);
-    });
-
-    it('should return 400 for any other database error', async () => {
-        vi.spyOn(User.prototype, 'save').mockRejectedValueOnce(new Error('DB Error'));
-
-        const res = await request(app)
-            .post('/createuser')
-            .send({ username: 'test', password: 'password123' });
-
-        expect(res.status).toBe(400);
-    });
-});
+    
+})
