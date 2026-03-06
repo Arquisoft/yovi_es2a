@@ -10,7 +10,7 @@ vi.mock('../src/models/User.js', () => {
 });
 
 vi.mock('mongoose', async () => {
-    function Schema() {}
+    function Schema() { }
     return {
         default: {
             Schema,
@@ -39,4 +39,23 @@ describe('POST /createuser', () => {
         expect(res.body).toHaveProperty('message')
         expect(res.body.message).toContain('iyan2')
     })
+
+    // Test para el error 400 (Faltan datos)
+    it('should return 400 if password is missing', async () => {
+        const res = await request(app)
+            .post('/createuser')
+            .send({ username: 'solo_usuario' }); // Sin password
+        expect(res.status).toBe(400);
+    });
+
+    // Test para el error 409 (Usuario duplicado)
+    it('should return 409 if username already exists', async () => {
+        // Simulamos que la base de datos lanza el error 11000
+        vi.mocked(User.prototype.save).mockRejectedValueOnce({ code: 11000 });
+
+        const res = await request(app)
+            .post('/createuser')
+            .send({ username: 'repetido', password: 'password123' });
+        expect(res.status).toBe(409);
+    });
 })
