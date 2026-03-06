@@ -1,4 +1,4 @@
-import { vi, it, describe, expect } from 'vitest';
+import { vi, it, describe, expect, afterEach } from 'vitest';
 import User from '../src/models/User.js';
 import request from 'supertest';
 
