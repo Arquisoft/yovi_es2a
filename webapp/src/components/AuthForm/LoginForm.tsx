@@ -40,6 +40,7 @@ const AuthForm: React.FC = () => {
         setError(data.error || 'Something went wrong');
       }
     } catch (err) {
+      console.error("Auth error details:", err);
       setError('Network error connection');
     }
   };
@@ -48,7 +49,7 @@ const AuthForm: React.FC = () => {
     <form onSubmit={handleSubmit} className="register-form">
       <div className="auth-tabs-container">
          <button type="button" className={`auth-tab ${isLogin ? 'selected' : ''}`} onClick={() => setIsLogin(true)}>LOGIN</button>
-         <button type="button" className={`auth-tab ${!isLogin ? 'selected' : ''}`} onClick={() => setIsLogin(false)}>REGISTER</button>
+         <button type="button" className={`auth-tab ${isLogin === false ? 'selected' : ''}`} onClick={() => setIsLogin(false)}>REGISTER</button>
       </div>
 
       <div className="form-content">
