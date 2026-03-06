@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
 import connectDB from './src/database.js';  
+import Hashing from './src/hashing.js';
 
 
 //Carga las variables del .env
@@ -66,7 +67,8 @@ app.post('/createuser', async (req, res) => {
     }
 
     //Si hay username, crea el usuario, y lo guarda
-    const newUser = new User({ username, password });
+    const hashedPassword = await Hashing.hashPassword(password);
+    const newUser = new User({ username, password: hashedPassword });
     await newUser.save();
 
     //Mensaje de bienvenida
@@ -76,6 +78,11 @@ app.post('/createuser', async (req, res) => {
     });
 
   } catch (err) {
+    if (err.code === 11000) {
+      return res.status(409).json({ 
+        error: `The username '${username}' is already taken. Please choose another one.` 
+      });
+    }
     //Si hay algun error como un usario que ya existe, responde con 400.
     res.status(400).json({ error: err.message });
   }
@@ -103,7 +110,7 @@ app.post('/login', async (req, res) => {
 
     // 2. Aquí deberías comparar la contraseña (usando bcrypt en el futuro)
     // Por ahora, como estamos probando:
-    if (user.password !== password) {
+    if (!(await Hashing.verifyPassword(user.password, password))) {
        return res.status(401).json({ error: "Invalid password" });
     }
 
