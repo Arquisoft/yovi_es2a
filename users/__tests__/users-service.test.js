@@ -1,8 +1,7 @@
-import { describe, it, expect, afterEach, vi } from 'vitest'
-import request from 'supertest'
-import User from '../src/models/User.js'; 
-import Hashing from '../src/hashing.js';
-import app from '../users-service.js';
+import { vi, it, describe, expect } from 'vitest';
+import User from '../src/models/User.js';
+import request from 'supertest';
+import app from '../index.js';
 
 vi.mock('../src/models/User.js', () => {
     const mockSave = vi.fn().mockResolvedValue(true);
