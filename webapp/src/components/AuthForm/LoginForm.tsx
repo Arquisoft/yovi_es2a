@@ -15,7 +15,6 @@ const AuthForm: React.FC = () => {
     e.preventDefault();
     setError(null);
 
-    // Validación básica en el cliente
     if (!isLogin && password !== confirmPassword) {
       setError("Passwords don't match!");
       return;
@@ -47,7 +46,6 @@ const AuthForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit} className="register-form">
-      {/* TABS (Tus botones de Login/Register se mantienen igual) */}
       <div className="auth-tabs-container">
          <button type="button" className={`auth-tab ${isLogin ? 'selected' : ''}`} onClick={() => setIsLogin(true)}>LOGIN</button>
          <button type="button" className={`auth-tab ${!isLogin ? 'selected' : ''}`} onClick={() => setIsLogin(false)}>REGISTER</button>
