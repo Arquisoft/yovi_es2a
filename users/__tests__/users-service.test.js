@@ -32,11 +32,13 @@ describe('POST /createuser', () => {
     it('returns a greeting message for the provided username', async () => {
         const res = await request(app)
             .post('/createuser')
-            .send({ username: 'Pablo' })
+            .send({ username: 'iyan2', password: 'iyan' })
             .set('Accept', 'application/json')
 
         expect(res.status).toBe(201)
         expect(res.body).toHaveProperty('message')
-        expect(res.body.message).toContain('Pablo')
+        expect(res.body.message).toContain('iyan2')
     })
+
+    
 })

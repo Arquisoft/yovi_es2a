@@ -1,5 +1,7 @@
 services:
   users:
+    build:
+      context: ./users
     image: ghcr.io/arquisoft/yovi_es2a-users:latest
     restart: always
     container_name: users
