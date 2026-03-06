@@ -58,7 +58,8 @@ app.use(express.json());
 
 //ENDPOINT POST /createuser, recibe un username, lo guarda en mongoDB y responde con el mensaje de bienvenida
 app.post('/createuser', async (req, res) => {
-  const { username, password } = req.body;
+  const username = req.body.username ? String(req.body.username) : null;
+  const password = req.body.password ? String(req.body.password) : null;
 
   try {
     //Si no hay username y/o password, devuelve error.
@@ -74,7 +75,7 @@ app.post('/createuser', async (req, res) => {
     //Mensaje de bienvenida
     res.status(201).json({
       message: `Hello ${username}!`,
-      user: newUser
+      user: { username: newUser.username }
     });
 
   } catch (err) {
@@ -98,9 +99,13 @@ if (process.argv[1] === __filename) {
 
 // ENDPOINT POST /login
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body; 
+  const username = req.body.username ? String(req.body.username) : null;
+  const password = req.body.password ? String(req.body.password) : null;
 
   try {
+    if (!username || !password) {
+      return res.status(400).json({ error: "Username and password are required" });
+    }
     //Buscamos al usuario en la base de datos
     const user = await User.findOne({ username });
 
@@ -113,7 +118,10 @@ app.post('/login', async (req, res) => {
        return res.status(401).json({ error: "Invalid password" });
     }
 
-    res.status(200).json({ message: `Welcome back, ${username}!`, user });
+    res.status(200).json({ 
+      message: `Welcome back, ${username}!`, 
+      user: { username: user.username } 
+    });
 
   } catch (err) {
     res.status(500).json({ error: "Internal server error" });
