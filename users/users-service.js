@@ -63,7 +63,7 @@ app.post('/createuser', async (req, res) => {
   try {
     //Si no hay username y/o password, devuelve error.
     if (!username || !password) {
-      return res.status(200).json({ error: "Username and password are required" });
+      return res.status(400).json({ error: "Username and password are required" });
     }
 
     //Si hay username, crea el usuario, y lo guarda
@@ -98,18 +98,17 @@ if (process.argv[1] === __filename) {
 
 // ENDPOINT POST /login
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body; // Recuerda capturar la password también
+  const { username, password } = req.body; 
 
   try {
-    // 1. Buscamos al usuario en la base de datos
+    //Buscamos al usuario en la base de datos
     const user = await User.findOne({ username });
 
     if (!user) {
       return res.status(401).json({ error: "User not found" });
     }
 
-    // 2. Aquí deberías comparar la contraseña (usando bcrypt en el futuro)
-    // Por ahora, como estamos probando:
+    // comparar la contraseña (usando bcrypt en el futuro)
     if (!(await Hashing.verifyPassword(user.password, password))) {
        return res.status(401).json({ error: "Invalid password" });
     }
