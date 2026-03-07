@@ -36,8 +36,7 @@ pub use choose::MoveResponse;
 pub use error::ErrorResponse;
 pub use version::*;
 
-use crate::{GameYError, RandomBot, YBotRegistry, state::AppState};
-
+use crate::{GameYError, RandomBot, YBotRegistry, PlayerId, state::AppState};
 /// Creates the Axum router with the given state.
 ///
 /// This is useful for testing the API without binding to a network port.
@@ -68,7 +67,23 @@ pub fn create_router(state: AppState) -> axum::Router {
 ///
 /// The default state includes the `RandomBot` which selects moves randomly.
 pub fn create_default_state() -> AppState {
-    let bots = YBotRegistry::new().with_bot(Arc::new(RandomBot));
+    use crate::bot::{Difficulty, DefensiveBot, OffensiveBot, PositionalBot};
+
+    let bots = YBotRegistry::new()
+        .with_bot(Arc::new(RandomBot))
+        // Defensive
+        .with_bot(Arc::new(DefensiveBot { my_player_id: PlayerId::new(0), opponent_id: PlayerId::new(1), difficulty: Difficulty::Easy }))
+        .with_bot(Arc::new(DefensiveBot { my_player_id: PlayerId::new(0), opponent_id: PlayerId::new(1), difficulty: Difficulty::Medium }))
+        .with_bot(Arc::new(DefensiveBot { my_player_id: PlayerId::new(0), opponent_id: PlayerId::new(1), difficulty: Difficulty::Hard }))
+        // Offensive
+        .with_bot(Arc::new(OffensiveBot { my_player_id: PlayerId::new(0), difficulty: Difficulty::Easy }))
+        .with_bot(Arc::new(OffensiveBot { my_player_id: PlayerId::new(0), difficulty: Difficulty::Medium }))
+        .with_bot(Arc::new(OffensiveBot { my_player_id: PlayerId::new(0), difficulty: Difficulty::Hard }))
+        // Positional
+        .with_bot(Arc::new(PositionalBot { my_player_id: PlayerId::new(0), opponent_id: PlayerId::new(1), difficulty: Difficulty::Easy }))
+        .with_bot(Arc::new(PositionalBot { my_player_id: PlayerId::new(0), opponent_id: PlayerId::new(1), difficulty: Difficulty::Medium }))
+        .with_bot(Arc::new(PositionalBot { my_player_id: PlayerId::new(0), opponent_id: PlayerId::new(1), difficulty: Difficulty::Hard }));
+
     AppState::new(bots)
 }
 

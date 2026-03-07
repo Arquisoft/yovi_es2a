@@ -22,7 +22,6 @@ const AuthForm: React.FC = () => {
 
     try {
       const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
-      // Decidimos la ruta según el modo
       const endpoint = isLogin ? '/login' : '/createuser';
 
       const res = await fetch(`${API_URL}${endpoint}`, {
@@ -35,7 +34,7 @@ const AuthForm: React.FC = () => {
 
       if (res.ok) {
         localStorage.setItem("username", username);
-        navigate('/game');
+        navigate('/lobby');
       } else {
         setError(data.error || 'Something went wrong');
       }
