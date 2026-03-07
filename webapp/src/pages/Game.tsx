@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import '../styles/App.css';
 import '../styles/Game.css';
 import { GameBoard } from '../components/gameBoard/GameBoard';
@@ -11,7 +12,6 @@ interface GameProps {
     botId?: string;
 }
 
-// Aquí se le deberían pasar las opciones de juego
 export function Game({ size = 7 }: GameProps): JSX.Element {
     const username = localStorage.getItem("username") ?? undefined;
     const navigate = useNavigate();
@@ -23,17 +23,24 @@ export function Game({ size = 7 }: GameProps): JSX.Element {
 
     const { cells, currentPlayer, winner, status, error, handleCellClick, handleResign, resetGame } = useGame({ size, mode, botId, username });
 
+    const volverAlMenu = () => {
+        navigate('/lobby'); 
+    };
+
+    // Navegación segura usando useEffect para evitar warnings de React
+    useEffect(() => {
+        if (username == null) {
+            navigate('/');
+        }
+    }, [username, navigate]);
+
     if (status === "loading") return <div>Cargando partida...</div>;
 
-    if (username == null) {
-        navigate('/');
-    }
     return (
         <>
-            {status === "finished" && <Overlay winner={winner} onResetClick={resetGame} />}
+            {status === "finished" && <Overlay winner={winner} onResetClick={resetGame} onMenuClick={volverAlMenu} />}
 
             <div className="game-container">
-
                 {/* Tablero */}
                 <GameBoard
                     cells={cells}
