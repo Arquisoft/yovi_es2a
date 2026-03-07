@@ -19,6 +19,7 @@ import type { ApiGameState, ApiMakeMoveResponse } from "../types/gameApi";
 
 // Si está vacío usamos localHost, en otro caso funciona con la ip. Debería funcionar en el despliegue
 const BACKEND_URL = "http://localhost:4000";
+const USERS_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 
 // Llamada que crea el juego
@@ -97,4 +98,41 @@ export async function resign(
         throw new Error(error.error ?? "Error al rendirse");
     }
     return response.json();
+}
+
+// Guarda el resultado de una partida finalizada en el historial del usuario.
+// resultado: '1' = gana el usuario logueado, '2' = pierde, 'X' = empate
+export async function saveGameResult(
+    username: string,
+    rival: string,
+    resultado: "1" | "2" | "X"
+): Promise<void> {
+    const response = await fetch(`${USERS_URL}/savegame`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, rival, resultado }),
+    });
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error ?? "Error al guardar la partida");
+    }
+}
+
+// Devuelve el historial de partidas de un usuario
+export async function getHistory(username: string): Promise<GameHistoryRecord[]> {
+    const response = await fetch(`${USERS_URL}/history/${username}`);
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error ?? "Error al obtener el historial");
+    }
+    const data = await response.json();
+    return data.history;
+}
+
+export interface GameHistoryRecord {
+    _id: string;
+    username: string;
+    rival: string;
+    resultado: "1" | "2" | "X";
+    createdAt: string;
 }

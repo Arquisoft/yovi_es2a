@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import YAML from 'js-yaml';
 import promBundle from 'express-prom-bundle';
 import User from './src/models/User.js';
+import GameRecord from './src/models/GameRecord.js';
 import dotenv from 'dotenv';
 import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
@@ -126,6 +127,45 @@ app.post('/login', async (req, res) => {
   } catch (err) {
     console.error("Internal server error details:", err);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ENDPOINT POST /savegame
+// Guarda el resultado de una partida finalizada en el historial
+// Body: { username, rival, resultado }
+// resultado: '1' (gana el usuario logueado), '2' (pierde), 'X' (empate)
+app.post('/savegame', async (req, res) => {
+  const { username, rival, resultado } = req.body ?? {};
+
+  if (!username || !rival || !resultado) {
+    return res.status(400).json({ error: 'username, rival and resultado are required' });
+  }
+
+  if (!['1', '2', 'X'].includes(resultado)) {
+    return res.status(400).json({ error: "resultado must be '1', '2' or 'X'" });
+  }
+
+  try {
+    const record = new GameRecord({ username, rival, resultado });
+    await record.save();
+    res.status(201).json({ message: 'Game saved', record });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ENDPOINT GET /history/:username
+// Devuelve el historial de partidas de un usuario ordenado por fecha descendente
+app.get('/history/:username', async (req, res) => {
+  const username = String(req.params.username);
+
+  try {
+    const records = await GameRecord.find({ username })
+      .sort({ createdAt: -1 })
+      .lean();
+    res.status(200).json({ username, history: records });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

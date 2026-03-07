@@ -13,9 +13,9 @@ interface GameProps {
 
 // Aquí se le deberían pasar las opciones de juego
 export function Game({ size = 7, mode = "computer", botId = "random_bot" }: GameProps): JSX.Element {
-    const username = localStorage.getItem("username");
+    const username = localStorage.getItem("username") ?? undefined;
     const navigate = useNavigate();
-    const { cells, currentPlayer, winner, status, error, handleCellClick, handleResign, resetGame } = useGame({ size, mode, botId });
+    const { cells, currentPlayer, winner, status, error, handleCellClick, handleResign, resetGame } = useGame({ size, mode, botId, username });
 
     if (status === "loading") return <div>Cargando partida...</div>;
 
