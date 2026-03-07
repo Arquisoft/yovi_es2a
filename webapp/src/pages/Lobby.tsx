@@ -1,23 +1,31 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Lobby.css';
+import '../styles/Lobby.css';
+
+
 
 type GameMode = "human" | "computer" | null;
 type BotType = "random" | "defensive" | "offensive" | "positional";
 type Difficulty = "easy" | "medium" | "hard";
 
 const BOT_NAMES: Record<BotType, string> = {
-    random: "Random",
-    defensive: "Defensive",
-    offensive: "Offensive",
-    positional: "Positional",
+    random: "Aleatorio",
+    defensive: "Defensivo",
+    offensive: "Ofensivo",
+    positional: "Posicional",
 };
 
 const BOT_DESCRIPTIONS: Record<BotType, string> = {
-    random: "Plays randomly. Perfect for beginners.",
-    defensive: "Blocks your moves and plays safe.",
-    offensive: "Aggressive playstyle, always attacking.",
-    positional: "Controls key positions on the board.",
+    random: "Juega al azar. Perfecto para principiantes.",
+    defensive: "Bloquea tus movimientos y juega seguro.",
+    offensive: "Estilo agresivo, siempre atacando.",
+    positional: "Controla las posiciones clave del tablero.",
+};
+
+const DIFFICULTY_LABELS: Record<Difficulty, string> = {
+    easy: "FÁCIL",
+    medium: "MEDIO",
+    hard: "DIFÍCIL",
 };
 
 function getBotId(type: BotType, difficulty: Difficulty): string {
@@ -43,8 +51,8 @@ export default function Lobby(): JSX.Element {
     return (
         <div className="lobby-container">
             <div className="lobby-card">
-                <h1 className="lobby-title">CHOOSE YOUR BATTLE</h1>
-                <p className="lobby-subtitle">How do you want to play?</p>
+                <h1 className="lobby-title">ELIGE TU PARTIDA</h1>
+                <p className="lobby-subtitle">¿Cómo quieres jugar?</p>
 
                 <div className="mode-selector">
                     <button
@@ -52,23 +60,23 @@ export default function Lobby(): JSX.Element {
                         onClick={() => setMode("computer")}
                     >
                         <span className="mode-icon">🤖</span>
-                        <span className="mode-label">vs Machine</span>
-                        <span className="mode-desc">Play against AI</span>
+                        <span className="mode-label">vs Máquina</span>
+                        <span className="mode-desc">Jugar contra la IA</span>
                     </button>
                     <button
                         className={`mode-btn ${mode === "human" ? "active" : ""}`}
                         onClick={() => setMode("human")}
                     >
                         <span className="mode-icon">👥</span>
-                        <span className="mode-label">vs Human</span>
-                        <span className="mode-desc">Local 2 players</span>
+                        <span className="mode-label">vs Humano</span>
+                        <span className="mode-desc">2 jugadores locales</span>
                     </button>
                 </div>
 
                 {mode === "computer" && (
                     <div className="bot-config">
                         <div className="config-section">
-                            <h3 className="config-title">Strategy</h3>
+                            <h3 className="config-title">Estrategia</h3>
                             <div className="bot-grid">
                                 {(Object.keys(BOT_NAMES) as BotType[]).map((type) => (
                                     <button
@@ -85,7 +93,7 @@ export default function Lobby(): JSX.Element {
 
                         {botType !== "random" && (
                             <div className="config-section">
-                                <h3 className="config-title">Difficulty</h3>
+                                <h3 className="config-title">Dificultad</h3>
                                 <div className="difficulty-selector">
                                     {(["easy", "medium", "hard"] as Difficulty[]).map((d) => (
                                         <button
@@ -93,7 +101,7 @@ export default function Lobby(): JSX.Element {
                                             className={`diff-btn diff-${d} ${difficulty === d ? "active" : ""}`}
                                             onClick={() => setDifficulty(d)}
                                         >
-                                            {d.toUpperCase()}
+                                            {DIFFICULTY_LABELS[d]}
                                         </button>
                                     ))}
                                 </div>
@@ -104,8 +112,8 @@ export default function Lobby(): JSX.Element {
 
                 {mode === "human" && (
                     <div className="human-info">
-                        <p>🎮 Two players take turns on the same device.</p>
-                        <p>Player 1 goes first!</p>
+                        <p>🎮 Dos jugadores se turnan en el mismo dispositivo.</p>
+                        <p>¡El jugador 1 empieza primero!</p>
                     </div>
                 )}
 
@@ -114,7 +122,7 @@ export default function Lobby(): JSX.Element {
                     onClick={handlePlay}
                     disabled={!mode}
                 >
-                    {mode ? "PLAY!" : "SELECT A MODE"}
+                    {mode ? "¡JUGAR!" : "SELECCIONA UN MODO"}
                 </button>
             </div>
         </div>
