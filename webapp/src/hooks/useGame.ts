@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { TableCell, Player } from "../types/game";
-import { createGame, placeToken, resign as resignService } from "../services/gameService";
+import { createGame, placeToken, resign as resignService, saveGameResult } from "../services/gameService";
 import type { ApiGameState } from "../types/gameApi";
 
 //  ────────────────────Tipos────────────────────────────────────────────────────────────
@@ -12,6 +12,7 @@ interface UseGameOptions {
     size?: number;
     mode?: "human" | "computer";
     botId?: string;
+    username?: string;
 }
 
 // Lo que devuelve el hook useGame
@@ -58,6 +59,7 @@ export function useGame({
     size = 7,
     mode = "human",
     botId = "random_bot",
+    username,
 }: UseGameOptions = {}): UseGameReturn {
     const [gameId, setGameId] = useState<string | null>(null);
     const [cells, setCells] = useState<TableCell[]>([]);
@@ -72,7 +74,19 @@ export function useGame({
         setCurrentPlayer(playerIdToPlayer(apiState.next_player));
         setWinner(playerIdToPlayer(apiState.winner));
         setStatus(apiState.status);
-    }, []);
+        
+    // Solo guardamos cuando termina la partida y hay un usuario logueado
+        if (apiState.status === "finished" && username) {
+            const rival = mode === "computer" ? botId : "invitado";
+            // '1' = gana el jugador 0 (usuario), '2' = gana el jugador 1 (rival), 'X' = empate
+            const resultado: "1" | "2" | "X" =
+                apiState.winner === 0 ? "1" :
+                apiState.winner === 1 ? "2" : "X";
+            saveGameResult(username, rival, resultado).catch((e) => {
+                console.error("Error al guardar historial:", e);
+            });
+        }
+    }, [username, mode, botId]);
 
     // Crea una partida nueva al montar el componente
     const initGame = useCallback(async () => {
