@@ -3,7 +3,7 @@ import '../styles/Game.css';
 import { GameBoard } from '../components/gameBoard/GameBoard';
 import { EndGameOverlay as Overlay } from '../components/gameBoard/EndGameOverlay';
 import { useGame } from '../hooks/useGame';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface GameProps {
     size?: number;
@@ -12,15 +12,21 @@ interface GameProps {
 }
 
 // Aquí se le deberían pasar las opciones de juego
-export function Game({ size = 7, mode = "computer", botId = "random_bot" }: GameProps): JSX.Element {
+export function Game({ size = 7 }: GameProps): JSX.Element {
     const username = localStorage.getItem("username") ?? undefined;
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Leemos el modo y botId del state que viene desde el Lobby
+    const mode: "human" | "computer" = location.state?.mode ?? "computer";
+    const botId: string = location.state?.botId ?? "random_bot";
+
     const { cells, currentPlayer, winner, status, error, handleCellClick, handleResign, resetGame } = useGame({ size, mode, botId, username });
 
     if (status === "loading") return <div>Cargando partida...</div>;
 
     if (username == null) {
-        navigate('/');;
+        navigate('/');
     }
     return (
         <>
