@@ -34,7 +34,6 @@ const AuthForm: React.FC = () => {
 
       if (res.ok) {
         localStorage.setItem("username", username);
-        // Redirigimos al lobby en vez de directamente al juego
         navigate('/lobby');
       } else {
         setError(data.error || 'Something went wrong');

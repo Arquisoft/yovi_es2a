@@ -18,7 +18,7 @@ const BOT_NAMES: Record<BotType, string> = {
 const BOT_DESCRIPTIONS: Record<BotType, string> = {
     random: "Juega al azar. Perfecto para principiantes.",
     defensive: "Bloquea tus movimientos y juega seguro.",
-    offensive: "Estilo agresivo, siempre atacando.",
+    offensive: "Intenta ganar jugando ofensivamente.",
     positional: "Controla las posiciones clave del tablero.",
 };
 
