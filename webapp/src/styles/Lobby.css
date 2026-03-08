@@ -16,6 +16,7 @@
     max-width: 500px;
     color: #000000;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    position: relative;
 }
 
 .lobby-title {
@@ -148,4 +149,59 @@
 
 .play-btn.ready:hover {
     background: #333333;
+}
+
+.lobby-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.5rem;
+}
+
+.history-btn {
+    background: none;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: #555555;
+    transition: all 0.2s ease;
+}
+
+.history-btn:hover {
+    background: #f0f0f0;
+    border-color: #999999;
+    color: #000000;
+}
+
+.history-panel {
+    position: absolute;
+    inset: 0;
+    background: #ffffff;
+    border-radius: 4px;
+    padding: 1.5rem;
+    overflow-y: auto;
+    z-index: 10;
+}
+
+.history-panel-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.25rem;
+}
+
+.history-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #555555;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.history-close-btn:hover {
+    background: #f0f0f0;
+    color: #000000;
 }
