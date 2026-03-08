@@ -26,9 +26,9 @@ const Historic: React.FC = () => {
     }, [username]);
 
     if (!username)      return <p>Debes iniciar sesión para ver tu historial.</p>;
-    if (loading)        return <p>Cargando historial...</p>;
-    if (error)          return <p style={{ color: 'red' }}>Error: {error}</p>;
-    if (history.length === 0) return <p>Todavía no tienes partidas registradas.</p>;
+    if (loading)  return <p className="historic-status">Cargando historial...</p>;
+    if (error)    return <p className="historic-status historic-error">Error: {error}</p>;
+    if (history.length === 0) return <p className="historic-status">Todavía no tienes partidas registradas.</p>;
 
     return (
         <div className="historic-container">

@@ -1,0 +1,48 @@
+.historic-container {
+    width: 100%;
+}
+
+.historic-container h2 {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin: 0 0 1.25rem 0;
+}
+
+.historic-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.historic-table th {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 2px solid #000000;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #666666;
+}
+
+.historic-table td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.historic-table tr:last-child td {
+    border-bottom: none;
+}
+
+.historic-table tr:hover td {
+    background-color: #f9f9f9;
+}
+
+.historic-status {
+    text-align: center;
+    color: #666666;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+}
+
+.historic-error {
+    color: red;
+}
