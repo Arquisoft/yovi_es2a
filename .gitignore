@@ -8,3 +8,4 @@ webapp/.env
 .vscode/
 docker-compose.override.yml
 webapp/*.env
+users_env.env

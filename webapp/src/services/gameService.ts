@@ -18,7 +18,8 @@
 import type { ApiGameState, ApiMakeMoveResponse } from "../types/gameApi";
 
 // Si está vacío usamos localHost, en otro caso funciona con la ip. Debería funcionar en el despliegue
-const BACKEND_URL = "http://localhost:4000";
+const BACKEND_URL = import.meta.env.VITE_GAMEY_URL ?? "http://localhost:4000";
+
 const USERS_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 
