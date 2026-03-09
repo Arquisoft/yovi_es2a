@@ -54,35 +54,38 @@ const AuthForm: React.FC = () => {
       <div className="form-content">
         <div className="form-group">
           <label htmlFor="username">Username</label>
-          <input 
-            type="text" 
-            value={username} 
-            onChange={(e) => setUsername(e.target.value)} 
-            className="form-input" 
-            required 
+          <input
+            id="username"
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="form-input"
+            required
           />
         </div>
 
         <div className="form-group">
           <label htmlFor="password">Password</label>
-          <input 
-            type="password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            className="form-input" 
-            required 
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="form-input"
+            required
           />
         </div>
 
         {!isLogin && (
           <div className="form-group">
             <label htmlFor="confirmPassword">Confirm Password</label>
-            <input 
-              type="password" 
-              value={confirmPassword} 
-              onChange={(e) => setConfirmPassword(e.target.value)} 
-              className="form-input" 
-              required 
+            <input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="form-input"
+              required
             />
           </div>
         )}
