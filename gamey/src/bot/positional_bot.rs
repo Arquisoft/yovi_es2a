@@ -13,9 +13,7 @@ impl YBot for PositionalBot {
 
     // Función que devuelve el nombre del bot
     fn name(&self) -> &str {
-        //Miramos la self.difficulty con & para mirar el valor sin adueñarnos de el en la memoria.
         match &self.difficulty {
-            // Dependiendo de la dificultad, devolvemos uno u otro.
             Difficulty::Easy => "positional_easy",
             Difficulty::Medium => "positional_medium",
             Difficulty::Hard => "positional_hard",
@@ -25,19 +23,14 @@ impl YBot for PositionalBot {
     //Función principal. Se llama cada vez que es tu turno y te da una imagen del tablero actual.
     //Devuelve Option<Coordinates>, es decir, devuelve Coordinates o None.
     fn choose_move(&self, board: &GameY) -> Option<Coordinates> {
-        //Le pedimos a board que nos de un vector con los índices de las casillas vacias.
-        let available_cells = board.available_cells();
-
-        //Si no hay casillas vacias (tablero lleno) devolvemos None
-        if available_cells.is_empty() {
-            return None;
-        }
-
-        match &self.difficulty {
-            Difficulty::Easy => self.play_easy(board, &available_cells),
-            Difficulty::Medium => self.play_medium(board, &available_cells),
-            Difficulty::Hard => self.play_hard(board, &available_cells),
-        }
+        // Delegamos la lógica común a BotUtils y pasamos la estrategia según dificultad
+        BotUtils::choose_move_with_strategy(board, |available_cells| {
+            match &self.difficulty {
+                Difficulty::Easy => self.play_easy(board, available_cells),
+                Difficulty::Medium => self.play_medium(board, available_cells),
+                Difficulty::Hard => self.play_hard(board, available_cells),
+            }
+        })
     }
 }
 
@@ -51,31 +44,19 @@ impl PositionalBot {
     // MEDIO: Si puede ganar, gana. Si no, busca el centro.
     fn play_medium(&self, board: &GameY, available_cells: &Vec<u32>) -> Option<Coordinates> {
         // 1. ¿Puedo ganar ya este turno?
-        let movimiento_victoria = BotUtils::find_immediate_win(board, available_cells, self.my_player_id);
-        if movimiento_victoria.is_some() {
-            return movimiento_victoria;
-        }
-
-        // 2. Si no, dominamos el centro
-        self.get_best_central_move(board, available_cells)
+        BotUtils::find_immediate_win(board, available_cells, self.my_player_id)
+            // 2. Si no, dominamos el centro
+            .or_else(|| self.get_best_central_move(board, available_cells))
     }
 
     // DIFÍCIL: Prioriza ganar o bloquear al rival, y sino, al centro
     fn play_hard(&self, board: &GameY, available_cells: &Vec<u32>) -> Option<Coordinates> {
         // 1. ¿Puedo ganar en este turno?
-        let movimiento_victoria = BotUtils::find_immediate_win(board, available_cells, self.my_player_id);
-        if movimiento_victoria.is_some() {
-            return movimiento_victoria;
-        }
-
-        // 2. BLOQUEO: Comprobamos si el rival ganaría en su próximo turno
-        let movimiento_bloqueo = BotUtils::find_immediate_win(board, available_cells, self.opponent_id);
-        if movimiento_bloqueo.is_some() {
-            return movimiento_bloqueo;
-        }
-
-        // 3. Si nada, al centro
-        self.get_best_central_move(board, available_cells)
+        BotUtils::find_immediate_win(board, available_cells, self.my_player_id)
+            // 2. BLOQUEO: Comprobamos si el rival ganaría en su próximo turno
+            .or_else(|| BotUtils::find_immediate_win(board, available_cells, self.opponent_id))
+            // 3. Si nada, al centro
+            .or_else(|| self.get_best_central_move(board, available_cells))
     }
 
     // Elige la casilla disponible más cercana al centro geométrico del tablero

@@ -12,9 +12,7 @@ impl YBot for OffensiveBot {
 
     // Función que devuelve el nombre del bot.
     fn name(&self) -> &str {
-        //Miramos la self.difficulty con & para mirar el valor sin adueñarnos de el en la memoria.
         match &self.difficulty {
-            // Dependiendo de la dificultad, devolvemos uno u otro.
             Difficulty::Easy => "offensive_easy",
             Difficulty::Medium => "offensive_medium",
             Difficulty::Hard => "offensive_hard",
@@ -24,19 +22,14 @@ impl YBot for OffensiveBot {
     //Función principal. Se llama cada vez que es tu turno y te da una imagen del tablero actual.
     //Devuelve Option<Coordinates>, es decir, devuelve Coordinates o None.
     fn choose_move(&self, board: &GameY) -> Option<Coordinates> {
-        //Le pedimos a board que nos de un vector con los índices de las casillas vacias.
-        let available_cells = board.available_cells();
-
-        //Si no hay casillas vacias (tablero lleno) devolvemos None
-        if available_cells.is_empty() {
-            return None;
-        }
-
-        match &self.difficulty {
-            Difficulty::Easy => self.play_easy(board, &available_cells),
-            Difficulty::Medium => self.play_medium(board, &available_cells),
-            Difficulty::Hard => self.play_hard(board, &available_cells),
-        }
+        // Delegamos la lógica común a BotUtils y pasamos la estrategia según dificultad
+        BotUtils::choose_move_with_strategy(board, |available_cells| {
+            match &self.difficulty {
+                Difficulty::Easy => self.play_easy(board, available_cells),
+                Difficulty::Medium => self.play_medium(board, available_cells),
+                Difficulty::Hard => self.play_hard(board, available_cells),
+            }
+        })
     }
 }
 
@@ -46,39 +39,29 @@ impl OffensiveBot {
     // Solo mira 1 turno al futuro. Si puede ganar, gana.
     // Si no, random, ni se molesta en mirar al rival.
     fn play_easy(&self, board: &GameY, available_cells: &Vec<u32>) -> Option<Coordinates> {
-        // 1. Miro si con alguna casilla ya puedo ganar
-        let movimiento_victoria = BotUtils::find_immediate_win(board, available_cells, self.my_player_id);
-        if movimiento_victoria.is_some() {
-            return movimiento_victoria;
-        }
-
-        // 2. Si no, tiro random.
-        let casilla_elegida = BotUtils::elegir_al_azar(available_cells);
-        Some(BotUtils::to_coords(casilla_elegida, board))
+        // 1. ¿Puedo ganar en este turno?
+        BotUtils::find_immediate_win(board, available_cells, self.my_player_id)
+            // 2. Si no, tiro random.
+            .or_else(|| Some(BotUtils::to_coords(BotUtils::elegir_al_azar(available_cells), board)))
     }
 
     // Dificultad MEDIA:
     // Mira 2 turnos a futuro, intenta preparar una jugada para ganar en el siguiente turno.
     fn play_medium(&self, board: &GameY, available_cells: &Vec<u32>) -> Option<Coordinates> {
-        // 1. Miro si con alguna casilla ya puedo ganar
-        let movimiento_victoria = BotUtils::find_immediate_win(board, available_cells, self.my_player_id);
-        if movimiento_victoria.is_some() {
-            return movimiento_victoria;
+        // 1. ¿Puedo ganar en este turno?
+        if let Some(m) = BotUtils::find_immediate_win(board, available_cells, self.my_player_id) {
+            return Some(m);
         }
 
         // 2. Miramos a futuro: ¿hay alguna casilla que nos deje a un paso de ganar?
-        for i in 0..available_cells.len() {
-            let coordenadas = BotUtils::to_coords(available_cells[i], board);
-
-            //Creo una copia del tablero y ponemos nuestra ficha en la casilla que sea
+        for &casilla in available_cells.iter() {
+            let coordenadas = BotUtils::to_coords(casilla, board);
             let mut tablero_simulado = board.clone();
             let movimiento = Movement::Placement { player: self.my_player_id, coords: coordenadas };
 
             if tablero_simulado.add_move(movimiento).is_ok() {
-                // Miramos las casillas que quedan libres en el futuro simulado
-                let casillas_futuras = tablero_simulado.available_cells();
-
                 // Si desde el futuro simulado podemos ganar en un paso, esta casilla es buena
+                let casillas_futuras = tablero_simulado.available_cells();
                 let gana_siguiente = casillas_futuras.iter()
                     .any(|&c| BotUtils::simulates_win(&tablero_simulado, BotUtils::to_coords(c, &tablero_simulado), self.my_player_id));
 
@@ -89,40 +72,17 @@ impl OffensiveBot {
         }
 
         // 3. Si no, tiro random.
-        let casilla_elegida = BotUtils::elegir_al_azar(available_cells);
-        Some(BotUtils::to_coords(casilla_elegida, board))
+        Some(BotUtils::to_coords(BotUtils::elegir_al_azar(available_cells), board))
     }
 
     // DIFICULTAD DIFÍCIL:
     // Intenta crear DOS amenazas de victoria simultáneas.
     fn play_hard(&self, board: &GameY, available_cells: &Vec<u32>) -> Option<Coordinates> {
-        // 1. Miro si con alguna casilla ya puedo ganar
-        let movimiento_victoria = BotUtils::find_immediate_win(board, available_cells, self.my_player_id);
-        if movimiento_victoria.is_some() {
-            return movimiento_victoria;
-        }
-
-        // 2. Busco una casilla que me abra 2 o más caminos de victoria
-        for i in 0..available_cells.len() {
-            let coordenadas = BotUtils::to_coords(available_cells[i], board);
-            let mut tablero_simulado = board.clone();
-            let movimiento = Movement::Placement { player: self.my_player_id, coords: coordenadas };
-
-            if tablero_simulado.add_move(movimiento).is_ok() {
-                // Contamos cuántos movimientos ganadores nos quedan disponibles
-                let casillas_futuras = tablero_simulado.available_cells();
-                let caminos_ganadores = casillas_futuras.iter()
-                    .filter(|&&c| BotUtils::simulates_win(&tablero_simulado, BotUtils::to_coords(c, &tablero_simulado), self.my_player_id))
-                    .count();
-
-                // Si hay 2 o más caminos, el rival no puede taparlos todos
-                if caminos_ganadores >= 2 {
-                    return Some(coordenadas);
-                }
-            }
-        }
-
-        // 3. Si no puedo hacer dos caminos, uso la lógica del nivel medio
-        self.play_medium(board, available_cells)
+        // 1. ¿Puedo ganar en este turno?
+        BotUtils::find_immediate_win(board, available_cells, self.my_player_id)
+            // 2. Busco una casilla que me abra 2 o más caminos de victoria (tenedor)
+            .or_else(|| BotUtils::find_fork_move(board, available_cells, self.my_player_id, 2))
+            // 3. Si no puedo hacer dos caminos, uso la lógica del nivel medio
+            .or_else(|| self.play_medium(board, available_cells))
     }
 }
