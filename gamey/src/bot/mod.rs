@@ -23,6 +23,8 @@ pub mod offensive_bot;
 pub mod defensive_bot;
 pub mod positional_bot;
 
+pub mod bot_utils;
+
 //Expongo el contenido directamente en la raiz de bot:: para que otros archivos puedan importarlos
 //con una ruta mas corta
 pub use offensive_bot::*;
