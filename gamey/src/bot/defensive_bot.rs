@@ -193,8 +193,8 @@ mod tests {
 
         let chosen = bot.choose_move(&game).unwrap();
         let idx = chosen.to_index(game.board_size());
-        let win_coords = Coordinates::new(0, 2, 0);
-        let win_idx = win_coords.to_index(game.board_size());
+        let win_idx = Coordinates::new(0, 2, 0).to_index(game.board_size());
+        assert_eq!(idx, win_idx);
     }
 
     #[test]
@@ -221,8 +221,8 @@ mod tests {
 
         let chosen = bot.choose_move(&game).unwrap();
         let idx = chosen.to_index(game.board_size());
-        let win_coords = Coordinates::new(0, 2, 0);
-        let win_idx = win_coords.to_index(game.board_size());
+        let win_idx = Coordinates::new(0, 2, 0).to_index(game.board_size());
+        assert_eq!(idx, win_idx);
     }
 
     #[test]
@@ -249,8 +249,8 @@ mod tests {
 
         let chosen = bot.choose_move(&game).unwrap();
         let idx = chosen.to_index(game.board_size());
-        let win_coords = Coordinates::new(0, 2, 0);
-        let win_idx = win_coords.to_index(game.board_size());
+        let win_idx = Coordinates::new(0, 2, 0).to_index(game.board_size());
+        assert_eq!(idx, win_idx);
     }
 
     // Tests de bloqueo (el rival está a punto de ganar)
@@ -278,8 +278,8 @@ mod tests {
 
         let chosen = bot.choose_move(&game).unwrap();
         let idx = chosen.to_index(game.board_size());
-        let block_coords = Coordinates::new(0, 2, 0);
-        let block_idx = block_coords.to_index(game.board_size());
+        let block_idx = Coordinates::new(0, 2, 0).to_index(game.board_size());
+        assert_eq!(idx, block_idx);
     }
 
     #[test]
@@ -306,8 +306,8 @@ mod tests {
 
         let chosen = bot.choose_move(&game).unwrap();
         let idx = chosen.to_index(game.board_size());
-        let block_coords = Coordinates::new(0, 2, 0);
-        let block_idx = block_coords.to_index(game.board_size());
+        let block_idx = Coordinates::new(0, 2, 0).to_index(game.board_size());
+        assert_eq!(idx, block_idx);
     }
 
     #[test]
@@ -334,8 +334,8 @@ mod tests {
 
         let chosen = bot.choose_move(&game).unwrap();
         let idx = chosen.to_index(game.board_size());
-        let block_coords = Coordinates::new(0, 2, 0);
-        let block_idx = block_coords.to_index(game.board_size());
+        let block_idx = Coordinates::new(0, 2, 0).to_index(game.board_size());
+        assert_eq!(idx, block_idx);
     }
 
 }
