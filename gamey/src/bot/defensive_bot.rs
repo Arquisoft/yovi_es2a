@@ -76,3 +76,360 @@ impl DefensiveBot {
             .or_else(|| Some(BotUtils::to_coords(BotUtils::elegir_al_azar(available_cells), board)))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{Coordinates, GameY, Movement, PlayerId};
+
+    // Helper para crear el bot defensivo con un jugador dado
+    fn make_bot(difficulty: Difficulty) -> DefensiveBot {
+        DefensiveBot {
+            my_player_id: PlayerId::new(0),
+            opponent_id: PlayerId::new(1),
+            difficulty,
+        }
+    }
+
+    // ============================================================================
+    // Tests de nombre
+    // ============================================================================
+
+    #[test]
+    fn test_defensive_easy_name() {
+        let bot = make_bot(Difficulty::Easy);
+        assert_eq!(bot.name(), "defensive_easy");
+    }
+
+    #[test]
+    fn test_defensive_medium_name() {
+        let bot = make_bot(Difficulty::Medium);
+        assert_eq!(bot.name(), "defensive_medium");
+    }
+
+    #[test]
+    fn test_defensive_hard_name() {
+        let bot = make_bot(Difficulty::Hard);
+        assert_eq!(bot.name(), "defensive_hard");
+    }
+
+    // ============================================================================
+    // Tests de tablero vacío y lleno
+    // ============================================================================
+
+    #[test]
+    fn test_easy_returns_move_on_empty_board() {
+        let bot = make_bot(Difficulty::Easy);
+        let game = GameY::new(5);
+        assert!(bot.choose_move(&game).is_some());
+    }
+
+    #[test]
+    fn test_medium_returns_move_on_empty_board() {
+        let bot = make_bot(Difficulty::Medium);
+        let game = GameY::new(5);
+        assert!(bot.choose_move(&game).is_some());
+    }
+
+    #[test]
+    fn test_hard_returns_move_on_empty_board() {
+        let bot = make_bot(Difficulty::Hard);
+        let game = GameY::new(5);
+        assert!(bot.choose_move(&game).is_some());
+    }
+
+    #[test]
+    fn test_easy_returns_none_on_full_board() {
+        let bot = make_bot(Difficulty::Easy);
+        let mut game = GameY::new(1);
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(0),
+            coords: Coordinates::new(0, 0, 0),
+        }).unwrap();
+        // El tablero está lleno (y terminado), choose_move debe devolver None
+        assert!(bot.choose_move(&game).is_none());
+    }
+
+    #[test]
+    fn test_medium_returns_none_on_full_board() {
+        let bot = make_bot(Difficulty::Medium);
+        let mut game = GameY::new(1);
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(0),
+            coords: Coordinates::new(0, 0, 0),
+        }).unwrap();
+        assert!(bot.choose_move(&game).is_none());
+    }
+
+    #[test]
+    fn test_hard_returns_none_on_full_board() {
+        let bot = make_bot(Difficulty::Hard);
+        let mut game = GameY::new(1);
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(0),
+            coords: Coordinates::new(0, 0, 0),
+        }).unwrap();
+        assert!(bot.choose_move(&game).is_none());
+    }
+
+    // ============================================================================
+    // Tests de victoria inmediata (los tres niveles deben ganar si pueden)
+    // ============================================================================
+
+    /// Monta un tablero de tamaño 3 donde el jugador 0 puede ganar en un movimiento.
+    /// Bot fácil debe detectarlo y ganar.
+    #[test]
+    fn test_easy_takes_immediate_win() {
+        let bot = make_bot(Difficulty::Easy);
+        let mut game = GameY::new(3);
+
+        // Colocamos fichas de player 0 para que solo le falte una para ganar
+        // Conectamos lados A y B con fichas adyacentes, dejando la última libre
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(0),
+            coords: Coordinates::new(0, 0, 2), // toca lado A y B
+        }).unwrap();
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(1),
+            coords: Coordinates::new(2, 0, 0), // rival en esquina
+        }).unwrap();
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(0),
+            coords: Coordinates::new(0, 1, 1), // toca lado A
+        }).unwrap();
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(1),
+            coords: Coordinates::new(1, 1, 0), // rival
+        }).unwrap();
+
+        // Ahora player 0 puede ganar colocando en (0,2,0) que toca lado A y C
+        let chosen = bot.choose_move(&game).unwrap();
+        let idx = chosen.to_index(game.board_size());
+        let win_coords = Coordinates::new(0, 2, 0);
+        let win_idx = win_coords.to_index(game.board_size());
+        assert_eq!(idx, win_idx, "El bot fácil debería tomar la victoria inmediata");
+    }
+
+    #[test]
+    fn test_medium_takes_immediate_win() {
+        let bot = make_bot(Difficulty::Medium);
+        let mut game = GameY::new(3);
+
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(0),
+            coords: Coordinates::new(0, 0, 2),
+        }).unwrap();
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(1),
+            coords: Coordinates::new(2, 0, 0),
+        }).unwrap();
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(0),
+            coords: Coordinates::new(0, 1, 1),
+        }).unwrap();
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(1),
+            coords: Coordinates::new(1, 1, 0),
+        }).unwrap();
+
+        let chosen = bot.choose_move(&game).unwrap();
+        let idx = chosen.to_index(game.board_size());
+        let win_coords = Coordinates::new(0, 2, 0);
+        let win_idx = win_coords.to_index(game.board_size());
+        assert_eq!(idx, win_idx, "El bot medio debería tomar la victoria inmediata");
+    }
+
+    #[test]
+    fn test_hard_takes_immediate_win() {
+        let bot = make_bot(Difficulty::Hard);
+        let mut game = GameY::new(3);
+
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(0),
+            coords: Coordinates::new(0, 0, 2),
+        }).unwrap();
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(1),
+            coords: Coordinates::new(2, 0, 0),
+        }).unwrap();
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(0),
+            coords: Coordinates::new(0, 1, 1),
+        }).unwrap();
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(1),
+            coords: Coordinates::new(1, 1, 0),
+        }).unwrap();
+
+        let chosen = bot.choose_move(&game).unwrap();
+        let idx = chosen.to_index(game.board_size());
+        let win_coords = Coordinates::new(0, 2, 0);
+        let win_idx = win_coords.to_index(game.board_size());
+        assert_eq!(idx, win_idx, "El bot difícil debería tomar la victoria inmediata");
+    }
+
+    // ============================================================================
+    // Tests de bloqueo (el rival está a punto de ganar)
+    // ============================================================================
+
+    /// El rival (player 1) puede ganar en el siguiente turno.
+    /// El bot fácil debe bloquearlo.
+    #[test]
+    fn test_easy_blocks_opponent_win() {
+        let bot = make_bot(Difficulty::Easy);
+        let mut game = GameY::new(3);
+
+        // Rival conecta lados A y B, le falta (0,2,0) para ganar
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(1),
+            coords: Coordinates::new(0, 0, 2),
+        }).unwrap();
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(0),
+            coords: Coordinates::new(2, 0, 0),
+        }).unwrap();
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(1),
+            coords: Coordinates::new(0, 1, 1),
+        }).unwrap();
+        // Turno del bot (player 0)
+        // Forzamos que sea turno de player 0 con un movimiento neutro
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(0),
+            coords: Coordinates::new(1, 1, 0),
+        }).unwrap();
+
+        // Ahora el rival puede ganar en (0,2,0), el bot debe bloquear ahí
+        let chosen = bot.choose_move(&game).unwrap();
+        let idx = chosen.to_index(game.board_size());
+        let block_coords = Coordinates::new(0, 2, 0);
+        let block_idx = block_coords.to_index(game.board_size());
+        assert_eq!(idx, block_idx, "El bot fácil debería bloquear la victoria del rival");
+    }
+
+    #[test]
+    fn test_medium_blocks_opponent_win() {
+        let bot = make_bot(Difficulty::Medium);
+        let mut game = GameY::new(3);
+
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(1),
+            coords: Coordinates::new(0, 0, 2),
+        }).unwrap();
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(0),
+            coords: Coordinates::new(2, 0, 0),
+        }).unwrap();
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(1),
+            coords: Coordinates::new(0, 1, 1),
+        }).unwrap();
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(0),
+            coords: Coordinates::new(1, 1, 0),
+        }).unwrap();
+
+        let chosen = bot.choose_move(&game).unwrap();
+        let idx = chosen.to_index(game.board_size());
+        let block_coords = Coordinates::new(0, 2, 0);
+        let block_idx = block_coords.to_index(game.board_size());
+        assert_eq!(idx, block_idx, "El bot medio debería bloquear la victoria del rival");
+    }
+
+    #[test]
+    fn test_hard_blocks_opponent_win() {
+        let bot = make_bot(Difficulty::Hard);
+        let mut game = GameY::new(3);
+
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(1),
+            coords: Coordinates::new(0, 0, 2),
+        }).unwrap();
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(0),
+            coords: Coordinates::new(2, 0, 0),
+        }).unwrap();
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(1),
+            coords: Coordinates::new(0, 1, 1),
+        }).unwrap();
+        game.add_move(Movement::Placement {
+            player: PlayerId::new(0),
+            coords: Coordinates::new(1, 1, 0),
+        }).unwrap();
+
+        let chosen = bot.choose_move(&game).unwrap();
+        let idx = chosen.to_index(game.board_size());
+        let block_coords = Coordinates::new(0, 2, 0);
+        let block_idx = block_coords.to_index(game.board_size());
+        assert_eq!(idx, block_idx, "El bot difícil debería bloquear la victoria del rival");
+    }
+
+    // ============================================================================
+    // Tests de movimiento válido (la casilla elegida existe en el tablero)
+    // ============================================================================
+
+    #[test]
+    fn test_easy_returns_valid_cell() {
+        let bot = make_bot(Difficulty::Easy);
+        let game = GameY::new(5);
+        let coords = bot.choose_move(&game).unwrap();
+        let idx = coords.to_index(game.board_size());
+        assert!(game.available_cells().contains(&idx));
+    }
+
+    #[test]
+    fn test_medium_returns_valid_cell() {
+        let bot = make_bot(Difficulty::Medium);
+        let game = GameY::new(5);
+        let coords = bot.choose_move(&game).unwrap();
+        let idx = coords.to_index(game.board_size());
+        assert!(game.available_cells().contains(&idx));
+    }
+
+    #[test]
+    fn test_hard_returns_valid_cell() {
+        let bot = make_bot(Difficulty::Hard);
+        let game = GameY::new(5);
+        let coords = bot.choose_move(&game).unwrap();
+        let idx = coords.to_index(game.board_size());
+        assert!(game.available_cells().contains(&idx));
+    }
+
+    // ============================================================================
+    // Tests de múltiples llamadas (robustez)
+    // ============================================================================
+
+    #[test]
+    fn test_easy_multiple_calls_always_valid() {
+        let bot = make_bot(Difficulty::Easy);
+        let game = GameY::new(7);
+        for _ in 0..10 {
+            let coords = bot.choose_move(&game).unwrap();
+            let idx = coords.to_index(game.board_size());
+            assert!(game.available_cells().contains(&idx));
+        }
+    }
+
+    #[test]
+    fn test_medium_multiple_calls_always_valid() {
+        let bot = make_bot(Difficulty::Medium);
+        let game = GameY::new(7);
+        for _ in 0..10 {
+            let coords = bot.choose_move(&game).unwrap();
+            let idx = coords.to_index(game.board_size());
+            assert!(game.available_cells().contains(&idx));
+        }
+    }
+
+    #[test]
+    fn test_hard_multiple_calls_always_valid() {
+        let bot = make_bot(Difficulty::Hard);
+        let game = GameY::new(7);
+        for _ in 0..10 {
+            let coords = bot.choose_move(&game).unwrap();
+            let idx = coords.to_index(game.board_size());
+            assert!(game.available_cells().contains(&idx));
+        }
+    }
+}
