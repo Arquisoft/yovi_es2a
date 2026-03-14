@@ -41,13 +41,14 @@ export default function Lobby(): JSX.Element {
     const [botType, setBotType] = useState<BotType>("random");
     const [difficulty, setDifficulty] = useState<Difficulty>("easy");
     const [showHistory, setShowHistory] = useState(false);
+    const [boardSize, setBoardSize] = useState(7); // Valor inicial 7
 
     const handlePlay = () => {
         if (mode === "human") {
-            navigate('/game', { state: { mode: "human" } });
+            navigate('/game', { state: { mode: "human", boardSize } });
         } else if (mode === "computer") {
             const botId = getBotId(botType, difficulty);
-            navigate('/game', { state: { mode: "computer", botId } });
+            navigate('/game', { state: { mode: "computer", botId, boardSize } });
         }
     };
 
@@ -78,6 +79,22 @@ export default function Lobby(): JSX.Element {
 
                 <h1 className="lobby-title">ELIGE TU PARTIDA</h1>
                 <p className="lobby-subtitle">¿Cómo quieres jugar?</p>
+
+                {/* Selector de tamaño de tablero */}
+                <div className="board-size-selector" style={{ marginBottom: 24 }}>
+                    <label htmlFor="board-size-range" style={{ fontWeight: 500 }}>
+                        Tamaño del tablero: <span style={{ fontWeight: 700 }}>{boardSize} x {boardSize}</span>
+                    </label>
+                    <input
+                        id="board-size-range"
+                        type="range"
+                        min={4}
+                        max={30}
+                        value={boardSize}
+                        onChange={e => setBoardSize(Number(e.target.value))}
+                        style={{ width: '100%', marginTop: 8 }}
+                    />
+                </div>
 
                 <div className="mode-selector">
                     <button

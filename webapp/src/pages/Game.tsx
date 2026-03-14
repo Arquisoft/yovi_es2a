@@ -12,14 +12,19 @@ interface GameProps {
     botId?: string;
 }
 
-export function Game({ size = 7 }: GameProps): JSX.Element {
+export function Game({ size: _size }: GameProps): JSX.Element {
     const username = localStorage.getItem("username") ?? undefined;
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Leemos el modo y botId del state que viene desde el Lobby
+    // Leemos el modo, botId y boardSize del state que viene desde el Lobby
     const mode: "human" | "computer" = location.state?.mode ?? "computer";
     const botId: string = location.state?.botId ?? "random_bot";
+
+    // El tamaño del tablero es el que viene del Lobby, o el prop, o 7
+    const boardSize: number = location.state?.boardSize ?? 7;
+    const size = boardSize ?? _size ?? 7;
+
 
     const { cells, currentPlayer, winner, status, error, handleCellClick, handleResign, resetGame } = useGame({ size, mode, botId, username });
 
