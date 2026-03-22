@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Historic from './Historic';
 import '../styles/Lobby.css';
 import '../styles/Historic.css';
+import Stats from './Stats';
 
 
 
@@ -42,6 +43,7 @@ export default function Lobby(): JSX.Element {
     const [difficulty, setDifficulty] = useState<Difficulty>("easy");
     const [showHistory, setShowHistory] = useState(false);
     const [boardSize, setBoardSize] = useState(7); // Valor inicial 7
+    const [showStats, setShowStats] = useState(false);
 
     const handlePlay = () => {
         if (mode === "human") {
@@ -64,6 +66,13 @@ export default function Lobby(): JSX.Element {
                         title="Ver historial"
                     >
                         📋 Historial
+                    </button>
+                    <button
+                        className="history-btn"
+                        onClick={() => setShowStats(true)}
+                        title="Ver estadísticas"
+                    >
+                        📊 Estadísticas
                     </button>
                 </div>
 
