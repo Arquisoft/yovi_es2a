@@ -33,3 +33,122 @@ paths:
                     example: "Hello testuser! welcome to the course!"
         '400':
           description: Error creating user
+/savegame:
+    post:
+      summary: Save a finished game to the user's history
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - rival
+                - resultado
+              properties:
+                username:
+                  type: string
+                  example: "testuser"
+                rival:
+                  type: string
+                  example: "random_bot"
+                resultado:
+                  type: string
+                  enum: ['1', '2', 'X']
+                  example: "1"
+                size:
+                  type: integer
+                  example: 7
+                  description: "Board size (e.g. 7 for a 7x7 board)"
+      responses:
+        '201':
+          description: Game saved successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Internal server error
+ 
+  /history/{username}:
+    get:
+      summary: Get game history for a user
+      description: >
+        Returns the list of finished games for the given user, ordered by date descending.
+        Supports optional filters via query parameters.
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "testuser"
+        - name: resultado
+          in: query
+          required: false
+          description: "Filter by result: '1' = win, '2' = loss, 'X' = draw"
+          schema:
+            type: string
+            enum: ['1', '2', 'X']
+        - name: rival
+          in: query
+          required: false
+          description: "Filter by rival name (partial match, case-insensitive)"
+          schema:
+            type: string
+          example: "random_bot"
+        - name: fechaDesde
+          in: query
+          required: false
+          description: "Filter games from this date (ISO format: YYYY-MM-DD)"
+          schema:
+            type: string
+            format: date
+          example: "2024-01-01"
+        - name: fechaHasta
+          in: query
+          required: false
+          description: "Filter games up to and including this date (ISO format: YYYY-MM-DD)"
+          schema:
+            type: string
+            format: date
+          example: "2024-12-31"
+        - name: size
+          in: query
+          required: false
+          description: "Filter by board size"
+          schema:
+            type: integer
+          example: 7
+      responses:
+        '200':
+          description: History retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  history:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        username:
+                          type: string
+                        rival:
+                          type: string
+                        resultado:
+                          type: string
+                          enum: ['1', '2', 'X']
+                        size:
+                          type: integer
+                        createdAt:
+                          type: string
+                          format: date-time
+        '400':
+          description: Invalid filter value
+        '500':
+          description: Internal server error
