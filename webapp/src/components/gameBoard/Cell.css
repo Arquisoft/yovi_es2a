@@ -1,6 +1,6 @@
 .table-cell {
-  width: 56px;
-  height: 56px;
+  width: 3.5vmin;
+  height: 3.5vmin;
 
     clip-path: polygon(
         50% 0%,      /* punta superior */
@@ -19,7 +19,7 @@
   flex-shrink: 0;
   transition: background-color 0.2s ease, filter 0.2s ease;
 
-    margin: 3px;
+  margin: 0.2vmin;
 }
 
 /* La primera celda de cada fila no se desplaza hacia la izquierda,
