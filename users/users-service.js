@@ -169,4 +169,33 @@ app.get('/history/:username', async (req, res) => {
   }
 });
 
+// ENDPOINT GET /stats/:username
+app.get('/stats/:username', async (req, res) => {
+  const username = String(req.params.username);
+
+  try {
+    const records = await GameRecord.find({ username }).sort({ createdAt: -1 }).lean();
+
+    const total = records.length;
+    if (total === 0) {
+      return res.status(200).json({
+        username, total: 0, wins: 0, losses: 0,
+        winRate: 0
+      });
+    }
+
+    const wins   = records.filter(r => r.resultado === '1').length;
+    const losses = records.filter(r => r.resultado === '2').length;
+    const winRate = Math.round((wins / total) * 1000) / 10;
+
+
+    res.status(200).json({
+      username, total, wins, losses, winRate
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default app;
