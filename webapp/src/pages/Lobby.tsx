@@ -85,6 +85,14 @@ export default function Lobby(): JSX.Element {
                         <Historic />
                     </div>
                 )}
+                {showStats && (
+                    <div className="history-panel">
+                        <div className="history-panel-header">
+                            <button className="history-close-btn" onClick={() => setShowStats(false)}>✕</button>
+                        </div>
+                        <Stats />
+                    </div>
+                )}
 
                 <h1 className="lobby-title">ELIGE TU PARTIDA</h1>
                 <p className="lobby-subtitle">¿Cómo quieres jugar?</p>
