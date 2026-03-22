@@ -132,7 +132,7 @@ app.post('/login', async (req, res) => {
 
 // ENDPOINT POST /savegame
 // Guarda el resultado de una partida finalizada en el historial
-// Body: { username, rival, resultado }
+// Body: { username, rival, resultado, size }
 // resultado: '1' (gana el usuario logueado), '2' (pierde), 'X' (empate)
 app.post('/savegame', async (req, res) => {
   const { username, rival, resultado } = req.body ?? {};
@@ -146,7 +146,7 @@ app.post('/savegame', async (req, res) => {
   }
 
   try {
-    const record = new GameRecord({ username, rival, resultado });
+    const record = new GameRecord({ username, rival, resultado, size});
     await record.save();
     res.status(201).json({ message: 'Game saved', record });
   } catch (err) {
@@ -156,11 +156,40 @@ app.post('/savegame', async (req, res) => {
 
 // ENDPOINT GET /history/:username
 // Devuelve el historial de partidas de un usuario ordenado por fecha descendente
+// Query params opcionales:
+//   resultado:  '1' | '2' | 'X'
+//   rival:      string (parcial, insensible a mayúsculas)
+//   fechaDesde: string (ISO date: YYYY-MM-DD)
+//   fechaHasta: string (ISO date: YYYY-MM-DD)
+//   size:       number
 app.get('/history/:username', async (req, res) => {
   const username = String(req.params.username);
-
+  const { resultado, rival, fechaDesde, fechaHasta, size } = req.query;
+ 
+  if (resultado && !['1', '2', 'X'].includes(resultado)) {
+    return res.status(400).json({ error: "resultado must be '1', '2' or 'X'" });
+  }
+  if (size && isNaN(Number(size))) {
+    return res.status(400).json({ error: "size must be a number" });
+  }
+ 
   try {
-    const records = await GameRecord.find({ username })
+    const filter = { username };
+    if (resultado)  filter.resultado = resultado;
+    if (rival)      filter.rival = { $regex: rival, $options: 'i' };
+    if (size)       filter.size = Number(size);
+ 
+    if (fechaDesde || fechaHasta) {
+      filter.createdAt = {};
+      if (fechaDesde) filter.createdAt.$gte = new Date(fechaDesde);
+      if (fechaHasta) {
+        const hasta = new Date(fechaHasta);
+        hasta.setDate(hasta.getDate() + 1);
+        filter.createdAt.$lt = hasta;
+      }
+    }
+ 
+    const records = await GameRecord.find(filter)
       .sort({ createdAt: -1 })
       .lean();
     res.status(200).json({ username, history: records });
