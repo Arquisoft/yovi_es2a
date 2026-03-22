@@ -2,11 +2,11 @@
     display: flex;
     flex-direction: column;
     align-items: center; /* esto centra cada fila horizontalmente */
-    margin-top: 40px;
+    margin-top: 1rem;
 }
 
 .row {
     display: flex;
     justify-content: center; /* centra las celdas dentro de la fila */
-    margin-top: -15px; /* overlap vertical para encaje de hexágonos */
+    margin-top: -0.75vmin; /* overlap vertical para encaje de hexágonos */
 }

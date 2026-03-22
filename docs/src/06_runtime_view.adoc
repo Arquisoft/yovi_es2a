@@ -3,6 +3,99 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-runtime-view]]
 == Vista en Tiempo de Ejecución
 
+Esta sección describe cómo se comportan los componentes del sistema durante la ejecución, mostrando los flujos más relevantes mediante diagramas de secuencia.
+
+=== Escenario 1: Registro e inicio de sesión
+
+El usuario accede a la aplicación e introduce sus credenciales. El servicio `users` valida los datos y devuelve un token de sesión.
+
+Revisar nombres de las peticiones
+
+[plantuml, runtime-login, png]
+----
+@startuml
+actor Usuario
+participant "webapp" as web
+participant "users" as users
+database "MongoDB" as mongo
+
+Usuario -> web: Introduce credenciales
+web -> users: POST /auth/login
+users -> mongo: Consulta usuario
+mongo --> users: Datos del usuario
+users --> web: Token de sesión
+web --> Usuario: Redirige al lobby
+@enduml
+----
+
+=== Escenario 2: Inicio de partida
+
+El usuario configura una nueva partida eligiendo tamaño del tablero, tipo de oponente y, si es bot, estrategia y nivel.
+
+[plantuml, runtime-newgame, png]
+----
+@startuml
+actor Usuario
+participant "webapp" as web
+participant "gamey" as gamey
+
+Usuario -> web: Configura partida (tamaño, oponente, estrategia)
+web -> gamey: POST /game/new
+gamey --> web: Estado inicial del tablero
+web --> Usuario: Muestra tablero
+@enduml
+----
+
+=== Escenario 3: Turno de juego contra el bot
+
+El usuario hace clic en una celda. El frontend envía el movimiento al motor de juego, que lo valida, comprueba si hay ganador y calcula la respuesta del bot.
+
+Hacer diagrama
+----
+
+----
+
+=== Escenario 4: Fin de partida
+
+Cuando el motor detecta un ganador, se notifica al frontend y la partida queda registrada en el historial.
+
+[plantuml, runtime-endgame, png]
+----
+@startuml
+actor Usuario
+participant "webapp" as web
+participant "gamey" as gamey
+participant "users" as users
+database "MongoDB" as mongo
+
+gamey --> web: Victoria/derrota detectada
+web -> users: POST /history (resultado de la partida)
+users -> mongo: Guarda partida
+mongo --> users: OK
+web --> Usuario: Muestra resultado final
+@enduml
+----
+
+=== Escenario 5: Consulta del historial
+
+El usuario accede a su historial de partidas desde el lobby.
+
+[plantuml, runtime-history, png]
+----
+@startuml
+actor Usuario
+participant "webapp" as web
+participant "users" as users
+database "MongoDB" as mongo
+
+Usuario -> web: Accede al historial
+web -> users: GET /history/:userId
+users -> mongo: Consulta partidas del usuario
+mongo --> users: Lista de partidas
+users --> web: Estadísticas e historial
+web --> Usuario: Muestra historial
+@enduml
+----
 
 ifdef::arc42help[]
 [role="arc42help"]

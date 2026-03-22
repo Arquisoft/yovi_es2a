@@ -46,6 +46,57 @@ endif::arc42help[]
 
 === Infrastructure Level 1
 
+El sistema YOVI está desplegado en **Microsoft Azure** mediante contenedores Docker orquestados con Docker Compose. El sistema se compone de tres microservicios independientes que se comunican entre sí a través de sus respectivas APIs REST.
+
+[plantuml, deployment-diagram, png]
+----
+@startuml
+node "Microsoft Azure" {
+    node "Docker Host" {
+        component "webapp\n(Frontend + API)" as webapp
+        component "gamey\n(Motor de juego Rust)" as gamey
+        component "users\n(Gestión de usuarios)" as users
+        database "MongoDB" as mongo
+    }
+}
+
+actor "Usuario" as user
+actor "Bot externo" as bot
+
+user --> webapp : HTTPS
+bot --> webapp : HTTPS (API REST)
+webapp --> gamey : HTTP (API REST)
+webapp --> users : HTTP (API REST)
+users --> mongo : MongoDB protocol
+@enduml
+----
+
+.Descripción de los nodos
+
+[cols="1,2,2"]
+|===
+|Componente |Tecnología |Responsabilidad
+
+|*webapp*
+|TypeScript
+|Sirve el frontend web y expone la API pública para usuarios y bots externos.
+
+|*gamey*
+|Rust
+|Motor de juego. Valida movimientos, detecta victorias y sugiere jugadas mediante las estrategias implementadas.
+
+|*users*
+|Node.js / TypeScript
+|Gestiona el registro, autenticación y el historial de partidas de los usuarios.
+
+|*MongoDB*
+|MongoDB
+|Base de datos documental que persiste usuarios, credenciales y estadísticas de partidas.
+|===
+
+.Motivación
+Se ha optado por un despliegue basado en contenedores Docker sobre Azure para facilitar la portabilidad, el aislamiento entre servicios y la automatización del despliegue mediante integración continua. Docker Compose permite levantar y coordinar todos los servicios con un único comando tanto en local como en producción.
+
 ifdef::arc42help[]
 [role="arc42help"]
 ****
