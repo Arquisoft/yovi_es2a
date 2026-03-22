@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Historic from './Historic';
+import Stats from './Stats';
 import '../styles/Lobby.css';
 import '../styles/Historic.css';
-import Stats from './Stats';
 
 
 
