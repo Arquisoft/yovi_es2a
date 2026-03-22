@@ -180,7 +180,7 @@ app.get('/stats/:username', async (req, res) => {
     if (total === 0) {
       return res.status(200).json({
         username, total: 0, wins: 0, losses: 0,
-        winRate: 0, currentStreak: 0
+        winRate: 0, currentStreak: 0, bestStreak: 0
       });
     }
 
@@ -195,9 +195,17 @@ app.get('/stats/:username', async (req, res) => {
       else break;
     }
 
+    // Mejor racha histórica
+    let bestStreak = 0;
+    let streak = 0;
+    for (const r of [...records].reverse()) {
+      if (r.resultado === '1') { streak++; if (streak > bestStreak) bestStreak = streak; }
+      else streak = 0;
+    }
+
     res.status(200).json({
       username, total, wins, losses, winRate,
-      currentStreak
+      currentStreak, bestStreak
     });
 
   } catch (err) {
