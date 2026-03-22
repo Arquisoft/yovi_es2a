@@ -106,7 +106,8 @@ export async function resign(
 export async function saveGameResult(
     username: string,
     rival: string,
-    resultado: "1" | "2" | "X"
+    resultado: "1" | "2" | "X",
+    size: number
 ): Promise<void> {
     const response = await fetch(`${USERS_URL}/savegame`, {
         method: "POST",
@@ -119,9 +120,20 @@ export async function saveGameResult(
     }
 }
 
-// Devuelve el historial de partidas de un usuario
-export async function getHistory(username: string): Promise<GameHistoryRecord[]> {
-    const response = await fetch(`${USERS_URL}/history/${username}`);
+// Devuelve el historial de partidas de un usuario con filtros opcionales
+export async function getHistory(
+    username: string,
+    filters: HistoryFilters = {}
+): Promise<GameHistoryRecord[]> {
+    const params = new URLSearchParams();
+    if (filters.resultado)          params.set("resultado", filters.resultado);
+    if (filters.rival?.trim())      params.set("rival", filters.rival.trim());
+    if (filters.fechaDesde)         params.set("fechaDesde", filters.fechaDesde);
+    if (filters.fechaHasta)         params.set("fechaHasta", filters.fechaHasta);
+    if (filters.size)               params.set("size", String(filters.size));
+ 
+    const query = params.toString() ? `?${params.toString()}` : "";
+    const response = await fetch(`${USERS_URL}/history/${username}${query}`);
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error ?? "Error al obtener el historial");
@@ -135,5 +147,15 @@ export interface GameHistoryRecord {
     username: string;
     rival: string;
     resultado: "1" | "2" | "X";
+    size?: number;
     createdAt: string;
+}
+
+// Filtros opcionales para getHistory
+export interface HistoryFilters {
+    resultado?: "1" | "2" | "X";
+    rival?: string;
+    fechaDesde?: string;
+    fechaHasta?: string;
+    size?: number;
 }
