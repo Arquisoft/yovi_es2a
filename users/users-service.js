@@ -180,7 +180,7 @@ app.get('/stats/:username', async (req, res) => {
     if (total === 0) {
       return res.status(200).json({
         username, total: 0, wins: 0, losses: 0,
-        winRate: 0
+        winRate: 0, currentStreak: 0
       });
     }
 
@@ -188,9 +188,16 @@ app.get('/stats/:username', async (req, res) => {
     const losses = records.filter(r => r.resultado === '2').length;
     const winRate = Math.round((wins / total) * 1000) / 10;
 
+    // Racha actual
+    let currentStreak = 0;
+    for (const r of records) {
+      if (r.resultado === '1') currentStreak++;
+      else break;
+    }
 
     res.status(200).json({
-      username, total, wins, losses, winRate
+      username, total, wins, losses, winRate,
+      currentStreak
     });
 
   } catch (err) {
