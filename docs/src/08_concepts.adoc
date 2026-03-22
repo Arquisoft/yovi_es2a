@@ -21,6 +21,14 @@ El modelo de dominio gira en torno al juego de estrategia "Y".
 * **Feedback Inmediato:** La interfaz bloquea visualmente acciones ilegales antes de enviarlas al servidor para mejorar la reactividad, aunque la validación final siempre reside en el backend.
 * **Diseño Adaptable:** La interfaz se adapta a diferentes tamaños de pantalla, asegurando que el tablero triangular sea jugable tanto en escritorio como en dispositivos móviles.
 
+==== Prototipos de pantallas
+Los prototipos originales de las pantallas del proyecto tal y como se diseñaron en las reuniones perativas se pueden encontrar a continuación:
+image::screen_prototypes.jpeg[Prototipos de pantallas]
+Cabe destaavar que estos prototipos se han utilizado como referencia para el desarrollo de la interfaz de usuario, aunque se han realizado ajustes durante el proceso de implementación para mejorar la usabilidad y adaptarse a las limitaciones técnicas.
+
+
+==== Mapa de pantallas
+
 === Seguridad
 
 * **Validación en el Servidor:** Aunque la web avise de errores. Todas las jugadas se validan de nuevo en el servidor para evitar trampas.

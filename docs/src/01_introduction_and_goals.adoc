@@ -145,22 +145,14 @@ endif::arc42help[]
 |===
 |Rol |Miembros y contacto |Expectativa
 
-.5+a| **Equipo de Desarrollo**
-a| * Sergio González Martínez
-uo300798@uniovi.es
-.5+| Desarrollar la aplicación asignada utilizando buenas prácticas, trabajar correctamente en equipo siguiendo la metodología ágil y lograr una solución basada en microservicios que sea mantenible, escalable y usable, y cumplir con los requisitos de calidad del sistema.
+| **Equipo de Desarrollo**
+a| * Sergio González Martínez - uo300798@uniovi.es
+ * Pablo Arias Fernández - uo3000007@uniovi.es
+ * Iyán Díaz Pereda - uo3000006@uniovi.es
+ * Enol de la Calle Iglesias - uo3000888@uniovi.es
+ * Iyán Álvarez Casasnovas - uo3009006@uniovi.es
 
-a| * Pablo Arias Fernández
-uo3000007@uniovi.es
-
-a| * Iyán Díaz Pereda
-uo3000006@uniovi.es
-
-a| * Enol de la Calle Iglesias
-uo3000888@uniovi.es
-
-a| * Iyán Álvarez Casasnovas
-uo3009006@uniovi.es
+| Desarrollar la aplicación asignada utilizando buenas prácticas, trabajar correctamente en equipo siguiendo la metodología ágil y lograr una solución basada en microservicios que sea mantenible, escalable y usable, y cumplir con los requisitos de calidad del sistema.
 
 | **Profesores (Product Owners)**
 a| * Jose Emilio Labra Gayo - labra@uniovi.es
