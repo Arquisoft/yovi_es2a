@@ -137,3 +137,28 @@ export interface GameHistoryRecord {
     resultado: "1" | "2" | "X";
     createdAt: string;
 }
+
+export interface UserStats {
+  username: string;
+  total: number;
+  wins: number;
+  losses: number;
+  winRate: number;
+  currentStreak: number;
+  bestStreak: number;
+  mostPlayedRival: string | null;
+  rivalStats: Record<string, {
+    wins: number;
+    losses: number;
+    total: number;
+  }>;
+}
+
+export async function getStats(username: string): Promise<UserStats> {
+  const response = await fetch(`${USERS_URL}/stats/${username}`);
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error ?? 'Error al obtener las estadísticas');
+  }
+  return response.json();
+}
