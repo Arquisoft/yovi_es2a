@@ -4,7 +4,6 @@ import { getHistory, type GameHistoryRecord } from '../services/gameService';
 const RESULTADO_LABEL: Record<string, string> = {
     '1': '✅ Victoria',
     '2': '❌ Derrota',
-    'X': '➖ Empate',
 };
 
 const Historic: React.FC = () => {

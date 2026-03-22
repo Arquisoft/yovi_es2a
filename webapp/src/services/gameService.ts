@@ -106,7 +106,7 @@ export async function resign(
 export async function saveGameResult(
     username: string,
     rival: string,
-    resultado: "1" | "2" | "X"
+    resultado: "1" | "2"
 ): Promise<void> {
     const response = await fetch(`${USERS_URL}/savegame`, {
         method: "POST",

@@ -141,8 +141,8 @@ app.post('/savegame', async (req, res) => {
     return res.status(400).json({ error: 'username, rival and resultado are required' });
   }
 
-  if (!['1', '2', 'X'].includes(resultado)) {
-    return res.status(400).json({ error: "resultado must be '1', '2' or 'X'" });
+  if (!['1', '2'].includes(resultado)) {
+    return res.status(400).json({ error: "resultado must be '1' or '2'" });
   }
 
   try {
