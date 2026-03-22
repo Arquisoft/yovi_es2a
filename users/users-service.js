@@ -180,7 +180,8 @@ app.get('/stats/:username', async (req, res) => {
     if (total === 0) {
       return res.status(200).json({
         username, total: 0, wins: 0, losses: 0,
-        winRate: 0, currentStreak: 0, bestStreak: 0
+        winRate: 0, currentStreak: 0, bestStreak: 0,
+        rivalStats: {}
       });
     }
 
@@ -203,9 +204,18 @@ app.get('/stats/:username', async (req, res) => {
       else streak = 0;
     }
 
+    // Estadísticas por rival
+    const rivalMap = {};
+    for (const r of records) {
+      if (!rivalMap[r.rival]) rivalMap[r.rival] = { wins: 0, losses: 0, total: 0 };
+      rivalMap[r.rival].total++;
+      if (r.resultado === '1') rivalMap[r.rival].wins++;
+      else                     rivalMap[r.rival].losses++;
+    }
+
     res.status(200).json({
       username, total, wins, losses, winRate,
-      currentStreak, bestStreak
+      currentStreak, bestStreak, rivalStats: rivalMap
     });
 
   } catch (err) {
