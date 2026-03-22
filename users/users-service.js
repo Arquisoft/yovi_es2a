@@ -181,7 +181,7 @@ app.get('/stats/:username', async (req, res) => {
       return res.status(200).json({
         username, total: 0, wins: 0, losses: 0,
         winRate: 0, currentStreak: 0, bestStreak: 0,
-        rivalStats: {}
+        mostPlayedRival: null, rivalStats: {}
       });
     }
 
@@ -213,9 +213,12 @@ app.get('/stats/:username', async (req, res) => {
       else                     rivalMap[r.rival].losses++;
     }
 
+    const mostPlayedRival = Object.entries(rivalMap)
+      .sort((a, b) => b[1].total - a[1].total)[0][0];
+
     res.status(200).json({
       username, total, wins, losses, winRate,
-      currentStreak, bestStreak, rivalStats: rivalMap
+      currentStreak, bestStreak, mostPlayedRival, rivalStats: rivalMap
     });
 
   } catch (err) {
