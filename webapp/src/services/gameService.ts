@@ -102,11 +102,11 @@ export async function resign(
 }
 
 // Guarda el resultado de una partida finalizada en el historial del usuario.
-// resultado: '1' = gana el usuario logueado, '2' = pierde, 'X' = empate
+// resultado: '1' = gana el usuario logueado, '2' = pierde
 export async function saveGameResult(
     username: string,
     rival: string,
-    resultado: "1" | "2" | "X",
+    resultado: "1" | "2",
     size: number,
 ): Promise<void> {
     const response = await fetch(`${USERS_URL}/savegame`, {
@@ -146,14 +146,39 @@ export interface GameHistoryRecord {
     _id: string;
     username: string;
     rival: string;
-    resultado: "1" | "2" | "X";
+    resultado: "1" | "2";
     size?: number;
     createdAt: string;
 }
 
+export interface UserStats {
+  username: string;
+  total: number;
+  wins: number;
+  losses: number;
+  winRate: number;
+  currentStreak: number;
+  bestStreak: number;
+  mostPlayedRival: string | null;
+  rivalStats: Record<string, {
+    wins: number;
+    losses: number;
+    total: number;
+  }>;
+}
+
+export async function getStats(username: string): Promise<UserStats> {
+  const response = await fetch(`${USERS_URL}/stats/${username}`);
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error ?? 'Error al obtener las estadísticas');
+  }
+  return response.json();
+}
+
 // Filtros opcionales para getHistory
 export interface HistoryFilters {
-    resultado?: "1" | "2" | "X";
+    resultado?: "1" | "2";
     rival?: string;
     fechaDesde?: string;
     fechaHasta?: string;

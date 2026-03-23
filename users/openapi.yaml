@@ -16,12 +16,16 @@ paths:
               type: object
               required:
                 - username
+                - password
               properties:
                 username:
                   type: string
                   example: "testuser"
+                password:
+                  type: string
+                  example: "mypassword"
       responses:
-        '200':
+        '201':
           description: User created successfully
           content:
             application/json:
@@ -30,12 +34,62 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Hello testuser! welcome to the course!"
+                    example: "Hello testuser!"
+                  user:
+                    type: object
+                    properties:
+                      username:
+                        type: string
         '400':
-          description: Error creating user
-/savegame:
+          description: Username or password missing
+        '409':
+          description: Username already taken
+
+  /login:
     post:
-      summary: Save a finished game to the user's history
+      summary: Logs in an existing user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  example: "testuser"
+                password:
+                  type: string
+                  example: "mypassword"
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Welcome back, testuser!"
+                  user:
+                    type: object
+                    properties:
+                      username:
+                        type: string
+        '400':
+          description: Username or password missing
+        '401':
+          description: User not found or invalid password
+        '500':
+          description: Internal server error
+
+  /savegame:
+    post:
+      summary: Saves the result of a finished game
       requestBody:
         required: true
         content:
@@ -55,7 +109,8 @@ paths:
                   example: "random_bot"
                 resultado:
                   type: string
-                  enum: ['1', '2', 'X']
+                  enum: ['1', '2']
+                  description: "'1' = user wins, '2' = user loses"
                   example: "1"
                 size:
                   type: integer
@@ -64,14 +119,34 @@ paths:
       responses:
         '201':
           description: Game saved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Game saved"
+                  record:
+                    type: object
+                    properties:
+                      username:
+                        type: string
+                      rival:
+                        type: string
+                      resultado:
+                        type: string
+                      createdAt:
+                        type: string
+                        format: date-time
         '400':
-          description: Invalid input
+          description: Missing or invalid fields
         '500':
           description: Internal server error
- 
+
   /history/{username}:
     get:
-      summary: Get game history for a user
+      summary: Returns the game history of a user
       description: >
         Returns the list of finished games for the given user, ordered by date descending.
         Supports optional filters via query parameters.
@@ -85,10 +160,10 @@ paths:
         - name: resultado
           in: query
           required: false
-          description: "Filter by result: '1' = win, '2' = loss, 'X' = draw"
+          description: "Filter by result: '1' = win, '2' = loss"
           schema:
             type: string
-            enum: ['1', '2', 'X']
+            enum: ['1', '2']
         - name: rival
           in: query
           required: false
@@ -121,7 +196,7 @@ paths:
           example: 7
       responses:
         '200':
-          description: History retrieved successfully
+          description: Game history retrieved
           content:
             application/json:
               schema:
@@ -142,7 +217,7 @@ paths:
                           type: string
                         resultado:
                           type: string
-                          enum: ['1', '2', 'X']
+                          enum: ['1', '2']
                         size:
                           type: integer
                         createdAt:
@@ -150,5 +225,41 @@ paths:
                           format: date-time
         '400':
           description: Invalid filter value
+        '500':
+          description: Internal server error
+
+  /stats/{username}:
+    get:
+      summary: Returns aggregated stats of a user
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Stats calculated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:        { type: string }
+                  total:           { type: integer }
+                  wins:            { type: integer }
+                  losses:          { type: integer }
+                  winRate:         { type: number }
+                  currentStreak:   { type: integer }
+                  bestStreak:      { type: integer }
+                  mostPlayedRival: { type: string, nullable: true }
+                  rivalStats:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        wins:   { type: integer }
+                        losses: { type: integer }
+                        total:  { type: integer }
         '500':
           description: Internal server error

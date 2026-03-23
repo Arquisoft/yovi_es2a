@@ -141,8 +141,8 @@ app.post('/savegame', async (req, res) => {
     return res.status(400).json({ error: 'username, rival and resultado are required' });
   }
 
-  if (!['1', '2', 'X'].includes(resultado)) {
-    return res.status(400).json({ error: "resultado must be '1', '2' or 'X'" });
+  if (!['1', '2'].includes(resultado)) {
+    return res.status(400).json({ error: "resultado must be '1' or '2'" });
   }
 
   try {
@@ -193,6 +193,63 @@ app.get('/history/:username', async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
     res.status(200).json({ username, history: records });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ENDPOINT GET /stats/:username
+app.get('/stats/:username', async (req, res) => {
+  const username = String(req.params.username);
+
+  try {
+    const records = await GameRecord.find({ username }).sort({ createdAt: -1 }).lean();
+
+    const total = records.length;
+    if (total === 0) {
+      return res.status(200).json({
+        username, total: 0, wins: 0, losses: 0,
+        winRate: 0, currentStreak: 0, bestStreak: 0,
+        mostPlayedRival: null, rivalStats: {}
+      });
+    }
+
+    const wins   = records.filter(r => r.resultado === '1').length;
+    const losses = records.filter(r => r.resultado === '2').length;
+    const winRate = Math.round((wins / total) * 1000) / 10;
+
+    // Racha actual
+    let currentStreak = 0;
+    for (const r of records) {
+      if (r.resultado === '1') currentStreak++;
+      else break;
+    }
+
+    // Mejor racha histórica
+    let bestStreak = 0;
+    let streak = 0;
+    for (const r of [...records].reverse()) {
+      if (r.resultado === '1') { streak++; if (streak > bestStreak) bestStreak = streak; }
+      else streak = 0;
+    }
+
+    // Estadísticas por rival
+    const rivalMap = {};
+    for (const r of records) {
+      if (!rivalMap[r.rival]) rivalMap[r.rival] = { wins: 0, losses: 0, total: 0 };
+      rivalMap[r.rival].total++;
+      if (r.resultado === '1') rivalMap[r.rival].wins++;
+      else                     rivalMap[r.rival].losses++;
+    }
+
+    const mostPlayedRival = Object.entries(rivalMap)
+      .sort((a, b) => b[1].total - a[1].total)[0][0];
+
+    res.status(200).json({
+      username, total, wins, losses, winRate,
+      currentStreak, bestStreak, mostPlayedRival, rivalStats: rivalMap
+    });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

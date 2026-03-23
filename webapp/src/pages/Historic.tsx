@@ -4,7 +4,6 @@ import { getHistory, type GameHistoryRecord, type HistoryFilters } from '../serv
 const RESULTADO_LABEL: Record<string, string> = {
     '1': '✅ Victoria',
     '2': '❌ Derrota',
-    'X': '➖ Empate',
 };
 
 const Historic: React.FC = () => {
@@ -81,7 +80,6 @@ const handleBuscar = () => setFiltroRival(rivalInput);
                     <option value="todos">Todos los resultados</option>
                     <option value="1">✅ Victoria</option>
                     <option value="2">❌ Derrota</option>
-                    <option value="X">➖ Empate</option>
                 </select>
  
                 {/* Tamaño tablero */}
