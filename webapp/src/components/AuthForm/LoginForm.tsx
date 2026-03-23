@@ -1,18 +1,13 @@
 import './AuthForm.css'
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState} from 'react';
+import '../AuthComprobation';
+import AuthComprobation from '../AuthComprobation';
+import { useNavigate} from 'react-router-dom';
 
 const AuthForm: React.FC = () => {
-  const user = localStorage.getItem("username") ?? undefined;
-  const [isLogin, setIsLogin] = useState(true);
+  AuthComprobation();
   const navigate = useNavigate();
-
-  useEffect(() => {
-          if (user != null) {
-              navigate('/lobby');
-          }
-      }, [user, navigate]);
-
+  const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
