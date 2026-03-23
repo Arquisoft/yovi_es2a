@@ -80,7 +80,6 @@ const handleBuscar = () => setFiltroRival(rivalInput);
                     <option value="todos">Todos los resultados</option>
                     <option value="1">✅ Victoria</option>
                     <option value="2">❌ Derrota</option>
-                    <option value="X">➖ Empate</option>
                 </select>
  
                 {/* Tamaño tablero */}
