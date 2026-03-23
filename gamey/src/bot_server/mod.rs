@@ -56,9 +56,9 @@ pub fn create_router(state: AppState) -> axum::Router {
         )
         // ── API de juego (nueva) ─────────────────────────────────────────────
         // En un fichero aparte por el principio de responsabilidad unica
-        .route("/v1/game",                          axum::routing::post(game_routes::create_game))
-        .route("/v1/game/{game_id}",                axum::routing::get(game_routes::get_game))
-        .route("/v1/game/{game_id}/move",           axum::routing::post(game_routes::make_move))
+        .route("/game/new",                          axum::routing::post(game_routes::create_game))
+        .route("/game/{game_id}",                axum::routing::get(game_routes::get_game))
+        .route("/game/{game_id}/move",           axum::routing::post(game_routes::make_move))
         .layer(cors)
         .with_state(state)
 }
