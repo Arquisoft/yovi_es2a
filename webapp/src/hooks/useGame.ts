@@ -82,7 +82,7 @@ export function useGame({
             const resultado: "1" | "2" | "X" =
                 apiState.winner === 0 ? "1" :
                 apiState.winner === 1 ? "2" : "X";
-            saveGameResult(username, rival, resultado).catch((e) => {
+            saveGameResult(username, rival, resultado, size).catch((e) => {
                 console.error("Error al guardar historial:", e);
             });
         }

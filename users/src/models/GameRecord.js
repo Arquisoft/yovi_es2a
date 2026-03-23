@@ -15,6 +15,10 @@ const gameRecordSchema = new mongoose.Schema({
     enum: ['1', '2'],
     required: true,   // '1' = gana el usuario logueado, '2' = pierde
   },
+  size: {
+    type: Number,
+    required: false,  // tamaño del tablero (ej. 7 para un tablero 7x7)
+  },
 }, { timestamps: true });  // createdAt actúa como fecha de la partida
 
 export default mongoose.model('GameRecord', gameRecordSchema);

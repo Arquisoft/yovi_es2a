@@ -43,7 +43,13 @@ export function Game({ size: _size }: GameProps): JSX.Element {
 
     return (
         <>
-            {status === "finished" && <Overlay winner={winner} onResetClick={resetGame} onMenuClick={volverAlMenu} />}
+            {status === "finished" && <Overlay 
+                                winner={winner} 
+                                onResetClick={resetGame} 
+                                onMenuClick={volverAlMenu} 
+                                username={username ?? "Jugador 1"} 
+                                rival={mode === "computer" ? botId : (location.state?.rival || "Jugador 2")}
+            />}
 
             <div className="game-container">
                 {/* Tablero */}

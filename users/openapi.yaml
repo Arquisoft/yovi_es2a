@@ -112,6 +112,10 @@ paths:
                   enum: ['1', '2']
                   description: "'1' = user wins, '2' = user loses"
                   example: "1"
+                size:
+                  type: integer
+                  example: 7
+                  description: "Board size (e.g. 7 for a 7x7 board)"
       responses:
         '201':
           description: Game saved successfully
@@ -143,12 +147,53 @@ paths:
   /history/{username}:
     get:
       summary: Returns the game history of a user
+      description: >
+        Returns the list of finished games for the given user, ordered by date descending.
+        Supports optional filters via query parameters.
       parameters:
         - name: username
           in: path
           required: true
           schema:
             type: string
+          example: "testuser"
+        - name: resultado
+          in: query
+          required: false
+          description: "Filter by result: '1' = win, '2' = loss"
+          schema:
+            type: string
+            enum: ['1', '2']
+        - name: rival
+          in: query
+          required: false
+          description: "Filter by rival name (partial match, case-insensitive)"
+          schema:
+            type: string
+          example: "random_bot"
+        - name: fechaDesde
+          in: query
+          required: false
+          description: "Filter games from this date (ISO format: YYYY-MM-DD)"
+          schema:
+            type: string
+            format: date
+          example: "2024-01-01"
+        - name: fechaHasta
+          in: query
+          required: false
+          description: "Filter games up to and including this date (ISO format: YYYY-MM-DD)"
+          schema:
+            type: string
+            format: date
+          example: "2024-12-31"
+        - name: size
+          in: query
+          required: false
+          description: "Filter by board size"
+          schema:
+            type: integer
+          example: 7
       responses:
         '200':
           description: Game history retrieved
@@ -173,9 +218,13 @@ paths:
                         resultado:
                           type: string
                           enum: ['1', '2']
+                        size:
+                          type: integer
                         createdAt:
                           type: string
                           format: date-time
+        '400':
+          description: Invalid filter value
         '500':
           description: Internal server error
 
