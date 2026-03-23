@@ -1,8 +1,9 @@
 import './AuthForm.css'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const AuthForm: React.FC = () => {
+  const userLogged = localStorage.getItem("username") ?? undefined;
   const [isLogin, setIsLogin] = useState(true);
   const navigate = useNavigate();
 
@@ -10,6 +11,12 @@ const AuthForm: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+          if (userLogged != null) {
+              navigate('/lobby');
+          }
+      }, [username, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

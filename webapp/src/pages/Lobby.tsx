@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Historic from './Historic';
 import '../styles/Lobby.css';
@@ -36,12 +36,19 @@ function getBotId(type: BotType, difficulty: Difficulty): string {
 }
 
 export default function Lobby(): JSX.Element {
+    const username = localStorage.getItem("username") ?? undefined;
     const navigate = useNavigate();
     const [mode, setMode] = useState<GameMode>(null);
     const [botType, setBotType] = useState<BotType>("random");
     const [difficulty, setDifficulty] = useState<Difficulty>("easy");
     const [showHistory, setShowHistory] = useState(false);
     const [boardSize, setBoardSize] = useState(7); // Valor inicial 7
+
+    useEffect(() => {
+            if (username == null) {
+                navigate('/');
+            }
+        }, [username, navigate]);
 
     const handlePlay = () => {
         if (mode === "human") {
