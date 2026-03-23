@@ -102,16 +102,17 @@ export async function resign(
 }
 
 // Guarda el resultado de una partida finalizada en el historial del usuario.
-// resultado: '1' = gana el usuario logueado, '2' = pierde, 'X' = empate
+// resultado: '1' = gana el usuario logueado, '2' = pierde
 export async function saveGameResult(
     username: string,
     rival: string,
-    resultado: "1" | "2" | "X"
+    resultado: "1" | "2",
+    size: number,
 ): Promise<void> {
     const response = await fetch(`${USERS_URL}/savegame`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, rival, resultado }),
+        body: JSON.stringify({ username, rival, resultado, size }),
     });
     if (!response.ok) {
         const error = await response.json();
@@ -119,9 +120,20 @@ export async function saveGameResult(
     }
 }
 
-// Devuelve el historial de partidas de un usuario
-export async function getHistory(username: string): Promise<GameHistoryRecord[]> {
-    const response = await fetch(`${USERS_URL}/history/${username}`);
+// Devuelve el historial de partidas de un usuario con filtros opcionales
+export async function getHistory(
+    username: string,
+    filters: HistoryFilters = {}
+): Promise<GameHistoryRecord[]> {
+    const params = new URLSearchParams();
+    if (filters.resultado)          params.set("resultado", filters.resultado);
+    if (filters.rival?.trim())      params.set("rival", filters.rival.trim());
+    if (filters.fechaDesde)         params.set("fechaDesde", filters.fechaDesde);
+    if (filters.fechaHasta)         params.set("fechaHasta", filters.fechaHasta);
+    if (filters.size)               params.set("size", String(filters.size));
+ 
+    const query = params.toString() ? `?${params.toString()}` : "";
+    const response = await fetch(`${USERS_URL}/history/${username}${query}`);
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error ?? "Error al obtener el historial");
@@ -134,6 +146,41 @@ export interface GameHistoryRecord {
     _id: string;
     username: string;
     rival: string;
-    resultado: "1" | "2" | "X";
+    resultado: "1" | "2";
+    size?: number;
     createdAt: string;
+}
+
+export interface UserStats {
+  username: string;
+  total: number;
+  wins: number;
+  losses: number;
+  winRate: number;
+  currentStreak: number;
+  bestStreak: number;
+  mostPlayedRival: string | null;
+  rivalStats: Record<string, {
+    wins: number;
+    losses: number;
+    total: number;
+  }>;
+}
+
+export async function getStats(username: string): Promise<UserStats> {
+  const response = await fetch(`${USERS_URL}/stats/${username}`);
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error ?? 'Error al obtener las estadísticas');
+  }
+  return response.json();
+}
+
+// Filtros opcionales para getHistory
+export interface HistoryFilters {
+    resultado?: "1" | "2";
+    rival?: string;
+    fechaDesde?: string;
+    fechaHasta?: string;
+    size?: number;
 }

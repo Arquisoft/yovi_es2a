@@ -12,8 +12,12 @@ const gameRecordSchema = new mongoose.Schema({
   },
   resultado: {
     type: String,
-    enum: ['1', 'X', '2'],
-    required: true,   // '1' = gana el usuario logueado, '2' = pierde, 'X' = empate
+    enum: ['1', '2'],
+    required: true,   // '1' = gana el usuario logueado, '2' = pierde
+  },
+  size: {
+    type: Number,
+    required: false,  // tamaño del tablero (ej. 7 para un tablero 7x7)
   },
 }, { timestamps: true });  // createdAt actúa como fecha de la partida
 

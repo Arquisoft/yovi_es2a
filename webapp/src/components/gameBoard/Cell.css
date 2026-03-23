@@ -40,3 +40,21 @@
 .table-cell.player_two {
   background-color: royalblue;
 }
+
+/* Cuando la celda tiene clase player_one o player_two (está ocupada) */
+.table-cell.player_one, 
+.table-cell.player_two {
+    cursor: not-allowed;                  /* Cambia el cursor a 'prohibido' */
+    transition: filter 0.3s ease;         /* Transición suave al oscurecerse */
+}
+
+/* Evitamos que el brillo aumente al pasar el ratón si ya está ocupada */
+.table-cell.player_one:hover, 
+.table-cell.player_two:hover {
+    filter: none; /* No se oscurece al poner el cursor encima */
+}
+
+/* Aseguramos que solo las celdas VACÍAS tengan el cursor de puntero */
+.table-cell.empty {
+    cursor: pointer;
+}
