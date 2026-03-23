@@ -135,7 +135,7 @@ app.post('/login', async (req, res) => {
 // Body: { username, rival, resultado, size }
 // resultado: '1' (gana el usuario logueado), '2' (pierde), 'X' (empate)
 app.post('/savegame', async (req, res) => {
-  const { username, rival, resultado } = req.body ?? {};
+  const { username, rival, resultado, size } = req.body ?? {};
 
   if (!username || !rival || !resultado) {
     return res.status(400).json({ error: 'username, rival and resultado are required' });

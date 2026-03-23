@@ -107,12 +107,12 @@ export async function saveGameResult(
     username: string,
     rival: string,
     resultado: "1" | "2" | "X",
-    size: number
+    size: number,
 ): Promise<void> {
     const response = await fetch(`${USERS_URL}/savegame`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, rival, resultado }),
+        body: JSON.stringify({ username, rival, resultado, size }),
     });
     if (!response.ok) {
         const error = await response.json();

@@ -40,7 +40,7 @@ const Historic: React.FC = () => {
         if (filtroFechaHasta)              filters.fechaHasta = filtroFechaHasta;
         if (filtroSize !== 'todos')         filters.size       = Number(filtroSize);
 
-        getHistory(username)
+        getHistory(username, filters)
             .then(setHistory)
             .catch((e) => setError(e.message))
             .finally(() => setLoading(false));
@@ -91,10 +91,12 @@ const handleBuscar = () => setFiltroRival(rivalInput);
                     className="historic-filter-select"
                 >
                     <option value="todos">Todos los tamaños</option>
-                    <option value="5">5x5</option>
-                    <option value="7">7x7</option>
-                    <option value="9">9x9</option>
-                    <option value="11">11x11</option>
+                    {/* Generamos opciones del 4 al 30 */}
+                    {Array.from({ length: 27 }, (_, i) => i + 4).map((size) => (
+                        <option key={size} value={size}>
+                            {size}x{size}
+                        </option>
+                    ))}
                 </select>
  
                 {/* Rival */}
@@ -111,20 +113,25 @@ const handleBuscar = () => setFiltroRival(rivalInput);
                 </button>
  
                 {/* Fechas */}
-                <label className="historic-filter-label">Desde</label>
-                <input
-                    type="date"
-                    value={filtroFechaDesde}
-                    onChange={(e) => setFiltroFechaDesde(e.target.value)}
-                    className="historic-filter-date"
-                />
-                <label className="historic-filter-label">Hasta</label>
-                <input
-                    type="date"
-                    value={filtroFechaHasta}
-                    onChange={(e) => setFiltroFechaHasta(e.target.value)}
-                    className="historic-filter-date"
-                />
+                <div className="date-group">
+                    <label className="historic-filter-label">Desde</label>
+                    <input
+                        type="date"
+                        value={filtroFechaDesde}
+                        onChange={(e) => setFiltroFechaDesde(e.target.value)}
+                        className="historic-filter-date"
+                    />
+                </div>
+
+                <div className="date-group">
+                    <label className="historic-filter-label">Hasta</label>
+                    <input
+                        type="date"
+                        value={filtroFechaHasta}
+                        onChange={(e) => setFiltroFechaHasta(e.target.value)}
+                        className="historic-filter-date"
+                    />
+                </div>
  
                 {hayFiltrosActivos && (
                     <button className="historic-filter-reset" onClick={handleLimpiar}>
