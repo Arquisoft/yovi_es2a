@@ -34,7 +34,7 @@ const AuthForm: React.FC = () => {
 
       if (res.ok) {
         localStorage.setItem("username", username);
-        navigate('/lobby');
+        navigate('/menu');
       } else {
         setError(data.error || 'Something went wrong');
       }
