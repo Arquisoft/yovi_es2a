@@ -1,0 +1,85 @@
+.datahub-container {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+.datahub-card {
+    background: #ffffff;
+    border-radius: 4px;
+    padding: 2rem 2.5rem;
+    width: 100%;
+    max-width: 780px;
+    color: #000000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.datahub-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+}
+
+.datahub-back-btn {
+    background: none;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: #555555;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.datahub-back-btn:hover {
+    background: #f0f0f0;
+    border-color: #999999;
+    color: #000000;
+}
+
+.datahub-title {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.datahub-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid #e0e0e0;
+    margin-bottom: 1.75rem;
+}
+
+.datahub-tab {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 0.65rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    color: #777777;
+    margin-bottom: -2px;
+    transition: all 0.2s ease;
+}
+
+.datahub-tab:hover {
+    color: #333333;
+}
+
+.datahub-tab.active {
+    color: #000000;
+    border-bottom-color: #000000;
+}
+
+.datahub-content {
+    min-height: 200px;
+}

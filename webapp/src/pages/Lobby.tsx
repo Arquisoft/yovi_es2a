@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Historic from './Historic';
-import Stats from './Stats';
+
 import '../styles/Lobby.css';
-import '../styles/Historic.css';
+
 
 
 
@@ -41,9 +40,7 @@ export default function Lobby(): JSX.Element {
     const [mode, setMode] = useState<GameMode>(null);
     const [botType, setBotType] = useState<BotType>("random");
     const [difficulty, setDifficulty] = useState<Difficulty>("easy");
-    const [showHistory, setShowHistory] = useState(false);
     const [boardSize, setBoardSize] = useState(7); // Valor inicial 7
-    const [showStats, setShowStats] = useState(false);
 
     const handlePlay = () => {
         if (mode === "human") {
@@ -58,41 +55,18 @@ export default function Lobby(): JSX.Element {
         <div className="lobby-container">
             <div className="lobby-card">
 
-                {/* Botón historial arriba a la derecha */}
+                {/* Botón que vuelve al menu */}
                 <div className="lobby-header">
                     <button
                         className="history-btn"
-                        onClick={() => setShowHistory(true)}
-                        title="Ver historial"
+                        onClick={() => navigate('/menu')}
+                        title="Volver al menú"
                     >
-                        📋 Historial
-                    </button>
-                    <button
-                        className="history-btn"
-                        onClick={() => setShowStats(true)}
-                        title="Ver estadísticas"
-                    >
-                        📊 Estadísticas
+                        ← Menú
                     </button>
                 </div>
 
-                {/* Panel historial */}
-                {showHistory && (
-                    <div className="history-panel">
-                        <div className="history-panel-header">
-                            <button className="history-close-btn" onClick={() => setShowHistory(false)}>✕</button>
-                        </div>
-                        <Historic />
-                    </div>
-                )}
-                {showStats && (
-                    <div className="history-panel">
-                        <div className="history-panel-header">
-                            <button className="history-close-btn" onClick={() => setShowStats(false)}>✕</button>
-                        </div>
-                        <Stats />
-                    </div>
-                )}
+            
 
                 <h1 className="lobby-title">ELIGE TU PARTIDA</h1>
                 <p className="lobby-subtitle">¿Cómo quieres jugar?</p>
