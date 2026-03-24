@@ -3,7 +3,7 @@ import AuthForm from "./components/AuthForm/LoginForm";
 import Game from "./pages/Game";
 import Lobby from "./pages/Lobby";
 import Menu from "./pages/Menu";
-import DataHub from "./pages/DataHub";
+import DataHub from "./pages/Datahub";
 
 function App() { 
   

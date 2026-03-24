@@ -8,7 +8,7 @@ export default function Menu(): JSX.Element {
     return (
         <div className="menu-container">
             <div className="menu-card">
-                <h1 className="menu-title">HEX</h1>
+                <h1 className="menu-title">MENU</h1>
                 <p className="menu-subtitle">¿Qué quieres hacer?</p>
 
                 <div className="menu-options">
