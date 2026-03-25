@@ -12,8 +12,6 @@ setWorldConstructor(CustomWorld)
 
 Before(async function () {
   try {
-    await fetch('http://localhost:3000/testing/deleteuser/Alice', { method: 'DELETE' });
-    await fetch('http://localhost:3000/a', { method: 'DELETE' });
   } catch (e) {
   }
 

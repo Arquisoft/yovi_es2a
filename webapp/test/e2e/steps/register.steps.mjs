@@ -3,6 +3,30 @@ import assert from 'assert'
 
 Given('the user is on the registration tab', async function () {
   const page = this.page;
+
+  // --- CONFIGURACIÓN DEL MOCK ---
+  // Interceptamos la llamada POST a /createuser que hace el Frontend
+  await page.route('**/createuser', async (route) => {
+    // Simulamos que el backend responde con éxito (201 Created)
+    await route.fulfill({
+      status: 201,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        message: "Hello Alice!",
+        user: { username: "Alice" }
+      })
+    });
+  });
+
+  // Forzamos el login
+  await page.route('**/menu', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: "Welcome", user: { username: "Alice" } })
+    });
+  });
+
   await page.goto('http://localhost:80');
   
   // Localizamos el botón de REGISTER por su texto para ser más precisos
