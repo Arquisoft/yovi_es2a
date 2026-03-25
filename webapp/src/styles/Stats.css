@@ -1,0 +1,53 @@
+.stats-container {
+    padding: 1rem;
+}
+
+.stats-subtitle {
+    margin: 1.5rem 0 0.5rem;
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+/* Grid de tarjetas */
+.stats-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.stats-card {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 0.75rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 90px;
+    flex: 1;
+}
+
+.stats-card.win {
+    border-bottom: 3px solid #4caf50;
+}
+
+.stats-card.loss {
+    border-bottom: 3px solid #f44336;
+}
+
+.stats-card.streak {
+    border-bottom: 3px solid #ff9800;
+}
+
+/* Texto dentro de las tarjetas */
+.stats-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.stats-label {
+    font-size: 0.72rem;
+    opacity: 0.7;
+    margin-top: 2px;
+    text-align: center;
+}

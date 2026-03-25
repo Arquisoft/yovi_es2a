@@ -1,0 +1,84 @@
+.menu-container {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+.menu-card {
+    background: #ffffff;
+    border-radius: 4px;
+    padding: 3rem 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    color: #000000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.menu-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: 0.15em;
+}
+
+.menu-subtitle {
+    color: #666666;
+    margin: 0 0 2.5rem 0;
+    font-size: 0.95rem;
+}
+
+.menu-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.menu-option-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 1.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    background: #bcc3ce;
+    color: #333333;
+}
+
+.menu-option-btn:hover {
+    background: #a3aab5;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.menu-option-btn.play:hover {
+    background: #222222;
+    color: #ffffff;
+}
+
+.menu-option-btn.data:hover {
+    background: #444444;
+    color: #ffffff;
+}
+
+.menu-option-icon {
+    font-size: 2rem;
+}
+
+.menu-option-label {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.menu-option-desc {
+    font-size: 0.75rem;
+    opacity: 0.75;
+}
