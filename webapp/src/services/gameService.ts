@@ -1,17 +1,17 @@
 // Esta clase contiene todas las conexiones entre la API de rust y la lógica del juego en React.
 
 // Sobre el flujo desde React:
-//1. React arranca → POST /v1/game
+//1. React arranca → POST /game/new
 //                   El servidor crea un GameY, le asigna un ID único (uuid)
 //                   y lo guarda en el HashMap de AppState.
 //                   Devuelve el estado inicial del tablero.
 //
-//2. El jugador mueve → POST /v1/game/{id}/move
+//2. El jugador mueve → POST /game/{id}/move
 //                      El servidor busca la partida por ID en el HashMap,
 //                      aplica el movimiento, y si hay bot, lo hace jugar.
 //                      Devuelve el tablero actualizado.
 //
-//3. React consulta → GET /v1/game/{id}
+//3. React consulta → GET /game/{id}
 //                    El servidor busca la partida y devuelve su estado actual.
 
 // Importamos los tipos de la API
@@ -30,7 +30,7 @@ export async function createGame(
     mode: "human" | "computer" = "human",
     bot: string = "random_bot"
 ): Promise<ApiGameState> {
-    const response = await fetch(`${BACKEND_URL}/v1/game`, {
+    const response = await fetch(`${BACKEND_URL}/game/new`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // Añade al JSON tamaño, moodo y bot usando stringify para convertirlo a texto
@@ -46,7 +46,7 @@ export async function createGame(
 // Obtiene el estado de la partida por su ID
 export async function getGame(gameId: string): Promise<ApiGameState> {
     // Llamamos a la API de rust y le pedimos que nos devuelva el estado de la partida con ese ID
-    const response = await fetch(`${BACKEND_URL}/v1/game/${gameId}`);
+    const response = await fetch(`${BACKEND_URL}/game/${gameId}`);
     // Si sale mal obtenemos el error y lo mostramos
     if (!response.ok) {
         const error = await response.json();
@@ -72,7 +72,7 @@ export async function placeToken(
 
     if (botId) body.bot = botId;
 
-    const response = await fetch(`${BACKEND_URL}/v1/game/${gameId}/move`, {
+    const response = await fetch(`${BACKEND_URL}/game/${gameId}/move`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -89,7 +89,7 @@ export async function resign(
     gameId: string,
     player: number
 ): Promise<ApiMakeMoveResponse> {
-    const response = await fetch(`${BACKEND_URL}/v1/game/${gameId}/move`, {
+    const response = await fetch(`${BACKEND_URL}/game/${gameId}/move`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ player, action: "resign" }),
