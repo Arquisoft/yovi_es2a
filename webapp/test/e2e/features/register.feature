@@ -1,7 +1,7 @@
 Feature: Register
-  Validate the register form
+  Validate the users register
 
-  Scenario: Successful registration
-    Given the register page is open
-    When I enter "Alice" as the username and submit
-    Then I should see a welcome message containing "Hello Alice"
+  Scenario: Eegistro exitoso
+    Given the user is on the registration tab
+    When the user fills the form with username 'Alice' and password '123'
+    Then the account should be created successfully
