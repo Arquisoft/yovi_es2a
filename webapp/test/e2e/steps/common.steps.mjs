@@ -33,3 +33,11 @@ Then('I should see the game over screen', async function () {
     const isVisible = await this.page.locator('.overlay-content').isVisible();
     assert.strictEqual(isVisible, true, "No apareció la pantalla de fin de partida");
 });
+
+Then('I should be redirected to the main menu', async function () {
+    const page = this.page;
+    // Esperamos que tras el registro nos lleve al menú principal
+    await page.waitForURL('**/menu', { timeout: 5000 });
+    console.error('URL actual después del registro:', page.url());
+    assert.ok(page.url().includes('/menu'), 'Debería redirigir al menú principal después de un registro exitoso');
+});

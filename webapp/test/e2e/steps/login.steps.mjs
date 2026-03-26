@@ -59,14 +59,6 @@ When('The player register with user name {string} and password {string}', async 
     await page.press('#password', 'Enter');
 });
 
-Then('I should be redirected to the main menu', async function () {
-    const page = this.page;
-    // Esperamos que tras el registro nos lleve al menú principal
-    await page.waitForURL('**/menu', { timeout: 5000 });
-    console.error('URL actual después del registro:', page.url());
-    assert.ok(page.url().includes('/menu'), 'Debería redirigir al menú principal después de un registro exitoso');
-});
-
 Then('I receive an error message: {string}', async function (expectedError) {
     const locator = this.page.locator('.error-message'); 
     await locator.waitFor({ state: 'visible' });
