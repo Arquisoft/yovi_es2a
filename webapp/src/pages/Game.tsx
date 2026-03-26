@@ -66,7 +66,7 @@ export function Game({ size: _size }: GameProps): JSX.Element {
                         : <p>Turno: {currentPlayer}</p>
                     }
                     {error && <p className="error">{error}</p>}
-                    <button className="game-surrenter-button" onClick={handleResign} disabled={status !== "ongoing"}>
+                    <button className="game-surrender-button" onClick={handleResign} disabled={status !== "ongoing"}>
                         Rendirse
                     </button>
                 </div>
