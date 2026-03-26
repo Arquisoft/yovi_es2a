@@ -8,12 +8,7 @@ class CustomWorld {
   page = null
 }
 
-setWorldConstructor(CustomWorld)
-
 Before(async function () {
-  try {
-  } catch (e) {
-  }
 
   const headless = true
   const slowMo = 0
