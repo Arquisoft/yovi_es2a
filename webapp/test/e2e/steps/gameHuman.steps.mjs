@@ -63,13 +63,13 @@ Given('I have an active human game', async function () {
     const page = this.page;
     await page.click(SELECTORS.vsHumanoBtn);
     await page.click(SELECTORS.playBtn);
-    await page.waitForSelector(SELECTORS.gameBoard, { state: 'visible', timeout: 10000 });
+    await page.waitForSelector(SELECTORS.gameBoard, { state: 'visible', timeout: 5000 });
 });
 
 When('I configure the board for a human game', async function () {
     await this.page.click('.mode-btn:has-text("vs Humano")');
     await this.page.click('.play-btn.ready');
-    await this.page.waitForSelector('.game-board', { state: 'visible', timeout: 10000 });
+    await this.page.waitForSelector('.game-board', { state: 'visible', timeout: 5000 });
 });
 
 When('Player one clicks on an empty cell', async function () {
@@ -82,7 +82,7 @@ When('Player one makes the winning move', async function () {
 });
 
 Then('The cell should be marked as player one', async function () {
-    await this.page.waitForSelector('.table-cell.player_one', { timeout: 10000 });
+    await this.page.waitForSelector('.table-cell.player_one', { timeout: 5000 });
     const count = await this.page.locator('.table-cell.player_one').count();
     assert.ok(count > 0, "No hay celdas marcadas como jugador uno");
 });

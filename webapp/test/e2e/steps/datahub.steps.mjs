@@ -67,12 +67,12 @@ Given('I am logged in', async function () {
 
 When('I navigate to my data', async function () {
     await this.page.click('button:has-text("Ver datos")');
-    await this.page.waitForSelector('.datahub-container', { state: 'visible', timeout: 10000 });
+    await this.page.waitForSelector('.datahub-container', { state: 'visible', timeout: 5000 });
 });
 
 When('I click on the statistics tab', async function () {
     await this.page.click('.datahub-tab:has-text("Estadísticas")');
-    await this.page.waitForSelector('.stats-container', { state: 'visible', timeout: 10000 });
+    await this.page.waitForSelector('.stats-container', { state: 'visible', timeout: 5000 });
 });
 
 When('I filter history by victory', async function () {
