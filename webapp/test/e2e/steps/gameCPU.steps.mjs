@@ -78,28 +78,6 @@ await page.route('**/game/new', async (route) => {
 });
 });
 
-Given('I am logged in and on the play menu', async function () {
-    const page = this.page;
-    await page.goto(BASE_URL);
-    
-    // Mock rápido de login para el bypass
-    await page.route('**/login', async (route) => {
-        await route.fulfill({
-            status: 200,
-            body: JSON.stringify({ user: { username: "Alice" } })
-        });
-    });
-
-    await page.fill('#username', 'Alice');
-    await page.fill('#password', '123');
-    await page.press('#password', 'Enter');
-    
-    await page.waitForURL('**/menu');
-    // Navegamos al lobby desde el menú
-    await page.click('button:has-text("Jugar")');
-    await page.waitForSelector(SELECTORS.vsMaquinaBtn);
-});
-
 Given('I have an active game against {string}', async function (opponent) {
     const page = this.page;
     await page.click(SELECTORS.vsMaquinaBtn);
@@ -125,13 +103,6 @@ When('I click on an empty cell', async function () {
     await cell.click();
 });
 
-// --- THEN / VALIDACIONES ---
-
-Then('I should see the game board', async function () {
-    const isVisible = await this.page.locator(SELECTORS.gameBoard).isVisible();
-    assert.strictEqual(isVisible, true, "El tablero no apareció");
-});
-
 Then('The cell should be marked as mine', async function () {
     await this.page.waitForSelector('.table-cell.player_one', { timeout: 10000 });
     const exists = await this.page.locator('.table-cell.player_one').count();
@@ -144,11 +115,6 @@ Then('The Bot should make its move automatically', async function () {
     assert.ok(text.includes('PLAYER_ONE'), "El bot no devolvió el turno");
 });
 
-Then('I should see the game over screen', async function () {
-    await this.page.waitForSelector('.overlay-content', { state: 'visible', timeout: 10000 });
-    const isVisible = await this.page.locator('.overlay-content').isVisible();
-    assert.strictEqual(isVisible, true, "No apareció la pantalla de fin de partida");
-});
 
 Then('It should be my turn again', async function () {
     const text = await this.page.locator(SELECTORS.turnText).innerText();
