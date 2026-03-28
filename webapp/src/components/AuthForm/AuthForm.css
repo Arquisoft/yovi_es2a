@@ -95,3 +95,8 @@
   background-color: #ccc;
   cursor: not-allowed;
 }
+
+.error-message {
+  color: 'red';
+  font-size: '14px';
+}
