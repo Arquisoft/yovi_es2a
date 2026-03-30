@@ -36,7 +36,7 @@ const AuthForm: React.FC = () => {
 
       if (res.ok) {
         localStorage.setItem("username", username);
-        navigate('/lobby');
+        navigate('/menu');
       } else {
         setError(data.error || 'Something went wrong');
       }
@@ -92,7 +92,7 @@ const AuthForm: React.FC = () => {
           </div>
         )}
 
-        {error && <p style={{ color: 'red', fontSize: '14px' }}>{error}</p>}
+        {error && <p className="error-message">{error}</p>}
 
         <button type="submit" className="submit-button">
           {isLogin ? 'GO!' : 'CREATE'}

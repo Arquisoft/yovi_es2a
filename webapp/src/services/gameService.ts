@@ -1,17 +1,17 @@
 // Esta clase contiene todas las conexiones entre la API de rust y la lógica del juego en React.
 
 // Sobre el flujo desde React:
-//1. React arranca → POST /v1/game
+//1. React arranca → POST /game/new
 //                   El servidor crea un GameY, le asigna un ID único (uuid)
 //                   y lo guarda en el HashMap de AppState.
 //                   Devuelve el estado inicial del tablero.
 //
-//2. El jugador mueve → POST /v1/game/{id}/move
+//2. El jugador mueve → POST /game/{id}/move
 //                      El servidor busca la partida por ID en el HashMap,
 //                      aplica el movimiento, y si hay bot, lo hace jugar.
 //                      Devuelve el tablero actualizado.
 //
-//3. React consulta → GET /v1/game/{id}
+//3. React consulta → GET /game/{id}
 //                    El servidor busca la partida y devuelve su estado actual.
 
 // Importamos los tipos de la API
@@ -30,7 +30,7 @@ export async function createGame(
     mode: "human" | "computer" = "human",
     bot: string = "random_bot"
 ): Promise<ApiGameState> {
-    const response = await fetch(`${BACKEND_URL}/v1/game`, {
+    const response = await fetch(`${BACKEND_URL}/game/new`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // Añade al JSON tamaño, moodo y bot usando stringify para convertirlo a texto
@@ -46,7 +46,7 @@ export async function createGame(
 // Obtiene el estado de la partida por su ID
 export async function getGame(gameId: string): Promise<ApiGameState> {
     // Llamamos a la API de rust y le pedimos que nos devuelva el estado de la partida con ese ID
-    const response = await fetch(`${BACKEND_URL}/v1/game/${gameId}`);
+    const response = await fetch(`${BACKEND_URL}/game/${gameId}`);
     // Si sale mal obtenemos el error y lo mostramos
     if (!response.ok) {
         const error = await response.json();
@@ -72,7 +72,7 @@ export async function placeToken(
 
     if (botId) body.bot = botId;
 
-    const response = await fetch(`${BACKEND_URL}/v1/game/${gameId}/move`, {
+    const response = await fetch(`${BACKEND_URL}/game/${gameId}/move`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -89,7 +89,7 @@ export async function resign(
     gameId: string,
     player: number
 ): Promise<ApiMakeMoveResponse> {
-    const response = await fetch(`${BACKEND_URL}/v1/game/${gameId}/move`, {
+    const response = await fetch(`${BACKEND_URL}/game/${gameId}/move`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ player, action: "resign" }),
@@ -102,16 +102,17 @@ export async function resign(
 }
 
 // Guarda el resultado de una partida finalizada en el historial del usuario.
-// resultado: '1' = gana el usuario logueado, '2' = pierde, 'X' = empate
+// resultado: '1' = gana el usuario logueado, '2' = pierde
 export async function saveGameResult(
     username: string,
     rival: string,
-    resultado: "1" | "2" | "X"
+    resultado: "1" | "2",
+    size: number,
 ): Promise<void> {
     const response = await fetch(`${USERS_URL}/savegame`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, rival, resultado }),
+        body: JSON.stringify({ username, rival, resultado, size }),
     });
     if (!response.ok) {
         const error = await response.json();
@@ -119,9 +120,20 @@ export async function saveGameResult(
     }
 }
 
-// Devuelve el historial de partidas de un usuario
-export async function getHistory(username: string): Promise<GameHistoryRecord[]> {
-    const response = await fetch(`${USERS_URL}/history/${username}`);
+// Devuelve el historial de partidas de un usuario con filtros opcionales
+export async function getHistory(
+    username: string,
+    filters: HistoryFilters = {}
+): Promise<GameHistoryRecord[]> {
+    const params = new URLSearchParams();
+    if (filters.resultado)          params.set("resultado", filters.resultado);
+    if (filters.rival?.trim())      params.set("rival", filters.rival.trim());
+    if (filters.fechaDesde)         params.set("fechaDesde", filters.fechaDesde);
+    if (filters.fechaHasta)         params.set("fechaHasta", filters.fechaHasta);
+    if (filters.size)               params.set("size", String(filters.size));
+ 
+    const query = params.toString() ? `?${params.toString()}` : "";
+    const response = await fetch(`${USERS_URL}/history/${username}${query}`);
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error ?? "Error al obtener el historial");
@@ -134,6 +146,41 @@ export interface GameHistoryRecord {
     _id: string;
     username: string;
     rival: string;
-    resultado: "1" | "2" | "X";
+    resultado: "1" | "2";
+    size?: number;
     createdAt: string;
+}
+
+export interface UserStats {
+  username: string;
+  total: number;
+  wins: number;
+  losses: number;
+  winRate: number;
+  currentStreak: number;
+  bestStreak: number;
+  mostPlayedRival: string | null;
+  rivalStats: Record<string, {
+    wins: number;
+    losses: number;
+    total: number;
+  }>;
+}
+
+export async function getStats(username: string): Promise<UserStats> {
+  const response = await fetch(`${USERS_URL}/stats/${username}`);
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error ?? 'Error al obtener las estadísticas');
+  }
+  return response.json();
+}
+
+// Filtros opcionales para getHistory
+export interface HistoryFilters {
+    resultado?: "1" | "2";
+    rival?: string;
+    fechaDesde?: string;
+    fechaHasta?: string;
+    size?: number;
 }

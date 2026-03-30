@@ -5,7 +5,6 @@ services:
     image: ghcr.io/arquisoft/yovi_es2a-users:latest
     restart: always
     container_name: users
-    
 
     ports:
       - "3000:3000"
@@ -13,6 +12,7 @@ services:
       - ./users_env.env
     networks:
       - monitor-net
+  
 
   webapp:
     build:

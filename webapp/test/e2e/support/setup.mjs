@@ -8,13 +8,7 @@ class CustomWorld {
   page = null
 }
 
-setWorldConstructor(CustomWorld)
-
 Before(async function () {
-  try {
-    await fetch('http://localhost:3000/testing/deleteuser/Alice', { method: 'DELETE' });
-  } catch (e) {
-  }
 
   const headless = true
   const slowMo = 0

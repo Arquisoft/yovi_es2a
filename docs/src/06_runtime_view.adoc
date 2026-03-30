@@ -9,8 +9,6 @@ Esta sección describe cómo se comportan los componentes del sistema durante la
 
 El usuario accede a la aplicación e introduce sus credenciales. El servicio `users` valida los datos y devuelve un token de sesión.
 
-Revisar nombres de las peticiones
-
 [plantuml, runtime-login, png]
 ----
 @startuml
@@ -20,7 +18,7 @@ participant "users" as users
 database "MongoDB" as mongo
 
 Usuario -> web: Introduce credenciales
-web -> users: POST /auth/login
+web -> users: POST /login
 users -> mongo: Consulta usuario
 mongo --> users: Datos del usuario
 users --> web: Token de sesión
@@ -41,7 +39,7 @@ participant "gamey" as gamey
 
 Usuario -> web: Configura partida (tamaño, oponente, estrategia)
 web -> gamey: POST /game/new
-gamey --> web: Estado inicial del tablero
+gamey --> web: Estado inicial del tablero en YEN
 web --> Usuario: Muestra tablero
 @enduml
 ----
@@ -52,7 +50,16 @@ El usuario hace clic en una celda. El frontend envía el movimiento al motor de 
 
 Hacer diagrama
 ----
+@startuml
+actor Usuario
+participant "webapp" as web
+participant "gamey" as game
 
+Usuario -> web: Hace un movimiento
+web -> game: POST /game/:gameId/move
+game --> web: YEN con la respuestadel bot
+web --> Usuario: Muestra el nuevo estado del tablero
+@enduml
 ----
 
 === Escenario 4: Fin de partida
@@ -69,7 +76,7 @@ participant "users" as users
 database "MongoDB" as mongo
 
 gamey --> web: Victoria/derrota detectada
-web -> users: POST /history (resultado de la partida)
+web -> users: POST /savegame (resultado de la partida)
 users -> mongo: Guarda partida
 mongo --> users: OK
 web --> Usuario: Muestra resultado final

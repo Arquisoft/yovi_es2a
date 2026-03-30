@@ -78,11 +78,10 @@ export function useGame({
     // Solo guardamos cuando termina la partida y hay un usuario logueado
         if (apiState.status === "finished" && username) {
             const rival = mode === "computer" ? botId : "invitado";
-            // '1' = gana el jugador 0 (usuario), '2' = gana el jugador 1 (rival), 'X' = empate
-            const resultado: "1" | "2" | "X" =
-                apiState.winner === 0 ? "1" :
-                apiState.winner === 1 ? "2" : "X";
-            saveGameResult(username, rival, resultado).catch((e) => {
+            // '1' = gana el jugador 0 (usuario), '2' = gana el jugador 1 (rival)
+            const resultado: "1" | "2" =
+                apiState.winner === 0 ? "1" : "2";
+            saveGameResult(username, rival, resultado, size).catch((e) => {
                 console.error("Error al guardar historial:", e);
             });
         }
