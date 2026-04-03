@@ -7,7 +7,7 @@ import '../styles/Lobby.css';
 
 
 type GameMode = "human" | "computer" | null;
-type BotType = "random" | "defensive" | "offensive" | "positional";
+type BotType = "random" | "defensive" | "offensive" | "positional" | "monte_carlo";
 type Difficulty = "easy" | "medium" | "hard";
 
 const BOT_NAMES: Record<BotType, string> = {
@@ -15,6 +15,7 @@ const BOT_NAMES: Record<BotType, string> = {
     defensive: "Defensivo",
     offensive: "Ofensivo",
     positional: "Posicional",
+    monte_carlo: "Monte Carlo",
 };
 
 const BOT_DESCRIPTIONS: Record<BotType, string> = {
@@ -22,6 +23,7 @@ const BOT_DESCRIPTIONS: Record<BotType, string> = {
     defensive: "Bloquea tus movimientos y juega seguro.",
     offensive: "Intenta ganar jugando ofensivamente.",
     positional: "Controla las posiciones clave del tablero.",
+    monte_carlo: "Simula partidas para encontrar la mejor jugada.",
 };
 
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
@@ -30,8 +32,12 @@ const DIFFICULTY_LABELS: Record<Difficulty, string> = {
     hard: "DIFÍCIL",
 };
 
+// Bots que no tienen selector de dificultad
+const BOTS_WITHOUT_DIFFICULTY: BotType[] = ["random", "monte_carlo"];
+
 function getBotId(type: BotType, difficulty: Difficulty): string {
     if (type === "random") return "random_bot";
+    if (type === "monte_carlo") return "monte_carlo_bot";
     return `${type}_${difficulty}`;
 }
 
@@ -124,7 +130,8 @@ export default function Lobby(): JSX.Element {
                             </div>
                         </div>
 
-                        {botType !== "random" && (
+                        {/* Selector de dificultad solo para bots que lo tienen */}
+                        {!BOTS_WITHOUT_DIFFICULTY.includes(botType) && (
                             <div className="config-section">
                                 <h3 className="config-title">Dificultad</h3>
                                 <div className="difficulty-selector">

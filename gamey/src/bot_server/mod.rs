@@ -38,6 +38,7 @@ pub use error::ErrorResponse;
 pub use version::*;
 
 use crate::{GameYError, RandomBot, YBotRegistry, PlayerId, state::AppState};
+use crate::bot::monte_carlo_bot::MonteCarloBot;
 
 /// Creates the Axum router with the given state.
 ///
@@ -84,7 +85,12 @@ pub fn create_default_state() -> AppState {
         // Positional
         .with_bot(Arc::new(PositionalBot { my_player_id: PlayerId::new(0), opponent_id: PlayerId::new(1), difficulty: Difficulty::Easy }))
         .with_bot(Arc::new(PositionalBot { my_player_id: PlayerId::new(0), opponent_id: PlayerId::new(1), difficulty: Difficulty::Medium }))
-        .with_bot(Arc::new(PositionalBot { my_player_id: PlayerId::new(0), opponent_id: PlayerId::new(1), difficulty: Difficulty::Hard }));
+        .with_bot(Arc::new(PositionalBot { my_player_id: PlayerId::new(0), opponent_id: PlayerId::new(1), difficulty: Difficulty::Hard }))
+        .with_bot(Arc::new(MonteCarloBot {
+            my_player_id: PlayerId::new(0),
+            opponent_id: PlayerId::new(1),
+            simulations: 50,
+        }));
 
     AppState::new(bots)
 }
