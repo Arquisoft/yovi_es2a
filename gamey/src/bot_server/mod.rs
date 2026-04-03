@@ -6,6 +6,7 @@
 //! # Endpoints
 //! - `GET /status` - Health check endpoint
 //! - `POST /{api_version}/ybot/choose/{bot_id}` - Request a move from a bot
+//! - `POST /v1/play` - Envía un tablero en YEN y recibe el movimiento del bot en YEN
 //!
 //! # Example
 //! ```no_run
@@ -37,11 +38,11 @@ pub use error::ErrorResponse;
 pub use version::*;
 
 use crate::{GameYError, RandomBot, YBotRegistry, PlayerId, state::AppState};
+
 /// Creates the Axum router with the given state.
 ///
 /// This is useful for testing the API without binding to a network port.
 pub fn create_router(state: AppState) -> axum::Router {
-    // CConfiguramos el cors para permitir que se pueda acceder a la API desde cualquier origen.
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
         .allow_headers(Any)
@@ -54,11 +55,12 @@ pub fn create_router(state: AppState) -> axum::Router {
             "/{api_version}/ybot/choose/{bot_id}",
             axum::routing::post(choose::choose),
         )
-        // ── API de juego (nueva) ─────────────────────────────────────────────
-        // En un fichero aparte por el principio de responsabilidad unica
-        .route("/game/new",                          axum::routing::post(game_routes::create_game))
-        .route("/game/{game_id}",                axum::routing::get(game_routes::get_game))
-        .route("/game/{game_id}/move",           axum::routing::post(game_routes::make_move))
+        // ── API de juego ─────────────────────────────────────────────────────
+        .route("/game/new",                axum::routing::post(game_routes::create_game))
+        .route("/game/{game_id}",          axum::routing::get(game_routes::get_game))
+        .route("/game/{game_id}/move",     axum::routing::post(game_routes::make_move))
+        // ── API para bots externos (nuevo) ───────────────────────────────────
+        .route("/v1/play",                 axum::routing::post(game_routes::play))
         .layer(cors)
         .with_state(state)
 }
@@ -88,16 +90,6 @@ pub fn create_default_state() -> AppState {
 }
 
 /// Starts the bot server on the specified port.
-///
-/// This function blocks until the server is shut down.
-///
-/// # Arguments
-/// * `port` - The TCP port to listen on
-///
-/// # Errors
-/// Returns `GameYError::ServerError` if:
-/// - The TCP port cannot be bound (e.g., port already in use, permission denied)
-/// - The server encounters an error while running
 pub async fn run_bot_server(port: u16) -> Result<(), GameYError> {
     let state = create_default_state();
     let app = create_router(state);
@@ -120,8 +112,6 @@ pub async fn run_bot_server(port: u16) -> Result<(), GameYError> {
 }
 
 /// Health check endpoint handler.
-///
-/// Returns "OK" to indicate the server is running.
 pub async fn status() -> impl IntoResponse {
     "OK"
 }

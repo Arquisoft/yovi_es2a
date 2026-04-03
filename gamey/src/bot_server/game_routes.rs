@@ -340,3 +340,162 @@ fn trigger_bot_move(game: &mut GameY, bot: &dyn YBot) -> Option<AppliedMove> {
         }
     }
 }
+
+// ─── Endpoint /v1/play ────────────────────────────────────────────────────────
+ 
+/// Cuerpo de la petición para el endpoint play.
+/// Permite que un bot externo juegue contra nuestra IA enviando un tablero en YEN.
+#[derive(Debug, Deserialize)]
+pub struct PlayRequest {
+    /// Estado actual del tablero en notación YEN.
+    /// Ejemplo: "./../..." para un tablero de tamaño 3 vacío.
+    pub position: String,
+    /// Bot que responderá al movimiento. Por defecto: "random_bot".
+    #[serde(default = "default_bot")]
+    pub bot: String,
+    /// Jugador que debe mover (0 o 1). Por defecto: 0.
+    #[serde(default = "default_player")]
+    pub player: u32,
+}
+ 
+fn default_player() -> u32 { 0 }
+ 
+/// Respuesta del endpoint play.
+#[derive(Debug, Serialize)]
+pub struct PlayResponse {
+    /// Notación YEN del tablero tras el movimiento del bot.
+    pub position: String,
+    /// Índice de la celda donde jugó el bot.
+    pub cell_index: u32,
+    /// Estado de la partida: "ongoing" o "finished".
+    pub status: String,
+    /// Ganador si la partida terminó, null si sigue.
+    pub winner: Option<u32>,
+}
+ 
+/// `POST /v1/play`
+///
+/// Recibe un tablero en notación YEN y devuelve el siguiente movimiento del bot
+/// también en notación YEN. Permite que bots externos jueguen contra nuestra IA.
+///
+/// ### Ejemplo de request
+/// ```json
+/// {
+///   "position": "./../...",
+///   "bot": "defensive_hard",
+///   "player": 0
+/// }
+/// ```
+///
+/// ### Ejemplo de response
+/// ```json
+/// {
+///   "position": "./../.B.",
+///   "cell_index": 5,
+///   "status": "ongoing",
+///   "winner": null
+/// }
+/// ```
+pub async fn play(
+    State(state): State<AppState>,
+    Json(req): Json<PlayRequest>,
+) -> impl IntoResponse {
+    // 1. Parsear el YEN recibido para reconstruir el tablero
+    let yen = match parse_yen_from_string(&req.position) {
+        Ok(y) => y,
+        Err(e) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(serde_json::json!({ "error": format!("YEN inválido: {}", e) })),
+            ).into_response();
+        }
+    };
+ 
+    let mut game = match GameY::try_from(yen) {
+        Ok(g) => g,
+        Err(e) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(serde_json::json!({ "error": format!("No se pudo reconstruir el tablero: {}", e) })),
+            ).into_response();
+        }
+    };
+ 
+    // 2. Buscar el bot solicitado
+    let bot = match state.bots().find(&req.bot) {
+        Some(b) => b,
+        None => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(serde_json::json!({ "error": format!("Bot '{}' no encontrado", req.bot) })),
+            ).into_response();
+        }
+    };
+ 
+    // 3. Si el juego ya terminó, devolver error
+    if game.check_game_over() {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({ "error": "La partida ya ha terminado" })),
+        ).into_response();
+    }
+ 
+    // 4. El bot elige su movimiento
+    let bot_coords = match bot.choose_move(&game) {
+        Some(c) => c,
+        None => {
+            return (
+                StatusCode::UNPROCESSABLE_ENTITY,
+                Json(serde_json::json!({ "error": "El bot no pudo elegir un movimiento (tablero lleno?)" })),
+            ).into_response();
+        }
+    };
+ 
+    let bot_player = match game.next_player() {
+        Some(p) => p,
+        None => {
+            return (
+                StatusCode::UNPROCESSABLE_ENTITY,
+                Json(serde_json::json!({ "error": "No hay jugador activo" })),
+            ).into_response();
+        }
+    };
+ 
+    let cell_index = bot_coords.to_index(game.board_size());
+    let movement = Movement::Placement { player: bot_player, coords: bot_coords };
+ 
+    // 5. Aplicar el movimiento
+    if let Err(e) = game.add_move(movement) {
+        return (
+            StatusCode::UNPROCESSABLE_ENTITY,
+            Json(serde_json::json!({ "error": e.to_string() })),
+        ).into_response();
+    }
+ 
+    // 6. Construir la respuesta con el nuevo YEN
+    let new_yen: YEN = (&game).into();
+    let (status_str, winner) = match game.status() {
+        GameStatus::Ongoing { .. } => ("ongoing".to_string(), None),
+        GameStatus::Finished { winner } => ("finished".to_string(), Some(winner.id())),
+    };
+ 
+    let response = PlayResponse {
+        position: new_yen.layout().to_string(),
+        cell_index,
+        status: status_str,
+        winner,
+    };
+ 
+    (StatusCode::OK, Json(response)).into_response()
+}
+ 
+/// Parsea una cadena YEN en el formato "row1/row2/row3"
+/// y deduce el tamaño del tablero a partir del número de filas.
+fn parse_yen_from_string(position: &str) -> Result<YEN, String> {
+    let rows: Vec<&str> = position.split('/').collect();
+    let size = rows.len() as u32;
+    if size == 0 {
+        return Err("El YEN no puede estar vacío".to_string());
+    }
+    Ok(YEN::new(size, 0, vec!['B', 'R'], position.to_string()))
+}
