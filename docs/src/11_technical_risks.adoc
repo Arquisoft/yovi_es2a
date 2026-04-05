@@ -57,4 +57,8 @@ Para valorar la importancia de cada riesgo se utiliza una escala de impacto en t
 |===
 
 === Deuda Técnica
-Al encontrarnos en la fase inicial del proyecto, no se ha contraído deuda técnica significativa. Se están siguiendo los estándares de codificación y diseño definidos. No obstante, se realizará un seguimiento periódico para identificar posibles atajos tomados durante la implementación de los primeros prototipos.
+
+**Diseño web inicial poco optimizado visualmente**  
+Durante las primeras fases del desarrollo se priorizará la funcionalidad sobre el diseño visual 
+de la aplicación. Como resultado, la interfaz puede presentar un diseño básico con escasa 
+optimización estética o de experiencia de usuario, que deberá mejorarse en iteraciones posteriores.

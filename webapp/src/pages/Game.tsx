@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
 import '../styles/App.css';
 import '../styles/Game.css';
 import { GameBoard } from '../components/gameBoard/GameBoard';
 import { EndGameOverlay as Overlay } from '../components/gameBoard/EndGameOverlay';
 import { useGame } from '../hooks/useGame';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuthComprobation, getLoggedUser } from '../components/AuthComprobation';
 
 interface GameProps {
     size?: number;
@@ -13,7 +13,7 @@ interface GameProps {
 }
 
 export function Game({ size: _size }: GameProps): JSX.Element {
-    const username = localStorage.getItem("username") ?? undefined;
+    useAuthComprobation();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -25,19 +25,12 @@ export function Game({ size: _size }: GameProps): JSX.Element {
     const boardSize: number = location.state?.boardSize ?? 7;
     const size = boardSize ?? _size ?? 7;
 
-
-    const { cells, currentPlayer, winner, status, error, handleCellClick, handleResign, resetGame } = useGame({ size, mode, botId, username });
+    const username = localStorage.getItem("username") ?? undefined;
+    const { cells, currentPlayer, winner, status, error, handleCellClick, handleResign, resetGame } = useGame({ size, mode, botId, username});
 
     const volverAlMenu = () => {
         navigate('/lobby'); 
     };
-
-    // Navegación segura usando useEffect para evitar warnings de React
-    useEffect(() => {
-        if (username == null) {
-            navigate('/');
-        }
-    }, [username, navigate]);
 
     if (status === "loading") return <div>Cargando partida...</div>;
 
@@ -73,7 +66,7 @@ export function Game({ size: _size }: GameProps): JSX.Element {
             </div>
 
             <div className="user-info">
-                <p>Jugador Loggeado: {username}</p>
+                <p>Jugador Loggeado: {getLoggedUser()}</p>
             </div>
         </>    
     );

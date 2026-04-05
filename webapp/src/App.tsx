@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import AuthForm from "./components/AuthForm/LoginForm";
 import Game from "./pages/Game";
 import Lobby from "./pages/Lobby";
@@ -6,9 +6,9 @@ import Menu from "./pages/Menu";
 import DataHub from "./pages/Datahub";
 
 function App() { 
-  
+    
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<AuthForm />} />
         <Route path="/menu" element={<Menu />} />
@@ -18,7 +18,7 @@ function App() {
         <Route path="/historic" element={<Navigate to="/datos" replace />} />
         <Route path="/stats" element={<Navigate to="/datos" replace />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
