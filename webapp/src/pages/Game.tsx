@@ -4,8 +4,7 @@ import { GameBoard } from '../components/gameBoard/GameBoard';
 import { EndGameOverlay as Overlay } from '../components/gameBoard/EndGameOverlay';
 import { useGame } from '../hooks/useGame';
 import { useNavigate, useLocation } from 'react-router-dom';
-import AuthComprobation from '../components/AuthComprobation';
-import GetLoggedUser from '../components/AuthComprobation';
+import { useAuthComprobation, getLoggedUser } from '../components/AuthComprobation';
 
 interface GameProps {
     size?: number;
@@ -14,7 +13,7 @@ interface GameProps {
 }
 
 export function Game({ size: _size }: GameProps): JSX.Element {
-    AuthComprobation();
+    useAuthComprobation();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -67,7 +66,7 @@ export function Game({ size: _size }: GameProps): JSX.Element {
             </div>
 
             <div className="user-info">
-                <p>Jugador Loggeado: {GetLoggedUser()}</p>
+                <p>Jugador Loggeado: {getLoggedUser()}</p>
             </div>
         </>    
     );

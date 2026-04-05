@@ -1,11 +1,11 @@
 import './AuthForm.css'
 import React, { useState} from 'react';
 import '../AuthComprobation';
-import AuthComprobation from '../AuthComprobation';
+import { useAuthComprobation } from '../AuthComprobation';
 import { useNavigate} from 'react-router-dom';
 
 const AuthForm: React.FC = () => {
-  AuthComprobation();
+  useAuthComprobation();
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');

@@ -1,15 +1,19 @@
 import {useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function AuthComprobation(): JSX.Element {
-    const user = localStorage.getItem("username") ?? undefined;
+export function useAuthComprobation(): void {
     const navigate = useNavigate();
+
     useEffect(() => {
-            if (user == null) {
-                navigate('/');
-            } else {
-                navigate('/lobby');
-            }
-        }, [user, navigate]);
-    return <></>;
+        const user = localStorage.getItem("username");
+
+        if (!user) {
+            navigate('/');
+        }
+    }, [navigate]);
+}
+
+export function getLoggedUser(): string | undefined {
+    const user = localStorage.getItem("username") ?? undefined;
+    return user;
 }
