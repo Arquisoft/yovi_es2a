@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getLoggedUser } from './AuthComprobation';
+import { FaUserCircle } from 'react-icons/fa';
 import './Navbar.css';
 
 const Navbar: React.FC = () => {
@@ -16,10 +17,11 @@ const Navbar: React.FC = () => {
     return (
         <nav className="navbar">
             <div className="navbar-left">
-                YOVI_ES2A
+                <span className="navbar-brand">YOVI_ES2A</span>
             </div>
             <div className="navbar-right">
                 <button className="user-button" onClick={() => setShowDropdown(!showDropdown)}>
+                    <FaUserCircle size={20} />
                     {user}
                 </button>
                 {showDropdown && (

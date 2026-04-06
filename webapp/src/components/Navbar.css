@@ -33,14 +33,24 @@
 }
 
 .user-button {
+    display: flex;       
+    align-items: center;      
+    gap: 8px;                 
+
     background-color: #333;
     border: 1px solid #444;
-    border-radius: 20px; /* Botón redondeado */
+    border-radius: 20px;
     color: white;
     padding: 8px 16px;
     cursor: pointer;
     font-size: 0.95rem;
     transition: background 0.3s ease;
+}
+
+.user-icon {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
 }
 
 .user-button:hover {
