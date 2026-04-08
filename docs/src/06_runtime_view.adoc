@@ -104,6 +104,26 @@ web --> Usuario: Muestra historial
 @enduml
 ----
 
+=== Escenario 6: Consulta de historial con filtrado
+El usuario accede a su perfil y solicita ver sus partidas pasadas. El sistema permite filtrar por rival, resultado o fecha para optimizar la visualización.
+
+[plantuml, runtime-history, png]
+----
+@startuml
+actor Usuario
+participant "webapp" as web
+participant "users-service" as users
+database "MongoDB" as mongo
+
+Usuario -> web: Accede a Historial
+web -> users: GET /history/{username} (filters)
+users -> mongo: find(GameRecord) con criterios
+mongo --> users: Lista de partidas
+users --> web: JSON (GameHistoryRecord[])
+web --> Usuario: Renderiza tabla filtrada
+@enduml
+----
+
 ifdef::arc42help[]
 [role="arc42help"]
 ****
