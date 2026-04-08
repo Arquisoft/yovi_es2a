@@ -89,7 +89,7 @@ pub fn create_default_state() -> AppState {
         .with_bot(Arc::new(MonteCarloBot {
             my_player_id: PlayerId::new(0),
             opponent_id: PlayerId::new(1),
-            simulations: 50,
+            simulations: 150,
         }));
 
     AppState::new(bots)
