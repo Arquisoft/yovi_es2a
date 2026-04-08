@@ -174,21 +174,21 @@ app.get('/history/:username', async (req, res) => {
   }
  
   try {
-    const filter = { username };
-    if (resultado)  filter.resultado = resultado;
-    if (rival)      filter.rival = { $regex: rival, $options: 'i' };
+    const filter = { username: String(username) };
+    if (resultado)  filter.resultado = String(resultado);
+    if (rival)      filter.rival = { $regex: String(rival).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' };
     if (size)       filter.size = Number(size);
- 
+
     if (fechaDesde || fechaHasta) {
       filter.createdAt = {};
-      if (fechaDesde) filter.createdAt.$gte = new Date(fechaDesde);
+      if (fechaDesde) filter.createdAt.$gte = new Date(String(fechaDesde));
       if (fechaHasta) {
-        const hasta = new Date(fechaHasta);
+        const hasta = new Date(String(fechaHasta));
         hasta.setDate(hasta.getDate() + 1);
         filter.createdAt.$lt = hasta;
       }
     }
- 
+
     const records = await GameRecord.find(filter)
       .sort({ createdAt: -1 })
       .lean();
