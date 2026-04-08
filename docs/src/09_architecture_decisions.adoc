@@ -41,3 +41,34 @@ endif::arc42help[]
 En esta sección documentamos las decisiones arquitectónicas significativas que darán forma a la estructura, el despliegue y la tecnología del sistema YOVI. Estas decisiones se tomarán considerando los requisitos no funcionales, las restricciones del proyecto y la experiencia del equipo de desarrollo.
 
 El objetivo de este registro es proporcionar trazabilidad y justificación sobre por qué se eligieron ciertas soluciones frente a otras alternativas disponibles, utilizando el formato de registros de decisión (ADR).
+
+=== ADR-001: Uso de MongoDB como base de datos
+
+==== Contexto
+
+Se necesitaba persistir información de usuarios y su historial de partidas. Los datos a almacenar eran relativamente simples:
+
+* Credenciales de usuario (nombre de usuario y contraseña)
+* Historial de partidas por usuario
+
+==== Decisión
+
+Se utilizará **MongoDB** como base de datos, en lugar de una base de datos relacional como PostgreSQL o MySQL.
+
+==== Justificación
+
+Consideramos una mejor decisión el uso de una base de datos NoSQL como MongoDB debido a la simplicidad del modelo de datos y la ausencia de relaciones complejas. MongoDB permite almacenar documentos JSON, lo que se simplifica mucho la gestión de la información de los usuarios y su historial de partidas sin necesidad de diseñar esquemas rígidos o realizar migraciones frecuentes.
+
+De hecho, gracias a la flexibilidad en el esquema que proporciona Mongo, pudímos despreocuparnos en gran medida de la información relacionada con el historial y las estadísticas de cada usuario, lo que nos permitió centrarnos e ir poco a poco con el proyecto.
+
+Por último, la integración con el microservicio de usuarios en Node.js es directa mediante Mongoose, lo que facilita el desarrollo y mantenimiento del sistema. Por no hablar de que los miembros de equipo ya teníamos cierta experiencia con bases de datos no relacionales y consideramos interesante prácticar el uso de MongoDB.
+
+==== Alternativas consideradas
+
+* **PostgreSQL / MySQL**: Descartadas por añadir complejidad innecesaria (esquemas rígidos, migraciones) para un modelo de datos tan simple y sin relaciones entre entidades. 
+
+==== Consecuencias
+
+* El esquema es flexible y fácil de extender.
+* No se dispone de validación de integridad referencial a nivel de base de datos, aunque no resulta especialmente relevante dada nuestra estructura de datos.
+* La integración con el microservicio de usuarios en Node.js es directa mediante Mongoose.
