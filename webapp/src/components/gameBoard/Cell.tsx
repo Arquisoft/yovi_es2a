@@ -17,9 +17,10 @@ export function TableCell({id, owner, onClick,}: TableCellProps): JSX.Element {
     };
 
     return (
-        <div
+        <button
             className={`table-cell ${owner ? owner.toLowerCase() : "empty"}`}
             onClick={handleClick}
+            aria-label={`Casilla ${id}`} // Opcional, pero da puntos extra en accesibilidad
         />
     );
 }
