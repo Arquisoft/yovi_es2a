@@ -41,3 +41,11 @@ endif::arc42help[]
 En esta sección documentamos las decisiones arquitectónicas significativas que darán forma a la estructura, el despliegue y la tecnología del sistema YOVI. Estas decisiones se tomarán considerando los requisitos no funcionales, las restricciones del proyecto y la experiencia del equipo de desarrollo.
 
 El objetivo de este registro es proporcionar trazabilidad y justificación sobre por qué se eligieron ciertas soluciones frente a otras alternativas disponibles, utilizando el formato de registros de decisión (ADR).
+
+
+=== ADR 003: Estrategia de filtrado en el historial de partidas
+
+* **Estatus:** Aceptado.
+* **Contexto:** El usuario necesita consultar miles de registros. Realizar peticiones por cada pulsación de tecla (live search) saturaría el servicio de usuarios.
+* **Decisión:** Se implementa un estado temporal en el Frontend para el input de "Rival" y una ejecución "Lazy" de la búsqueda. La petición a la API solo se dispara al pulsar el botón "Buscar".
+* **Consecuencias:** Mejora del rendimiento de red y reducción de carga en MongoDB.

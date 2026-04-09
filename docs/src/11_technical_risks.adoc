@@ -54,6 +54,10 @@ Para valorar la importancia de cada riesgo se utiliza una escala de impacto en t
 | Tamaño amplio del equipo
 | Un número elevado de integrantes puede dificultar la sincronización del trabajo y la toma de decisiones. Se establecerán roles definidos, reuniones estructuradas y documentación compartida para mantener la organización.
 | Medio
+
+| Crecimiento desmedido de la colección de Historial
+| El almacenamiento de cada partida finalizada puede degradar el rendimiento de las consultas. Se mitigará mediante la indexación del campo `username` y `createdAt` en MongoDB.
+| Bajo
 |===
 
 === Deuda Técnica
