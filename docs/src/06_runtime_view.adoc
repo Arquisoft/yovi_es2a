@@ -6,11 +6,10 @@ ifndef::imagesdir[:imagesdir: ../images]
 Esta sección describe cómo se comportan los componentes del sistema durante la ejecución, mostrando los flujos más relevantes mediante diagramas de secuencia.
 
 === Escenario 1: Registro e inicio de sesión
-
 El usuario accede a la aplicación e introduce sus credenciales. El servicio `users` valida los datos y devuelve un token de sesión.
 
 [plantuml, runtime-login, png]
-----
+....
 @startuml
 actor Usuario
 participant "webapp" as web
@@ -24,14 +23,13 @@ mongo --> users: Datos del usuario
 users --> web: Token de sesión
 web --> Usuario: Redirige al lobby
 @enduml
-----
+....
 
 === Escenario 2: Inicio de partida
-
 El usuario configura una nueva partida eligiendo tamaño del tablero, tipo de oponente y, si es bot, estrategia y nivel.
 
 [plantuml, runtime-newgame, png]
-----
+....
 @startuml
 actor Usuario
 participant "webapp" as web
@@ -42,14 +40,13 @@ web -> gamey: POST /game/new
 gamey --> web: Estado inicial del tablero en YEN
 web --> Usuario: Muestra tablero
 @enduml
-----
+....
 
 === Escenario 3: Turno de juego contra el bot
-
 El usuario hace clic en una celda. El frontend envía el movimiento al motor de juego, que lo valida, comprueba si hay ganador y calcula la respuesta del bot.
 
-Hacer diagrama
-----
+[plantuml, runtime-move, png]
+....
 @startuml
 actor Usuario
 participant "webapp" as web
@@ -57,72 +54,98 @@ participant "gamey" as game
 
 Usuario -> web: Hace un movimiento
 web -> game: POST /game/:gameId/move
-game --> web: YEN con la respuestadel bot
+game --> web: YEN con la respuesta del bot
 web --> Usuario: Muestra el nuevo estado del tablero
 @enduml
-----
+....
 
-=== Escenario 4: Fin de partida
-
-Cuando el motor detecta un ganador, se notifica al frontend y la partida queda registrada en el historial.
+=== Escenario 4: Fin de partida y guardado en historial
 
 [plantuml, runtime-endgame, png]
-----
+....
 @startuml
+!theme plain
+autonumber
+skinparam monochrome true
+
 actor Usuario
-participant "webapp" as web
-participant "gamey" as gamey
-participant "users" as users
+participant "webapp (Frontend)" as web
+participant "gamey (Game Engine)" as gamey
+participant "users-service (API)" as users
 database "MongoDB" as mongo
 
-gamey --> web: Victoria/derrota detectada
+gamey -> web: Evento: Victoria/Derrota detectada
+activate web
 web -> users: POST /savegame (resultado de la partida)
-users -> mongo: Guarda partida
-mongo --> users: OK
-web --> Usuario: Muestra resultado final
+activate users
+users -> mongo: insertOne(GameRecord)
+activate mongo
+mongo --> users: Confirmación (_id)
+deactivate mongo
+users --> web: 201 Created
+deactivate users
+web --> Usuario: Renderiza pantalla de resultado final
+deactivate web
 @enduml
-----
+....
 
-=== Escenario 5: Consulta del historial
+=== Escenario 5: Consulta general del historial
 
-El usuario accede a su historial de partidas desde el lobby.
-
-[plantuml, runtime-history, png]
-----
+[plantuml, runtime-history-basic, png]
+....
 @startuml
+!theme plain
+autonumber
+skinparam monochrome true
+
 actor Usuario
-participant "webapp" as web
-participant "users" as users
+participant "webapp (Frontend)" as web
+participant "users-service (API)" as users
 database "MongoDB" as mongo
 
-Usuario -> web: Accede al historial
-web -> users: GET /history/:userId
-users -> mongo: Consulta partidas del usuario
+Usuario -> web: Accede a vista 'Historial'
+activate web
+web -> users: GET /history/{username}
+activate users
+users -> mongo: find(GameRecord) por username
+activate mongo
 mongo --> users: Lista de partidas
-users --> web: Estadísticas e historial
-web --> Usuario: Muestra historial
+deactivate mongo
+users --> web: 200 OK (Datos JSON)
+deactivate users
+web --> Usuario: Muestra tabla de historial
+deactivate web
 @enduml
-----
+....
 
 === Escenario 6: Consulta de historial con filtrado
-El usuario accede a su perfil y solicita ver sus partidas pasadas. El sistema permite filtrar por rival, resultado o fecha para optimizar la visualización.
 
-[plantuml, runtime-history, png]
-----
+[plantuml, runtime-history-filtered, png]
+....
 @startuml
+!theme plain
+autonumber
+skinparam monochrome true
+
 actor Usuario
-participant "webapp" as web
-participant "users-service" as users
+participant "webapp (Frontend)" as web
+participant "users-service (API)" as users
 database "MongoDB" as mongo
 
-Usuario -> web: Accede a Historial
+Usuario -> web: Aplica filtros y pulsa "Buscar"
+activate web
 web -> users: GET /history/{username} (filters)
-users -> mongo: find(GameRecord) con criterios
-mongo --> users: Lista de partidas
-users --> web: JSON (GameHistoryRecord[])
+activate users
+users -> mongo: find(GameRecord) aplicando filtros
+activate mongo
+mongo --> users: Lista filtrada
+deactivate mongo
+users --> web: 200 OK
+deactivate users
 web --> Usuario: Renderiza tabla filtrada
+deactivate web
 @enduml
-----
+....
 
 ifdef::arc42help[]
 [role="arc42help"]

@@ -188,10 +188,10 @@ A pesar de utilizar una base de datos NoSQL, el sistema mantiene una relación l
 |===
 
 [plantuml, database-schema, png]
-----
+....
 @startuml
 entity "User" as user {
-  * username : String <<PK>>
+  * username : String 
   --
   password : String
   createdAt : Date
@@ -200,12 +200,13 @@ entity "User" as user {
 entity "GameRecord" as game {
   * _id : ObjectId
   --
-  * username : String <<FK>>
-  rival : String
+  * username : String
+  rival/jugador2 : String (bot/invitado)
   resultado : Enum('1', '2')
   size : Number
   createdAt : Date
 }
 ' Relación: Un usuario puede tener muchas partidas en su historial
-user ||--o{ game : "es propietario de / Jugador 1"}
+user ||--o{ game : "eJugador 1"}
 @enduml
+....
