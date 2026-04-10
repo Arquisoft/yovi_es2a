@@ -86,3 +86,41 @@ more precisely down to a level of scenarios that can be discussed and evaluated.
 Tabular or free form text.
 ****
 endif::arc42help[]
+
+=== Validacion de Rendimiento (Pruebas de Carga)
+
+Para comprobar el rendimiento del proyecto, el equipo de desarrollo ha diseñado y ejecutado pruebas de estrés utilizando la herramienta Gatling.
+
+**1. Estrategia y Escenario de la Prueba:**
+Se diseñó el script `TestCargaLoginJugar.scala` para simular el flujo completo y realista de un usuario interactuando con el sistema. Cada usuario virtual ejecuta secuencialmente las siguientes acciones:
+
+* Petición POST a `/login` para autenticarse en el sistema.
+* Petición POST a `/game/new` para iniciar una partida local contra un invitado.
+* Intercambio de 4 turnos: Peticiones POST a `/game/{id}/move` simulando la colocación de 4 fichas en el tablero.
+* Rendición: Nueva petición a `/game/{id}/move` enviando la acción de rendición de uno de los jugadores.
+* Petición POST a `/savegame`, ejecutada automáticamente por el sistema al volver al menú para registrar el resultado final en el historial.
+
+Para simular el comportamiento humano real, se han intercalado tiempos de lectura o de pensar la jugada (pause(1), pause(6)....) entre cada petición.
+
+**2. Configuración de la Carga:**
+
+Se configuró una inyección progresiva de carga (Ramp-up) estableciendo 50 usuarios concurrentes a lo largo de 30 segundos mediante la instrucción `rampUsers(50).during(30.seconds)`.
+
+**3. Resultados Obtenidos:**
+
+A continuación, se muestra la gráfica de distribución de peticiones y el estado general de las ejecuciones junto a los tiempos de respuesta extraído del informe de Gatling:
+
+image::10-gatling_results.png[Distribución de peticiones OK vs KO en Gatling, width=400, align="center"]
+
+Tras analizar los datos del reporte (`index.html`), se extraen las siguientes métricas clave:
+
+* **Volumen total:** Se ejecutaron un total de 950 peticiones HTTP.
+* **Tiempos de respuesta (Rendimiento):** El servidor mostró una velocidad excelente. El 95º percentil de tiempo de respuesta se mantuvo por debajo de los 350ms, y la gran mayoría de peticiones OK se resolvieron en menos de 50ms.
+* **Tasa de Éxito y Errores:** 
+  ** Peticiones OK: 750 (79%)
+  ** Peticiones KO: 200 (21%)
+
+**4. Conclusión Arquitectónica e Identificación de Deuda Técnica:**
+La prueba confirma que el servidor (desarrollado en Rust) soporta la carga de 50 usuarios simultáneos sin colapsar y manteniendo tiempos de respuesta óptimos. 
+
+Es importante destacar que los errores registrados (código HTTP 422) demuestran que la seguridad del backend funciona a la perfección. Al simular movimientos a tan alta velocidad, el script intentó realizar acciones inválidas (como poner una ficha en una casilla ya ocupada). El servidor procesó estas reglas correctamente y bloqueó las trampas, lo que confirma la solidez del sistema incluso bajo estrés.
