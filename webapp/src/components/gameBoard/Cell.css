@@ -2,24 +2,29 @@
   width: 3.5vmin;
   height: 3.5vmin;
 
-    clip-path: polygon(
-        50% 0%,      /* punta superior */
-        100% 25%,    /* esquina superior derecha */
-        100% 75%,    /* esquina inferior derecha */
-        50% 100%,    /* punta inferior */
-        0% 75%,      /* esquina inferior izquierda */
-        0% 25%       /* esquina superior izquierda */
-    );
+  clip-path: polygon(
+      50% 0%,      /* punta superior */
+      100% 25%,    /* esquina superior derecha */
+      100% 75%,    /* esquina inferior derecha */
+      50% 100%,    /* punta inferior */
+      0% 75%,      /* esquina inferior izquierda */
+      0% 25%       /* esquina superior izquierda */
+  );
 
   background-color: lightgray; /* color por defecto */
   cursor: pointer;
 
-  /*define la capacidad de un elemento para reducir su tamaño 
-  si el contenedor es más pequeño que la suma de sus hijos.*/  
   flex-shrink: 0;
-  transition: background-color 0.2s ease, filter 0.2s ease;
-
+  /*transition: background-color 0.2s ease, filter 0.2s ease;*/
   margin: 0.2vmin;
+
+  /* --- AQUÍ ESTÁ LA MAGIA PARA ARREGLAR EL BUG --- */
+  border: none;             /* Quitamos el borde por defecto del botón */
+  outline: none;            /* Quitamos el anillo de focus al hacer clic */
+  padding: 0;               /* Quitamos el espacio interior del botón */
+  appearance: none;         /* Le decimos al navegador que no lo trate como un botón nativo */
+  transform: translateZ(0); /* Fuerza a usar la tarjeta gráfica para repintar el clip-path sin fallos */
+  -webkit-appearance: none; /* Lo mismo pero para Chrome/Safari */
 }
 
 /* La primera celda de cada fila no se desplaza hacia la izquierda,
@@ -30,6 +35,10 @@
 
 .table-cell:hover {
   filter: brightness(0.85);
+}
+
+.table-cell:focus-visible {
+  filter: brightness(0.7);
 }
 
 

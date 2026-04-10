@@ -17,10 +17,19 @@ export function TableCell({id, owner, onClick,}: TableCellProps): JSX.Element {
     };
 
     return (
-        <button
+        <div
+            role="button"
+            tabIndex={0}
             className={`table-cell ${owner ? owner.toLowerCase() : "empty"}`}
             onClick={handleClick}
-            aria-label={`Casilla ${id}`} // Opcional, pero da puntos extra en accesibilidad
+            onKeyDown={(e) => {
+                // Para que siga funcionando si alguien pulsa Enter o Espacio
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleClick();
+                }
+            }}
+            aria-label={`Casilla ${id}`}
         />
     );
 }
