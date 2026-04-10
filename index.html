@@ -1190,9 +1190,9 @@ together with a mapping table showing the relationships between channels and inp
 <td class="tableblock halign-left valign-top"><p class="tableblock">JSON / HTTPS</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">play(position, strategy?, level?)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Siguiente movimiento calculado</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">YEN / HTTPS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POST /v1/play (Parámetros: position, bot, player)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Siguiente movimiento calculado y estado</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JSON / HTTPS</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Consulta de usuarios</p></td>
@@ -2103,7 +2103,21 @@ when your infrastructure is more complex.</p>
 <li>
 <p><strong>Estrategia de Pruebas:</strong> Para asegurar la calidad y el rendimiento del sistema bajo estrés, se ha integrado la herramienta Gatling en el flujo de desarrollo. Los scripts de simulación (escritos en Scala) se encuentran  dentro del repositorio en la carpeta <code>PruebaCarga</code>. Esto permite a cualquier desarrollador del equipo levantar el entorno local de Docker y lanzar los tests de concurrencia para validar que sus cambios no han degradado el rendimiento del servidor antes de realizar un despliegue.</p>
 </li>
+<li>
+<p><strong>Pruebas de Integración de API (Bots Externos):</strong> El motor de juego en Rust expone el endpoint <code>/v1/play</code> para permitir la integración de bots externos cumpliendo con los requisitos del proyecto. A continuación se muestra un ejemplo real de consumo de la API mediante curl utilizado durante el desarrollo para validar su funcionamiento:</p>
+</li>
 </ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># Petición de un bot externo enviando un tablero de tamaño 3
+curl -X POST http://localhost:4000/v1/play \
+  -H "Content-Type: application/json" \
+  -d "{\"position\": \"./../...\", \"bot\": \"random_bot\", \"player\": 0}"
+
+# Respuesta del servidor (JSON) indicando el movimiento del bot
+{"position":"./../.B.","cell_index":4,"status":"ongoing","winner":null}</code></pre>
+</div>
 </div>
 <div class="sidebarblock arc42help">
 <div class="content">
