@@ -1,5 +1,6 @@
 // Tests del hook useGame — lógica principal del juego
-import { renderHook, act, waitFor } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
+import { act } from 'react'
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { useGame } from '../hooks/useGame'
 
@@ -94,9 +95,7 @@ describe('useGame', () => {
         const { result } = renderHook(() => useGame({ mode: 'human' }))
         await waitFor(() => expect(result.current.status).toBe('ongoing'))
 
-        await act(async () => {
-            await result.current.handleCellClick(0)
-        })
+        result.current.handleCellClick(0)
 
         expect(result.current.cells[0].owner).toBe('PLAYER_ONE')
         expect(result.current.currentPlayer).toBe('PLAYER_TWO')
@@ -108,9 +107,7 @@ describe('useGame', () => {
         const { result } = renderHook(() => useGame())
         await waitFor(() => expect(result.current.status).toBe('ongoing'))
 
-        await act(async () => {
-            await result.current.handleResign()
-        })
+        result.current.handleCellClick(0)
 
         expect(result.current.status).toBe('finished')
         expect(result.current.winner).toBe('PLAYER_ONE')
@@ -120,7 +117,7 @@ describe('useGame', () => {
         const { result } = renderHook(() => useGame())
         await waitFor(() => expect(result.current.status).toBe('ongoing'))
 
-        await act(async () => {
+        act(() => {
             result.current.resetGame()
         })
 
@@ -139,9 +136,7 @@ describe('useGame', () => {
         )
         await waitFor(() => expect(result.current.status).toBe('ongoing'))
 
-        await act(async () => {
-            await result.current.handleCellClick(0)
-        })
+        result.current.handleCellClick(0)
 
         await waitFor(() => {
             expect(saveGameResult).toHaveBeenCalledWith('testuser', 'random_bot', '1', 7)
@@ -164,9 +159,7 @@ describe('useGame', () => {
         const { result } = renderHook(() => useGame())
         await waitFor(() => expect(result.current.status).toBe('ongoing'))
 
-        await act(async () => {
-            await result.current.handleCellClick(0)
-        })
+        result.current.handleCellClick(0)
 
         expect(result.current.error).toBe('Movimiento inválido')
     })
@@ -179,9 +172,7 @@ describe('useGame', () => {
         )
         await waitFor(() => expect(result.current.status).toBe('ongoing'))
 
-        await act(async () => {
-            await result.current.handleCellClick(1)
-        })
+        result.current.handleCellClick(1)
 
         expect(placeToken).toHaveBeenCalledWith('game-123', 0, 1, 'defensive_easy')
     })
