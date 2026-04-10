@@ -2110,7 +2110,7 @@ when your infrastructure is more complex.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash"># Petición de un bot externo enviando un tablero de tamaño 3
+<pre class="highlight"><code class="language-bash" data-lang="bash"># Petición de un bot externo (random_bot)
 curl -X POST http://localhost:4000/v1/play \
   -H "Content-Type: application/json" \
   -d "{\"position\": \"./../...\", \"bot\": \"random_bot\", \"player\": 0}"
