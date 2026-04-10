@@ -4,7 +4,7 @@ ifndef::imagesdir[:imagesdir: ../images]
 == Introducción y Metas
 
 Yovi es una implementación digital del juego "Y".
-El juego se desarrolla en un tablero triangular con casillas hexagonal, donde el objetivo es conectar los tres lados del tablero mediante una cadena de fichas del mismo color.
+El juego se desarrolla en un tablero triangular con casillas hexagonales, donde el objetivo es conectar los tres lados del tablero mediante una cadena de fichas del mismo color.
 
 El propósito de este proyecto es diseñar y construir un software completo que simule la experiencia de este juego de mesa en un entorno web. El sistema permitirá:
 

@@ -102,7 +102,7 @@ endif::arc42help[]
 |===
 | Input al sistema | Output del sistema | Formato / Canal
 | Registro / actualización de usuario | Confirmación de operación | JSON / HTTPS
-| play(position, strategy?, level?) | Siguiente movimiento calculado | YEN / HTTPS
+| POST /v1/play (Parámetros: position, bot, player) | Siguiente movimiento calculado y estado | JSON / HTTPS 
 | Consulta de usuarios | Información de usuarios | JSON / HTTPS
 |===
 
