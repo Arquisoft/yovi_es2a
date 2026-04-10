@@ -45,6 +45,7 @@ Bots: Que requieren una API para automatizar el juego.
 | Usuario (Actor) | Jugador humano que interactúa con el sistema a través de un navegador web moderno.
 | Bot Externo (Actor) | Sistema automatizado que consume la API pública para jugar partidas contra la máquina o contra humanos.
 | Base de Datos (MongoDB) | Sistema externo encargado de la persistencia de usuarios, historiales de partidas, rankings y estadísticas. Base de datos no relacional.
+| GameRecord Model | Representa el esquema de persistencia de una partida finalizada en MongoDB, almacenando resultado, rival y metadatos.
 |===
 
 ==== Interfaces Importantes
@@ -168,3 +169,44 @@ Propósito: Gestionar la cola de jugadores. Instancia nuevos juegos a través de
 ==== Capa de Persistencia
 
 Propósito: Aislar las consultas y el mapeo de datos de MongoDB del resto de la lógica de negocio.
+
+==== Esquema de Base de Datos (Modelo Relacional en MongoDB)
+
+A pesar de utilizar una base de datos NoSQL, el sistema mantiene una relación lógica entre los usuarios y sus registros de juego. El `username` actúa como clave de enlace entre ambas colecciones.
+
+[cols="1,1,2", options="header"]
+|===
+| Colección | Campo | Descripción
+| **Users** | `username` | Identificador único del usuario (Clave primaria lógica).
+| | `password` | Hash de la contraseña del usuario.
+| | `createdAt` | Fecha de registro del usuario.
+| **GameRecords** | `username` | Referencia al usuario que jugó la partida (Jugador 1).
+| | `rival` | Nombre del oponente o bot (Jugador 2).
+| | `resultado` | '1' si ganó el usuario, '2' si ganó el rival.
+| | `size` | Tamaño del tablero (ej. 7, 11).
+| | `createdAt` | Marca de tiempo de la partida (Fecha del historial).
+|===
+
+[plantuml, database-schema, png]
+....
+@startuml
+entity "User" as user {
+  * username : String 
+  --
+  password : String
+  createdAt : Date
+}
+
+entity "GameRecord" as game {
+  * _id : ObjectId
+  --
+  * username : String
+  rival/jugador2 : String (bot/invitado)
+  resultado : Enum('1', '2')
+  size : Number
+  createdAt : Date
+}
+' Relación: Un usuario puede tener muchas partidas en su historial
+user ||--o{ game : "eJugador 1"}
+@enduml
+....

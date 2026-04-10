@@ -1,12 +1,16 @@
 // Ofrece dos opciones: "Jugar" (→ /lobby) y "Ver datos" (→ /datos)
 import { useNavigate } from 'react-router-dom';
+import { useAuthComprobation } from '../components/AuthComprobation';
+import Navbar from '../components/Navbar';
 import '../styles/Menu.css';
 
 export default function Menu(): JSX.Element {
     const navigate = useNavigate();
+    useAuthComprobation();
 
     return (
         <div className="menu-container">
+            <Navbar />
             <div className="menu-card">
                 <h1 className="menu-title">MENU</h1>
                 <p className="menu-subtitle">¿Qué quieres hacer?</p>

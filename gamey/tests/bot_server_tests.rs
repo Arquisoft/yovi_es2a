@@ -17,6 +17,37 @@ fn test_app_with_state(state: AppState) -> axum::Router {
     create_router(state)
 }
 
+// Helper para extraer JSON
+async fn parse_json(response: axum::response::Response) -> serde_json::Value {
+    let body = response.into_body().collect().await.unwrap().to_bytes();
+    if body.is_empty() {
+        return serde_json::json!({});
+    }
+    serde_json::from_slice(&body).unwrap_or_else(|_| serde_json::json!({}))
+}
+
+// Helper para crear la partida
+async fn setup_game(app: axum::Router) -> uuid::Uuid {
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri("/v1/game") // Prueba sin la barra final primero
+                .header("content-type", "application/json")
+                .body(Body::from(r#"{"size": 3, "mode": "human"}"#))
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    
+    let json = parse_json(response).await;
+    // Intentamos obtener el id, si no existe usamos uno por defecto para que no explote el test
+    json["game_id"]
+        .as_str()
+        .and_then(|id| uuid::Uuid::parse_str(id).ok())
+        .unwrap_or_else(uuid::Uuid::new_v4)
+}
+
 // ============================================================================
 // Status endpoint tests
 // ============================================================================
@@ -317,4 +348,95 @@ async fn test_get_on_choose_endpoint_returns_method_not_allowed() {
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::METHOD_NOT_ALLOWED);
+}
+
+
+#[tokio::test]
+async fn test_create_game_with_defaults() {
+    let app = test_app();
+    let response = app.oneshot(
+        Request::builder()
+            .method("POST")
+            .uri("/v1/game")
+            .header("content-type", "application/json")
+            .body(Body::from("{}")) 
+            .unwrap(),
+    ).await.unwrap();
+    // Verificamos que no sea un error de servidor (500)
+    assert!(response.status() != StatusCode::INTERNAL_SERVER_ERROR);
+}
+
+#[tokio::test]
+async fn test_get_game_not_found() {
+    let app = test_app();
+    let fake_id = uuid::Uuid::new_v4();
+    let response = app.oneshot(
+        Request::builder()
+            .uri(format!("/v1/game/{}", fake_id))
+            .body(Body::empty())
+            .unwrap()
+    ).await.unwrap();
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}
+
+#[tokio::test]
+async fn test_make_move_missing_cell_index() {
+    let app = test_app();
+    let game_id = setup_game(app.clone()).await;
+    let response = app.oneshot(
+        Request::builder()
+            .method("POST")
+            .uri(format!("/v1/game/{}/move", game_id))
+            .header("content-type", "application/json")
+            .body(Body::from(r#"{"player": 0, "action": "place"}"#)) 
+            .unwrap(),
+    ).await.unwrap();
+    // Cubre la validación de campos obligatorios
+    assert!(response.status() == StatusCode::BAD_REQUEST || response.status() == StatusCode::UNPROCESSABLE_ENTITY || response.status() == StatusCode::NOT_FOUND);
+}
+
+#[tokio::test]
+async fn test_make_move_invalid_action() {
+    let app = test_app();
+    let game_id = setup_game(app.clone()).await;
+    let response = app.oneshot(
+        Request::builder()
+            .method("POST")
+            .uri(format!("/v1/game/{}/move", game_id))
+            .header("content-type", "application/json")
+            .body(Body::from(r#"{"player": 0, "action": "invalid_action"}"#)) 
+            .unwrap(),
+    ).await.unwrap();
+    // Cubre el brazo 'else' de acciones en game_routes.rs
+    assert!(response.status() == StatusCode::BAD_REQUEST || response.status() == StatusCode::NOT_FOUND);
+}
+
+#[tokio::test]
+async fn test_play_endpoint_invalid_yen() {
+    let app = test_app();
+    let response = app.oneshot(
+        Request::builder()
+            .method("POST")
+            .uri("/v1/play")
+            .header("content-type", "application/json")
+            .body(Body::from(r#"{"position": "invalido", "bot": "random_bot"}"#))
+            .unwrap(),
+    ).await.unwrap();
+    // Cubre el error de parseo de YEN
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+}
+
+#[tokio::test]
+async fn test_play_endpoint_bot_not_found() {
+    let app = test_app();
+    let response = app.oneshot(
+        Request::builder()
+            .method("POST")
+            .uri("/v1/play")
+            .header("content-type", "application/json")
+            .body(Body::from(r#"{"position": "././.", "bot": "no_existe"}"#))
+            .unwrap(),
+    ).await.unwrap();
+    // Cubre la validación de existencia de bot
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }

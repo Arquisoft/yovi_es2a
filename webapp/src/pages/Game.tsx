@@ -5,6 +5,7 @@ import { EndGameOverlay as Overlay } from '../components/gameBoard/EndGameOverla
 import { useGame } from '../hooks/useGame';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthComprobation, getLoggedUser } from '../components/AuthComprobation';
+import Navbar from '../components/Navbar';
 
 interface GameProps {
     size?: number;
@@ -36,6 +37,7 @@ export function Game({ size: _size }: GameProps): JSX.Element {
 
     return (
         <>
+            <Navbar />
             {status === "finished" && <Overlay 
                                 winner={winner} 
                                 onResetClick={resetGame} 

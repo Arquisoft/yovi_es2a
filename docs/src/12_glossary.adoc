@@ -59,4 +59,10 @@ endif::arc42help[]
 
 | ADR (Architecture Decision Record)
 | Documento que registra decisiones arquitectónicas relevantes junto con su justificación.
+
+| GameRecord
+| Objeto de datos persistido que contiene el resumen de una partida: jugadores, resultado (victoria/derrota), tamaño del tablero y marca de tiempo.
+
+| Historial Filtrado
+| Funcionalidad que permite la recuperación selectiva de registros basada en criterios de búsqueda específicos para facilitar el análisis de rendimiento del usuario.
 |===

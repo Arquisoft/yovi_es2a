@@ -1,6 +1,7 @@
 import { useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { useAuthComprobation } from '../components/AuthComprobation';
+import Navbar from '../components/Navbar';
 import '../styles/Lobby.css';
 
 
@@ -44,6 +45,7 @@ function getBotId(type: BotType, difficulty: Difficulty): string {
 export default function Lobby(): JSX.Element {
     const username = localStorage.getItem("username") ?? undefined;
     const navigate = useNavigate();
+    useAuthComprobation();
     const [mode, setMode] = useState<GameMode>(null);
     const [botType, setBotType] = useState<BotType>("random");
     const [difficulty, setDifficulty] = useState<Difficulty>("easy");
@@ -66,6 +68,7 @@ export default function Lobby(): JSX.Element {
 
     return (
         <div className="lobby-container">
+            <Navbar />
             <div className="lobby-card">
 
                 {/* Botón que vuelve al menu */}

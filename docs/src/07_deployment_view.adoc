@@ -49,7 +49,8 @@ endif::arc42help[]
 El sistema YOVI está desplegado en **Microsoft Azure** mediante contenedores Docker orquestados con Docker Compose. El sistema se compone de tres microservicios independientes que se comunican entre sí a través de sus respectivas APIs REST.
 
 [plantuml, deployment-diagram, png]
-----
+
+....
 @startuml
 node "Microsoft Azure" {
     node "Docker Host" {
@@ -69,7 +70,7 @@ webapp --> gamey : HTTP (API REST)
 webapp --> users : HTTP (API REST)
 users --> mongo : MongoDB protocol
 @enduml
-----
+....
 
 .Descripción de los nodos
 
@@ -110,5 +111,3 @@ Describe (usually in a combination of diagrams, tables, and text):
 For multiple environments or alternative deployments please copy and adapt this section of arc42 for all relevant environments.
 ****
 endif::arc42help[]
-
-Esta sección se irá rellenando conforme avance el desarrollo del proyecto.
