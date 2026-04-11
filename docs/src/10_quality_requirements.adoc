@@ -36,7 +36,34 @@ Para estructurar estas metas, utilizamos las herramientas detalladas en los sigu
 * **Árbol de Calidad:** Una representación jerárquica que desglosa los atributos de calidad de alto nivel.
 * **Escenarios de Calidad:** Descripciones detalladas que permiten evaluar si el sistema cumple con las expectativas de los stakeholders.
 
-=== Quality Tree
+=== Arbol de calidad
+
+@startmindmap
+* Calidad del sistema YOVI
+** Usabilidad
+*** Interfaz intuitiva
+*** Facilidad para jugar
+*** Accesibilidad web
+** Rendimiento
+*** Tiempo de respuesta < 1s
+*** Baja latencia en jugadas
+*** Escalabilidad del backend
+** Seguridad
+*** Autenticación de usuarios
+*** Protección del API
+*** Validación de entradas (YEN)
+** Mantenibilidad
+*** Código modular (TS + Rust)
+*** Separación frontend/backend
+*** Facilidad para añadir estrategias
+** Fiabilidad
+*** Disponibilidad del sistema
+*** Manejo de errores
+*** Consistencia de partidas
+** Portabilidad
+*** Despliegue en web
+*** Compatibilidad con navegadores
+@endmindmap
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -59,7 +86,121 @@ In any case the tree should include links to the scenarios of the following sect
 ****
 endif::arc42help[]
 
-=== Quality Scenarios
+=== Escenarios de Calidad
+
+==== Rendimiento
+
+[options="header", cols="1,2,2,3,2"]
+|===
+|Atributo |Escenario |Estímulo |Respuesta esperada |Métrica
+
+|Rendimiento
+|Jugada contra un bot
+|El usuario realiza un movimiento
+|El sistema calcula y devuelve la siguiente jugada usando el motor en Rust
+|< 0.5 segundo
+
+|Rendimiento
+|Uso simultáneo
+|20 usuarios jugando simultáneamente
+|El sistema responde sin degradación significativa
+|< 1 segundos por respuesta
+|===
+
+==== Usabilidad
+
+[options="header", cols="1,2,2,3,2"]
+|===
+|Atributo |Escenario |Estímulo |Respuesta esperada |Métrica
+
+|Usabilidad
+|Nuevo usuario
+|Un usuario accede por primera vez
+|Puede iniciar una partida sin necesidad de instrucciones complejas
+|< 1 minuto
+
+|Usabilidad
+|Selección de estrategia
+|El usuario cambia la estrategia y o la dificultad
+|El sistema aplica correctamente la nueva configuración
+|Sin errores y < 10s
+|===
+
+==== Seguridad
+
+[options="header", cols="1,2,2,3,2"]
+|===
+|Atributo |Escenario |Estímulo |Respuesta esperada |Métrica
+
+|Seguridad
+|Acceso no autorizado
+|Un usuario no autenticado intenta acceder a funcionalidades restringidas
+|El sistema deniega el acceso
+|100% bloqueado
+
+|Seguridad
+|Entrada inválida
+|Se envía un JSON en formato YEN incorrecto
+|El sistema rechaza la petición con un error controlado
+|0 fallos no controlados
+|===
+
+==== Mantenibilidad
+
+[options="header", cols="1,2,2,3,2"]
+|===
+|Atributo |Escenario |Estímulo |Respuesta esperada |Métrica
+
+|Mantenibilidad
+|Nueva estrategia de bot
+|Se implementa un nuevo algoritmo de juego
+|Se integra sin afectar al resto del sistema
+|Solo hace falta implementarlo
+
+|Mantenibilidad
+|Cambio en API
+|Se modifica un endpoint
+|Los cambios están localizados sin afectar otros módulos
+|Bajo acoplamiento
+|===
+
+=== Fiabilidad
+
+[options="header", cols="1,2,2,3,2"]
+|===
+|Atributo |Escenario |Estímulo |Respuesta esperada |Métrica
+
+|Fiabilidad
+|Partida en curso
+|Se produce un fallo temporal
+|El estado de la partida se mantiene consistente
+|0 pérdida de datos
+
+|Fiabilidad
+|Partida en curso
+|Cae el motor de juego
+|El sistema maneja el error
+|La base de datos queda en un estado consistente
+|===
+
+==== Portabilidad
+
+[options="header", cols="1,2,2,3,2"]
+|===
+|Atributo |Escenario |Estímulo |Respuesta esperada |Métrica
+
+|Portabilidad
+|Compatibilidad de navegador
+|El usuario accede desde distintos navegadores
+|La aplicación funciona correctamente
+|100% funcionalidad
+
+|Portabilidad
+|Despliegue
+|La aplicación se despliega en un servidor
+|El sistema es accesible vía web
+|Disponible 24/7 (Siempre que el servidor esté activo)
+|===
 
 ifdef::arc42help[]
 [role="arc42help"]
