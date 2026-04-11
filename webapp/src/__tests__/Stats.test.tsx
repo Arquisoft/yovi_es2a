@@ -1,17 +1,17 @@
-// Tests del componente Stats — estadísticas del jugador
 import { render, screen, waitFor, within } from '@testing-library/react'
-import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import '@testing-library/jest-dom'
-import Stats from '../pages/Stats'
+import type { UserStats } from '../services/gameService'
 
 vi.mock('../services/gameService', () => ({
     getStats: vi.fn(),
 }))
 
+import Stats from '../pages/Stats'
 import { getStats } from '../services/gameService'
 
-const mockStats = {
-    username: 'testuser',
+const statsMock: UserStats = {
+    username: 'alice',
     total: 20,
     wins: 14,
     losses: 6,
@@ -20,27 +20,88 @@ const mockStats = {
     bestStreak: 7,
     mostPlayedRival: 'random_bot',
     rivalStats: {
-        random_bot: { total: 10, wins: 8, losses: 2 },
-        invitado:   { total: 10, wins: 6, losses: 4 },
+        random_bot:     { wins: 8, losses: 2, total: 10 },
+        defensive_easy: { wins: 6, losses: 4, total: 10 },
     },
 }
 
 describe('Stats', () => {
+
     beforeEach(() => {
-        localStorage.setItem('username', 'testuser')
-        vi.mocked(getStats).mockResolvedValue(mockStats)
+        localStorage.setItem('username', 'alice')
+        vi.mocked(getStats).mockResolvedValue(statsMock)
     })
 
     afterEach(() => {
+        vi.restoreAllMocks()
         localStorage.clear()
-        vi.clearAllMocks()
     })
 
-    test('muestra las tarjetas de estadísticas principales', async () => {
+    // ── Sin sesión ─────────────────────────────────────────────────────────
+
+    it('muestra mensaje de inicio de sesión si no hay usuario en localStorage', () => {
+        localStorage.clear()
+        render(<Stats />)
+
+        expect(screen.getByText(/debes iniciar sesión/i)).toBeInTheDocument()
+    })
+
+    // ── Estado de carga ────────────────────────────────────────────────────
+
+    it('muestra el indicador de carga mientras espera la respuesta', () => {
+        vi.mocked(getStats).mockReturnValue(new Promise(() => {}))
+
+        render(<Stats />)
+
+        expect(screen.getByText(/cargando estadísticas/i)).toBeInTheDocument()
+    })
+
+    // ── Error de la API ────────────────────────────────────────────────────
+
+    it('muestra el mensaje de error si la API falla', async () => {
+        vi.mocked(getStats).mockRejectedValue(new Error('Timeout'))
+
+        render(<Stats />)
+
+        await waitFor(() =>
+            expect(screen.getByText(/timeout/i)).toBeInTheDocument()
+        )
+    })
+
+    // ── Sin partidas ───────────────────────────────────────────────────────
+
+    it('muestra el mensaje de sin partidas si total es 0', async () => {
+        vi.mocked(getStats).mockResolvedValue({ ...statsMock, total: 0 })
+
+        render(<Stats />)
+
+        await waitFor(() =>
+            expect(screen.getByText(/no tienes partidas registradas/i)).toBeInTheDocument()
+        )
+    })
+
+    // ── Renderizado normal ─────────────────────────────────────────────────
+
+    it('muestra el título con el nombre de usuario', async () => {
+        render(<Stats />)
+
+        await waitFor(() =>
+            expect(screen.getByText(/estadísticas de alice/i)).toBeInTheDocument()
+        )
+    })
+
+    it('muestra el win rate correctamente', async () => {
+        render(<Stats />)
+
+        await waitFor(() =>
+            expect(screen.getByText('70%')).toBeInTheDocument()
+        )
+    })
+
+    it('muestra las tarjetas de estadísticas principales', async () => {
         render(<Stats />)
 
         await waitFor(() => {
-            // Convertimos el elemento en un HTMLElement para que funcione con within
             const tarjetas = document.querySelector('.stats-cards') as HTMLElement
             expect(within(tarjetas).getByText('Win Rate')).toBeInTheDocument()
             expect(within(tarjetas).getByText('Partidas jugadas')).toBeInTheDocument()
@@ -49,57 +110,52 @@ describe('Stats', () => {
         })
     })
 
-    test('muestra la racha actual y la mejor racha', async () => {
+    it('muestra la racha actual y la mejor racha', async () => {
         render(<Stats />)
 
         await waitFor(() => {
-            expect(screen.getByText('🔥 3')).toBeInTheDocument()
-            expect(screen.getByText('⭐ 7')).toBeInTheDocument()
+            expect(screen.getByText(/🔥 3/)).toBeInTheDocument()
+            expect(screen.getByText(/⭐ 7/)).toBeInTheDocument()
         })
     })
 
-    test('muestra el rival más jugado', async () => {
+    // ── Rival favorito ─────────────────────────────────────────────────────
+
+    it('muestra el rival favorito cuando existe', async () => {
         render(<Stats />)
 
-        await waitFor(() => {
-            // El label "Rival favorito" es único, lo usamos como ancla
+        await waitFor(() =>
             expect(screen.getByText('Rival favorito')).toBeInTheDocument()
-            // getAllByText porque random_bot aparece en tarjeta Y en tabla
-            expect(screen.getAllByText('random_bot').length).toBeGreaterThanOrEqual(1)
-        })
+        )
     })
 
-    test('muestra la tabla de estadísticas por rival', async () => {
+    it('no muestra el rival favorito si mostPlayedRival es null', async () => {
+        vi.mocked(getStats).mockResolvedValue({ ...statsMock, mostPlayedRival: null })
+
         render(<Stats />)
 
-        await waitFor(() => {
-            expect(screen.getByText('invitado')).toBeInTheDocument()
-            // Win rate de random_bot: 8/10 = 80%
+        await waitFor(() =>
+            expect(screen.getByText(/estadísticas de alice/i)).toBeInTheDocument()
+        )
+        expect(screen.queryByText(/rival favorito/i)).not.toBeInTheDocument()
+    })
+
+    // ── Tabla por rival ────────────────────────────────────────────────────
+
+    it('renderiza la tabla de rivales con sus filas', async () => {
+        render(<Stats />)
+
+        await waitFor(() =>
+            expect(screen.getByText('defensive_easy')).toBeInTheDocument()
+        )
+    })
+
+    it('muestra el win rate correcto en la tabla por rival', async () => {
+        render(<Stats />)
+
+        await waitFor(() =>
+            // random_bot: 8/10 = 80%
             expect(screen.getByText('80%')).toBeInTheDocument()
-        })
-    })
-
-    test('muestra mensaje si no hay usuario logueado', () => {
-        localStorage.clear()
-        render(<Stats />)
-        expect(screen.getByText(/debes iniciar sesión/i)).toBeInTheDocument()
-    })
-
-    test('muestra mensaje si no hay partidas registradas', async () => {
-        vi.mocked(getStats).mockResolvedValue({ ...mockStats, total: 0 })
-        render(<Stats />)
-
-        await waitFor(() => {
-            expect(screen.getByText(/no tienes partidas registradas/i)).toBeInTheDocument()
-        })
-    })
-
-    test('muestra error si getStats falla', async () => {
-        vi.mocked(getStats).mockRejectedValue(new Error('Timeout'))
-        render(<Stats />)
-
-        await waitFor(() => {
-            expect(screen.getByText(/timeout/i)).toBeInTheDocument()
-        })
+        )
     })
 })
