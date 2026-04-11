@@ -146,4 +146,63 @@ describe('GET /stats/:username', () => {
 
         expect(res.body.winRate).toBe(0)
     })
+
+    
+
+    // ── Rachas ────────────────────────────────────────────────────────────
+
+    it('calcula la racha actual correctamente cuando arranca con victorias', async () => {
+        // find() devuelve ordenado desc (más reciente primero)
+        // Las 2 primeras son victorias -> racha actual = 2
+        mockFindResult([
+            { username: 'alice', rival: 'random_bot', resultado: '1' },
+            { username: 'alice', rival: 'random_bot', resultado: '1' },
+            { username: 'alice', rival: 'random_bot', resultado: '2' },
+            { username: 'alice', rival: 'random_bot', resultado: '1' },
+        ])
+
+        const res = await request(app).get('/stats/alice')
+
+        expect(res.body.currentStreak).toBe(2)
+    })
+
+    it('la racha actual es 0 si la última partida es una derrota', async () => {
+        mockFindResult([
+            { username: 'alice', rival: 'random_bot', resultado: '2' },
+            { username: 'alice', rival: 'random_bot', resultado: '1' },
+            { username: 'alice', rival: 'random_bot', resultado: '1' },
+        ])
+
+        const res = await request(app).get('/stats/alice')
+
+        expect(res.body.currentStreak).toBe(0)
+    })
+
+    it('calcula la mejor racha histórica correctamente', async () => {
+        // En orden cronológico: V V V D V -> mejor racha = 3
+        mockFindResult([
+            { username: 'alice', rival: 'random_bot', resultado: '1' }, // más reciente
+            { username: 'alice', rival: 'random_bot', resultado: '2' },
+            { username: 'alice', rival: 'random_bot', resultado: '1' },
+            { username: 'alice', rival: 'random_bot', resultado: '1' },
+            { username: 'alice', rival: 'random_bot', resultado: '1' }, // más antigua
+        ])
+
+        const res = await request(app).get('/stats/alice')
+
+        expect(res.body.bestStreak).toBe(3)
+    })
+
+    it('la mejor racha coincide con la actual si todas son victorias', async () => {
+        mockFindResult([
+            { username: 'alice', rival: 'random_bot', resultado: '1' },
+            { username: 'alice', rival: 'random_bot', resultado: '1' },
+            { username: 'alice', rival: 'random_bot', resultado: '1' },
+        ])
+
+        const res = await request(app).get('/stats/alice')
+
+        expect(res.body.currentStreak).toBe(3)
+        expect(res.body.bestStreak).toBe(3)
+    })
 })
