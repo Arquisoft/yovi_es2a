@@ -28,9 +28,6 @@ image::screen_prototypes.jpeg[Prototipos de pantallas]
 
 Cabe destacar que estos prototipos se han utilizado como referencia para el desarrollo de la interfaz de usuario, aunque se han realizado ajustes durante el proceso de implementación para mejorar la usabilidad y adaptarse a las limitaciones técnicas.
 
-
-==== Mapa de pantallas
-
 === Seguridad
 
 * **Validación en el Servidor:** Aunque la web avise de errores. Todas las jugadas se validan de nuevo en el servidor para evitar trampas.
