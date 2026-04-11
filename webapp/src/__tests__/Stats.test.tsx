@@ -80,4 +80,74 @@ describe('Stats', () => {
             expect(screen.getByText(/todavía no tienes partidas/i)).toBeInTheDocument()
         )
     })
+
+    // ── Renderizado normal ─────────────────────────────────────────────────
+
+    it('muestra el título con el nombre de usuario', async () => {
+        localStorage.setItem('username', 'alice')
+        vi.mocked(getStats).mockResolvedValue(statsMock)
+
+        render(<Stats />)
+
+        await waitFor(() =>
+            expect(screen.getByText(/estadísticas de alice/i)).toBeInTheDocument()
+        )
+    })
+
+    it('muestra el win rate correctamente', async () => {
+        localStorage.setItem('username', 'alice')
+        vi.mocked(getStats).mockResolvedValue(statsMock)
+
+        render(<Stats />)
+
+        await waitFor(() =>
+            expect(screen.getByText('60%')).toBeInTheDocument()
+        )
+    })
+
+    it('muestra el total de partidas jugadas', async () => {
+        localStorage.setItem('username', 'alice')
+        vi.mocked(getStats).mockResolvedValue(statsMock)
+
+        render(<Stats />)
+
+        await waitFor(() =>
+            expect(screen.getByText('5')).toBeInTheDocument()
+        )
+    })
+
+    it('muestra las victorias y derrotas', async () => {
+        localStorage.setItem('username', 'alice')
+        vi.mocked(getStats).mockResolvedValue(statsMock)
+
+        render(<Stats />)
+
+        await waitFor(() => {
+            expect(screen.getByText('✅ Victorias')).toBeInTheDocument()
+            expect(screen.getByText('❌ Derrotas')).toBeInTheDocument()
+        })
+    })
+
+    it('muestra la racha actual y la mejor racha', async () => {
+        localStorage.setItem('username', 'alice')
+        vi.mocked(getStats).mockResolvedValue(statsMock)
+
+        render(<Stats />)
+
+        await waitFor(() => {
+            expect(screen.getByText(/🔥 2/)).toBeInTheDocument()
+            expect(screen.getByText(/⭐ 3/)).toBeInTheDocument()
+        })
+    })
+
+    it('muestra el rival favorito cuando existe', async () => {
+        localStorage.setItem('username', 'alice')
+        vi.mocked(getStats).mockResolvedValue(statsMock)
+
+        render(<Stats />)
+
+        await waitFor(() =>
+            expect(screen.getByText('Rival favorito')).toBeInTheDocument()
+        )
+    })
 })
