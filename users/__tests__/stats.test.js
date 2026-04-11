@@ -96,4 +96,54 @@ describe('GET /stats/:username', () => {
         expect(res.body).toHaveProperty('mostPlayedRival')
         expect(res.body).toHaveProperty('rivalStats')
     })
+
+    // ── Cálculo de totales ─────────────────────────────────────────────────
+
+    it('cuenta correctamente el total de partidas', async () => {
+        mockFindResult(partidasVariadas)
+
+        const res = await request(app).get('/stats/alice')
+
+        expect(res.body.total).toBe(5)
+    })
+
+    it('cuenta correctamente victorias y derrotas', async () => {
+        mockFindResult(partidasVariadas)
+
+        const res = await request(app).get('/stats/alice')
+
+        expect(res.body.wins).toBe(3)
+        expect(res.body.losses).toBe(2)
+    })
+
+    it('calcula correctamente el winRate con un decimal', async () => {
+        // 3 victorias de 5 partidas = 60%
+        mockFindResult(partidasVariadas)
+
+        const res = await request(app).get('/stats/alice')
+
+        expect(res.body.winRate).toBe(60)
+    })
+
+    it('devuelve winRate 100 si todas las partidas son victorias', async () => {
+        mockFindResult([
+            { username: 'alice', rival: 'random_bot', resultado: '1' },
+            { username: 'alice', rival: 'random_bot', resultado: '1' },
+        ])
+
+        const res = await request(app).get('/stats/alice')
+
+        expect(res.body.winRate).toBe(100)
+    })
+
+    it('devuelve winRate 0 si todas las partidas son derrotas', async () => {
+        mockFindResult([
+            { username: 'alice', rival: 'random_bot', resultado: '2' },
+            { username: 'alice', rival: 'random_bot', resultado: '2' },
+        ])
+
+        const res = await request(app).get('/stats/alice')
+
+        expect(res.body.winRate).toBe(0)
+    })
 })
