@@ -150,4 +150,29 @@ describe('Stats', () => {
             expect(screen.getByText('Rival favorito')).toBeInTheDocument()
         )
     })
+
+    // ── Tabla por rival ────────────────────────────────────────────────────
+
+    it('renderiza la tabla de rivales con sus filas', async () => {
+        localStorage.setItem('username', 'alice')
+        vi.mocked(getStats).mockResolvedValue(statsMock)
+
+        render(<Stats />)
+
+        await waitFor(() => {
+            expect(screen.getByText('defensive_easy')).toBeInTheDocument()
+        })
+    })
+
+    it('no muestra el rival favorito si mostPlayedRival es null', async () => {
+        localStorage.setItem('username', 'alice')
+        vi.mocked(getStats).mockResolvedValue({ ...statsMock, mostPlayedRival: null })
+
+        render(<Stats />)
+
+        await waitFor(() =>
+            expect(screen.getByText(/estadísticas de alice/i)).toBeInTheDocument()
+        )
+        expect(screen.queryByText(/rival favorito/i)).not.toBeInTheDocument()
+    })
 })
