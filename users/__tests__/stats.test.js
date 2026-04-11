@@ -251,4 +251,16 @@ describe('GET /stats/:username', () => {
         expect(de.wins).toBe(0)
         expect(de.losses).toBe(1)
     })
+
+    
+    // ── Errores ───────────────────────────────────────────────────────────
+
+    it('devuelve 500 si la base de datos falla', async () => {
+        mockFindThrows()
+
+        const res = await request(app).get('/stats/alice')
+
+        expect(res.status).toBe(500)
+        expect(res.body).toHaveProperty('error')
+    })
 })
