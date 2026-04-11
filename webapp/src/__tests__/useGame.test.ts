@@ -97,8 +97,10 @@ describe('useGame', () => {
 
         result.current.handleCellClick(0)
 
-        expect(result.current.cells[0].owner).toBe('PLAYER_ONE')
-        expect(result.current.currentPlayer).toBe('PLAYER_TWO')
+        await waitFor(() => {
+            expect(result.current.cells[0].owner).toBe('PLAYER_ONE')
+            expect(result.current.currentPlayer).toBe('PLAYER_TWO')
+        })
     })
 
     test('handleResign termina la partida con el ganador correcto', async () => {
@@ -107,10 +109,12 @@ describe('useGame', () => {
         const { result } = renderHook(() => useGame())
         await waitFor(() => expect(result.current.status).toBe('ongoing'))
 
-        result.current.handleCellClick(0)
+        result.current.handleResign()
 
-        expect(result.current.status).toBe('finished')
-        expect(result.current.winner).toBe('PLAYER_ONE')
+        await waitFor(() => {
+            expect(result.current.status).toBe('finished')
+            expect(result.current.winner).toBe('PLAYER_ONE')
+        })
     })
 
     test('resetGame vuelve a crear una partida nueva', async () => {
@@ -153,16 +157,18 @@ describe('useGame', () => {
         })
     })
 
-    test('muestra error cuando placeToken falla', async () => {
-        vi.mocked(placeToken).mockRejectedValue(new Error('Movimiento inválido'))
+test('muestra error cuando placeToken falla', async () => {
+    vi.mocked(placeToken).mockRejectedValue(new Error('Movimiento inválido'))
 
-        const { result } = renderHook(() => useGame())
-        await waitFor(() => expect(result.current.status).toBe('ongoing'))
+    const { result } = renderHook(() => useGame())
+    await waitFor(() => expect(result.current.status).toBe('ongoing'))
 
-        result.current.handleCellClick(0)
+    result.current.handleCellClick(0)
 
+    await waitFor(() => {
         expect(result.current.error).toBe('Movimiento inválido')
     })
+})
 
     test('pasa el botId correcto al placeToken en modo computer', async () => {
         vi.mocked(placeToken).mockResolvedValue({ game_state: mockApiState, applied_move: { player: 0, action: 'place', cell_index: 0 }, bot_move: null })
