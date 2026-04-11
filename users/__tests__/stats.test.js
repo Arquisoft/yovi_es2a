@@ -205,4 +205,50 @@ describe('GET /stats/:username', () => {
         expect(res.body.currentStreak).toBe(3)
         expect(res.body.bestStreak).toBe(3)
     })
+
+    
+
+    // ── Estadísticas por rival ─────────────────────────────────────────────
+
+    it('identifica correctamente el rival más jugado', async () => {
+        // random_bot aparece 3 veces, los demás 1 vez
+        mockFindResult(partidasVariadas)
+
+        const res = await request(app).get('/stats/alice')
+
+        expect(res.body.mostPlayedRival).toBe('random_bot')
+    })
+
+    it('rivalStats contiene entradas para cada rival distinto', async () => {
+        mockFindResult(partidasVariadas)
+
+        const res = await request(app).get('/stats/alice')
+
+        expect(res.body.rivalStats).toHaveProperty('random_bot')
+        expect(res.body.rivalStats).toHaveProperty('defensive_easy')
+        expect(res.body.rivalStats).toHaveProperty('offensive_hard')
+    })
+
+    it('rivalStats refleja correctamente victorias y derrotas por rival', async () => {
+        mockFindResult(partidasVariadas)
+
+        const res = await request(app).get('/stats/alice')
+        const rb = res.body.rivalStats['random_bot']
+
+        // random_bot: 3 partidas, 3 victorias
+        expect(rb.total).toBe(3)
+        expect(rb.wins).toBe(3)
+        expect(rb.losses).toBe(0)
+    })
+
+    it('rivalStats de un rival con derrota es correcto', async () => {
+        mockFindResult(partidasVariadas)
+
+        const res = await request(app).get('/stats/alice')
+        const de = res.body.rivalStats['defensive_easy']
+
+        expect(de.total).toBe(1)
+        expect(de.wins).toBe(0)
+        expect(de.losses).toBe(1)
+    })
 })
