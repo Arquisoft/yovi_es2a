@@ -61,5 +61,5 @@ Restricciones Políticas y Convenciones
 | Restricción | Descripción
 | Estándar arc42 | Seguimiento estricto de la estructura arc42 para documentar la arquitectura del juego.
 | Interoperabilidad | El motor del juego debe estar separado de la interfaz para permitir posibles cambios de UI en el futuro.
-| Idioma | Documentación técnica en español y código fuente/comentarios en inglés.
+| Idioma | Documentación técnica en español y código fuente/comentarios en español.
 |===
