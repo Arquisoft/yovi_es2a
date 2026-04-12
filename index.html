@@ -1104,7 +1104,7 @@ The title of the table is the name of your system, the three columns contain the
 <p>Estrategia de juego</p>
 </li>
 <li>
-<p>Datos para personales (email, usuario&#8230;&#8203;) para su registro</p>
+<p>Datos basicos (usuario y email) para su registro</p>
 </li>
 <li>
 <p>Movimientos en notación YEN</p>
@@ -1130,26 +1130,20 @@ The title of the table is the name of your system, the three columns contain the
 <td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
 <ul>
 <li>
-<p>Solicitud play(position: YEN). Para jugar contra el sistema</p>
+<p>Solicitud de movimiento (play en YEN).</p>
 </li>
 <li>
-<p>Solicitud de gestión de usuarios</p>
-</li>
-<li>
-<p>Solicitud de gestión de partidas</p>
+<p>Peticiones sde datos de usuario/partidas (vía API).</p>
 </li>
 </ul>
 </div></div></td>
 <td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
 <ul>
 <li>
-<p>Situación de la partida en formato YEN</p>
+<p>Respuesta de movimiento (YEN).</p>
 </li>
 <li>
-<p>Información de usuarios</p>
-</li>
-<li>
-<p>Información de partidas</p>
+<p>Listado de usuarios y registros de partidas en formato JSON.</p>
 </li>
 </ul>
 </div></div></td>
@@ -1242,19 +1236,30 @@ together with a mapping table showing the relationships between channels and inp
 </tbody>
 </table>
 <div class="ulist">
-<div class="title"><strong>API REST (Bots)</strong></div>
+<div class="title"><strong>API de Gestión (Servicio <code>users</code> - Puerto 3000)</strong></div>
 <ul>
 <li>
-<p>Protocolo: HTTPS, JSON/YEN.</p>
+<p>Protocolo y Formato: HTTPS y JSON.</p>
 </li>
 <li>
-<p>Permite la integración de bots externos con la aplicación web para que jueguen contra nuestro sistema o gestionen datos.</p>
+<p>Responsabilidad: Gestiona la persistencia y consulta de datos sensibles: perfiles de usuario, autenticación y almacenamiento del historial de partidas.</p>
 </li>
 <li>
-<p>Funciones principales: gestión de usuarios e historicos y pruebas de partidas entre bots (método play).</p>
+<p>Integración: Permite a agentes externos la consulta de estadísticas y rankings mediante endpoints REST estándar.</p>
+</li>
+</ul>
+</div>
+<div class="ulist">
+<div class="title"><strong>API de Motor de Juego (Servicio <code>gamey</code> - Puerto 4000)</strong></div>
+<ul>
+<li>
+<p>Protocolo y Formato: HTTPS, JSON y notación YEN.</p>
 </li>
 <li>
-<p>Notación YEN: usada para intercambiar posiciones y movimientos del juego Y.</p>
+<p>Responsabilidad: Procesa la lógica algorítmica del Juego Y, validación de reglas en tiempo real y ejecución de estrategias de IA.</p>
+</li>
+<li>
+<p>Interoperabilidad: Expone el método <code>POST /v1/play</code> que permite el intercambio de jugadas serializadas en notación YEN, facilitando la competición de bots externos contra el motor desarrollado en Rust.</p>
 </li>
 </ul>
 </div>
