@@ -62,7 +62,7 @@ a|
     * Versión de juego deseada
     * Tamaño del tablero
     * Estrategia de juego
-    * Datos para personales (email, usuario...) para su registro
+    * Datos basicos (usuario y email) para su registro
     * Movimientos en notación YEN
 a| 
     * Estado actualizado de la partida
@@ -71,13 +71,11 @@ a|
 
 | *Bot externo*
 a| 
-    * Solicitud play(position: YEN). Para jugar contra el sistema
-    * Solicitud de gestión de usuarios
-    * Solicitud de gestión de partidas 
+    * Solicitud de movimiento (play en YEN).
+    * Peticiones sde datos de usuario/partidas (vía API). 
 a| 
-    * Situación de la partida en formato YEN
-    * Información de usuarios
-    * Información de partidas
+    * Respuesta de movimiento (YEN).
+    * Listado de usuarios y registros de partidas en formato JSON.
 |===
 
 === Contexto Técnico
@@ -115,12 +113,15 @@ endif::arc42help[]
 | Consulta de resultados / estadísticas | Resultados y estadísticas | HTML / JSON / HTTPS
 |===
 
-.**API REST (Bots)**
+.**API de Gestión (Servicio `users` - Puerto 3000)**
+* Protocolo y Formato: HTTPS y JSON.
+* Responsabilidad: Gestiona la persistencia y consulta de datos sensibles: perfiles de usuario, autenticación y almacenamiento del historial de partidas.
+* Integración: Permite a agentes externos la consulta de estadísticas y rankings mediante endpoints REST estándar.
 
-* Protocolo: HTTPS, JSON/YEN.
-* Permite la integración de bots externos con la aplicación web para que jueguen contra nuestro sistema o gestionen datos.
-* Funciones principales: gestión de usuarios e historicos y pruebas de partidas entre bots (método play).
-* Notación YEN: usada para intercambiar posiciones y movimientos del juego Y.
+.**API de Motor de Juego (Servicio `gamey` - Puerto 4000)**
+* Protocolo y Formato: HTTPS, JSON y notación YEN.
+* Responsabilidad: Procesa la lógica algorítmica del Juego Y, validación de reglas en tiempo real y ejecución de estrategias de IA.
+* Interoperabilidad: Expone el método `POST /v1/play` que permite el intercambio de jugadas serializadas en notación YEN, facilitando la competición de bots externos contra el motor desarrollado en Rust.
 
 .**Interfaz Web (Jugadores)**
 
