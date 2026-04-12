@@ -38,6 +38,9 @@ Para estructurar estas metas, utilizamos las herramientas detalladas en los sigu
 
 === Arbol de calidad
 
+[plantuml, arbol-calidad, svg]
+....
+
 @startmindmap
 * Calidad del sistema YOVI
 ** Usabilidad
@@ -64,6 +67,7 @@ Para estructurar estas metas, utilizamos las herramientas detalladas en los sigu
 *** Despliegue en web
 *** Compatibilidad con navegadores
 @endmindmap
+....
 
 ifdef::arc42help[]
 [role="arc42help"]
