@@ -147,6 +147,43 @@ deactivate web
 @enduml
 ....
 
+=== Escenario 7: Cierre de sesión
+
+El usuario cierra su sesión desde la interfaz. El frontend elimina los datos locales (localStorage) y notifica al servicio `users`, que invalida la sesión en la base de datos.
+
+[plantuml, runtime-logout, png]
+....
+@startuml
+!theme plain
+autonumber
+skinparam monochrome true
+
+actor Usuario
+participant "webapp (Frontend)" as web
+participant "users-service (API)" as users
+database "MongoDB" as mongo
+
+Usuario -> web: Pulsa "Cerrar sesión"
+activate web
+
+web -> web: Elimina username de localStorage
+
+web -> users: POST /logout (username)
+activate users
+
+users -> mongo: Invalidar sesión / token
+activate mongo
+mongo --> users: Confirmación
+deactivate mongo
+
+users --> web: 200 OK
+deactivate users
+
+web --> Usuario: Redirige a pantalla de login
+deactivate web
+@enduml
+....
+
 ifdef::arc42help[]
 [role="arc42help"]
 ****
@@ -181,5 +218,3 @@ See https://docs.arc42.org/section-6/[Runtime View] in the arc42 documentation.
 
 ****
 endif::arc42help[]
-
-Esta sección se irá rellenando conforme avance el desarrollo del proyecto.

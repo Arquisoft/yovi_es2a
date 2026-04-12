@@ -156,6 +156,14 @@ Bloques de construcción contenidos:
 | Persistence Layer | Capa de abstracción (DAO/Repository) para comunicar con MongoDB.
 |===
 
+==== User Controller
+
+Propósito: mantener una navegación segura permitiendo únicamente jugar y acceder a seccioens específicas a usuarios registrados en el sistema.
+Responsabilidades:
+- Registro de usuarios
+- Login
+- Logout
+
 ==== Servicio de Juego
 
 Propósito: Cerebro de la ejecución. Recibe intentos de movimiento, consulta validez al motor, actualiza el estado y notifica a los jugadores.
