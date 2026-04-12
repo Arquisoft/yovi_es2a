@@ -31,17 +31,19 @@ endif::arc42help[]
 
 A continuación se describen los requisitos funcionales esenciales agrupados por funcionalidad:
 
-* **Mecánica del Juego:** El sistema debe representar un tablero triangular dividido en casillas hexagonales. Debe permitir la colocación de fichas por turnos y detectar automáticamente si un jugador ha conectado los tres lados del tablero (victoria) o si se produce un empate matemático.
+* **Mecánica del Juego:** El sistema debe representar un tablero triangular dividido en casillas hexagonales. Debe permitir la colocación de fichas por turnos y detectar automáticamente si un jugador ha conectado los tres lados del tablero (victoria).
 
 * **Modos de Juego:** Se requiere soportar dos tipos de partidas:
-** **Jugador vs Jugador:** Partidas en tiempo real entre dos usuarios humanos.
-** **Jugador vs Máquina:** Un usuario humano contra una Inteligencia Artificial con una dificultad básica.
+** **Jugador vs Jugador:** Partidas en tiempo real entre dos usuarios humanos en el mismo dispositivo.
+** **Jugador vs Máquina:** Desafio contra un agente inteligente. El sistema permite seleccionar entre múltiples estrategias (Aleatoria, Defensiva, Ofensiva, Posicional y Monte Carlos)  algunas con diferentes niveles de dificultad, pudiendo ser ajustado por el usuario.
+** **Interaccion mediante API (Bot vs Bot Externo): El sistema expone una interfaz API REST que permite a bots externos competir contra la IA del sistema o gestionar partidas de forma automatizada mediante la notación YEN. 
 
-* **Gestión de Usuarios:** Los usuarios deben poder registrarse e iniciar sesión para acceder a las partidas. El sistema debe mantener un perfil persistente de cada jugador.
 
-* **Historial y Persistencia:** El sistema debe almacenar el resultado de las partidas finalizadas, permitiendo a los usuarios consultar su historial de victorias y derrotas.
+* **Gestión de Usuarios:** Los usuarios gestiona la autenticación mediante el registro e inicio de sesión de usuarios. Garantiza la persistencia de los datos, manteniendo un perfil actualizado de cada jugador.
 
-* **Plataforma:** La aplicación debe ser accesible desde navegadores web modernos, siendo desplegable en cualquier entorno que soporte contenedores Docker.
+* **Historial y Persistencia:** El sistema registra de forma automática el resultado de cada partida finalizada. Los usuarios disponen de un panel de consulta donde pueden visualizar su historia de victorias y derrotas, permitiendo el filtrado de los registros por fecha, tipo de oponente y tamaño del tablero.
+
+* **Plataforma:** La aplicación es plenamente accesible desde navegadores web modernos. El sistema se distribuye mediante contenedores Docker, lo que garantiza un despliegue ágil y consistente en cualquier entorno que lo soporte.
 
 ifdef::arc42help[]
 [role="arc42help"]
