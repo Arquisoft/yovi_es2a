@@ -8,14 +8,14 @@ This project implements a distributed system for the Game Y, developed as part o
 
 ## Team
 
-- Sergio González Martínez (UO300006@uniovi.es)
+- Sergio González Martínez (UO300798@uniovi.es)
 - Iyán Díaz Pereda (UO300006@uniovi.es)
 - Pablo Arias Fernández (UO300305@uniovi.es)
 - Enol de la Calle Iglesias (UO301431@uniovi.es)
 - Iyán Álvarez Casanovas (UO301299@uniovi.es)
 
-Asignatura: Arquitectura del Software  
-Curso: 2025/2026
+**Course:** Software  Architecture 
+**Academic Year:** 2025/2026
 
 ## Architecture Overview
 
