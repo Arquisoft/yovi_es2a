@@ -14,7 +14,7 @@ This project implements a distributed system for the Game Y, developed as part o
 - Enol de la Calle Iglesias (UO301431@uniovi.es)
 - Iyán Álvarez Casanovas (UO301299@uniovi.es)
 
-**Course:** Software  Architecture 
+**Course:** Software  Architecture  
 **Academic Year:** 2025/2026
 
 ## Architecture Overview
