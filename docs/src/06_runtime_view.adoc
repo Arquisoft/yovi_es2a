@@ -168,16 +168,8 @@ activate web
 
 web -> web: Elimina username de localStorage
 
-web -> users: POST /logout (username)
+web -> users: logout
 activate users
-
-users -> mongo: Invalidar sesión / token
-activate mongo
-mongo --> users: Confirmación
-deactivate mongo
-
-users --> web: 200 OK
-deactivate users
 
 web --> Usuario: Redirige a pantalla de login
 deactivate web
