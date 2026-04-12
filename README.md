@@ -6,6 +6,8 @@
 
 This project implements a distributed system for the Game Y, developed as part of the Software Architecture course. It includes a web interface, a user management service, and a game engine.
 
+# URL Deployment: http://68.221.24.159/
+
 ## Team
 
 - Sergio González Martínez (UO300798@uniovi.es)
