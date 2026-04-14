@@ -116,28 +116,28 @@ mod tests {
     #[test]
     fn test_easy_returns_move_on_empty_board() {
         let bot = make_bot(Difficulty::Easy);
-        let game = GameY::new(5);
+        let game = GameY::new(5, None);
         assert!(bot.choose_move(&game).is_some());
     }
 
     #[test]
     fn test_medium_returns_move_on_empty_board() {
         let bot = make_bot(Difficulty::Medium);
-        let game = GameY::new(5);
+        let game = GameY::new(5, None);
         assert!(bot.choose_move(&game).is_some());
     }
 
     #[test]
     fn test_hard_returns_move_on_empty_board() {
         let bot = make_bot(Difficulty::Hard);
-        let game = GameY::new(5);
+        let game = GameY::new(5, None);
         assert!(bot.choose_move(&game).is_some());
     }
 
     #[test]
     fn test_easy_returns_none_on_full_board() {
         let bot = make_bot(Difficulty::Easy);
-        let mut game = GameY::new(1);
+        let mut game = GameY::new(1, None);
         game.add_move(Movement::Placement {
             player: PlayerId::new(0),
             coords: Coordinates::new(0, 0, 0),
@@ -148,7 +148,7 @@ mod tests {
     #[test]
     fn test_medium_returns_none_on_full_board() {
         let bot = make_bot(Difficulty::Medium);
-        let mut game = GameY::new(1);
+        let mut game = GameY::new(1, None);
         game.add_move(Movement::Placement {
             player: PlayerId::new(0),
             coords: Coordinates::new(0, 0, 0),
@@ -159,7 +159,7 @@ mod tests {
     #[test]
     fn test_hard_returns_none_on_full_board() {
         let bot = make_bot(Difficulty::Hard);
-        let mut game = GameY::new(1);
+        let mut game = GameY::new(1, None);
         game.add_move(Movement::Placement {
             player: PlayerId::new(0),
             coords: Coordinates::new(0, 0, 0),
@@ -171,7 +171,7 @@ mod tests {
     #[test]
     fn test_easy_takes_immediate_win() {
         let bot = make_bot(Difficulty::Easy);
-        let mut game = GameY::new(3);
+        let mut game = GameY::new(3, None);
 
         game.add_move(Movement::Placement {
             player: PlayerId::new(0),
@@ -198,7 +198,7 @@ mod tests {
     #[test]
     fn test_medium_takes_immediate_win() {
         let bot = make_bot(Difficulty::Medium);
-        let mut game = GameY::new(3);
+        let mut game = GameY::new(3, None);
 
         game.add_move(Movement::Placement {
             player: PlayerId::new(0),
@@ -226,7 +226,7 @@ mod tests {
     #[test]
     fn test_hard_takes_immediate_win() {
         let bot = make_bot(Difficulty::Hard);
-        let mut game = GameY::new(3);
+        let mut game = GameY::new(3, None);
 
         game.add_move(Movement::Placement {
             player: PlayerId::new(0),
@@ -255,7 +255,7 @@ mod tests {
     #[test]
     fn test_hard_blocks_opponent_win() {
         let bot = make_bot(Difficulty::Hard);
-        let mut game = GameY::new(3);
+        let mut game = GameY::new(3, None);
 
         game.add_move(Movement::Placement {
             player: PlayerId::new(1),
@@ -284,7 +284,7 @@ mod tests {
     #[test]
     fn test_easy_returns_valid_cell() {
         let bot = make_bot(Difficulty::Easy);
-        let game = GameY::new(5);
+        let game = GameY::new(5, None);
         let coords = bot.choose_move(&game).unwrap();
         let idx = coords.to_index(game.board_size());
         assert!(game.available_cells().contains(&idx));
@@ -293,7 +293,7 @@ mod tests {
     #[test]
     fn test_medium_returns_valid_cell() {
         let bot = make_bot(Difficulty::Medium);
-        let game = GameY::new(5);
+        let game = GameY::new(5, None);
         let coords = bot.choose_move(&game).unwrap();
         let idx = coords.to_index(game.board_size());
         assert!(game.available_cells().contains(&idx));
@@ -302,7 +302,7 @@ mod tests {
     #[test]
     fn test_hard_returns_valid_cell() {
         let bot = make_bot(Difficulty::Hard);
-        let game = GameY::new(5);
+        let game = GameY::new(5, None);
         let coords = bot.choose_move(&game).unwrap();
         let idx = coords.to_index(game.board_size());
         assert!(game.available_cells().contains(&idx));
