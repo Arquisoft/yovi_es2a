@@ -116,7 +116,7 @@ pub fn run_cli_game() -> Result<()> {
             return Ok(());
         }
     };
-    let mut game = game::GameY::new(args.size);
+    let mut game = game::GameY::new(args.size, None);
     loop {
         println!("{}", game.render(&render_options));
         let status = game.status();
