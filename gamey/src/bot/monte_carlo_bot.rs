@@ -144,14 +144,14 @@ mod tests {
     #[test]
     fn test_monte_carlo_returns_move_on_empty_board() {
         let bot = make_bot();
-        let game = GameY::new(3);
+        let game = GameY::new(3, None);
         assert!(bot.choose_move(&game).is_some());
     }
 
     #[test]
     fn test_monte_carlo_returns_none_on_full_board() {
         let bot = make_bot();
-        let mut game = GameY::new(1);
+        let mut game = GameY::new(1, None);
         game.add_move(Movement::Placement {
             player: PlayerId::new(0),
             coords: Coordinates::new(0, 0, 0),
@@ -162,7 +162,7 @@ mod tests {
     #[test]
     fn test_monte_carlo_returns_valid_cell() {
         let bot = make_bot();
-        let game = GameY::new(5);
+        let game = GameY::new(5, None);
         let coords = bot.choose_move(&game).unwrap();
         let idx = coords.to_index(game.board_size());
         assert!(game.available_cells().contains(&idx));
@@ -171,7 +171,7 @@ mod tests {
     #[test]
     fn test_monte_carlo_takes_immediate_win() {
         let bot = make_bot();
-        let mut game = GameY::new(3);
+        let mut game = GameY::new(3, None);
 
         game.add_move(Movement::Placement {
             player: PlayerId::new(0),
@@ -200,7 +200,7 @@ mod tests {
     #[test]
     fn test_monte_carlo_multiple_calls_always_valid() {
         let bot = make_bot();
-        let game = GameY::new(5);
+        let game = GameY::new(5, None);
         for _ in 0..5 {
             let coords = bot.choose_move(&game).unwrap();
             let idx = coords.to_index(game.board_size());
