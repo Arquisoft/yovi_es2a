@@ -6,8 +6,7 @@ import { useGame } from '../hooks/useGame';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthComprobation, getLoggedUser } from '../components/AuthComprobation';
 import Navbar from '../components/Navbar';
-import { useEffect, useState } from 'react';
-
+import { useEffect, useState, useRef } from 'react';
 interface GameProps {
     size?: number;
     mode?: "human" | "computer";
@@ -30,23 +29,34 @@ export function Game({ size: _size }: GameProps): JSX.Element {
     const size = boardSize ?? _size ?? 7;
 
     const username = localStorage.getItem("username") ?? undefined;
-    const { cells, currentPlayer, winner, status, error, handleCellClick, handleResign, handleTimeout, resetGame } = useGame({ size, mode, botId, username, timer: timerDuration });
+    const { cells, currentPlayer, winner, status, error, handleCellClick, handleResign, handleTimeout, resetGame, moveCount } = useGame({ size, mode, botId, username, timer: timerDuration });   
     
+    // --- NUEVO: Lógica del Reloj a Prueba de Bots ---
     const [timeLeft, setTimeLeft] = useState<number | null>(timerDuration);
+    
+    // AHORA TRACKEAMOS EL NUMERO DE MOVIMIENTO, NO EL JUGADOR
+    const [trackedMove, setTrackedMove] = useState<number>(moveCount); 
+    const isTimeoutProcessing = useRef(false);
 
-    useEffect(() => {
+    // Si el número de movimiento cambia, reiniciamos reloj
+    if (moveCount !== trackedMove) {
+        setTrackedMove(moveCount);
         if (timerDuration && status === "ongoing") {
             setTimeLeft(timerDuration);
         } else {
             setTimeLeft(null);
         }
-    }, [currentPlayer, status, timerDuration]);
+        isTimeoutProcessing.current = false;
+    }
 
     useEffect(() => {
         if (timeLeft === null || status !== "ongoing") return;
 
         if (timeLeft === 0) {
-            handleTimeout(); // Se llama a la API para ceder turno
+            if (!isTimeoutProcessing.current) {
+                isTimeoutProcessing.current = true;
+                handleTimeout(); 
+            }
             return;
         }
 

@@ -110,6 +110,7 @@ export async function timeout(
     const body: Record<string, unknown> = {
         player,
         action: "timeout",
+        cell_index: null,
     };
 
     // Si hay un bot jugando, le decimos a Rust que el bot juegue su turno automáticamente después

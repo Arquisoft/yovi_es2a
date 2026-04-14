@@ -27,6 +27,8 @@ interface UseGameReturn {
     handleResign: () => void;
     handleTimeout: () => void;
     resetGame: () => void;
+
+    moveCount: number;
 }
 
 //  ───────────────Funciones útiles de conversión────────────────────────────────────────────────
@@ -70,12 +72,16 @@ export function useGame({
     const [status, setStatus] = useState<"ongoing" | "finished" | "loading">("loading");
     const [error, setError] = useState<string | null>(null);
 
+    const [moveCount, setMoveCount] = useState<number>(0); 
+
     // Aplica un ApiGameState al estado local de React
     const applyGameState = useCallback((apiState: ApiGameState) => {
         setCells(apiStateToCell(apiState));
         setCurrentPlayer(playerIdToPlayer(apiState.next_player));
         setWinner(playerIdToPlayer(apiState.winner));
         setStatus(apiState.status);
+
+        setMoveCount(prev => prev + 1);
         
     // Solo guardamos cuando termina la partida y hay un usuario logueado
         if (apiState.status === "finished" && username) {
@@ -141,13 +147,19 @@ export function useGame({
         if (!gameId || status !== "ongoing") return;
 
         const player = currentPlayer === "PLAYER_ONE" ? 0 : 1;
-        const bot = mode === "computer" ? botId : undefined; // Por si queremos que el bot mueva automático después
+        const bot = mode === "computer" ? botId : undefined; 
 
         setError(null);
         try {
+            console.log(`⏰ Intentando ceder turno. Jugador actual: ${player}`); // <--- CHIVATO 1
+            
             const result = await timeoutService(gameId, player, bot);
+            
+            console.log("✅ Respuesta de Rust al timeout:", result); // <--- CHIVATO 2
+            
             applyGameState(result.game_state);
         } catch (e) {
+            console.error("❌ ERROR AL CEDER TURNO:", e); // <--- CHIVATO 3
             setError(e instanceof Error ? e.message : "Error al ceder turno");
         }
     }, [gameId, status, currentPlayer, mode, botId, applyGameState]);
@@ -168,5 +180,6 @@ export function useGame({
         handleResign,
         handleTimeout,
         resetGame,
+        moveCount,
     };
 }
