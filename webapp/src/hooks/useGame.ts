@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { TableCell, Player } from "../types/game";
-import { createGame, placeToken, resign as resignService, saveGameResult } from "../services/gameService";
 import type { ApiGameState } from "../types/gameApi";
-
+import { createGame, placeToken, resign as resignService, saveGameResult, timeout as timeoutService } from "../services/gameService"; // <-- SOLUCIÓN AL ERROR 2
 //  ────────────────────Tipos────────────────────────────────────────────────────────────
 
 // Opciones de configuración de la partida
@@ -13,6 +12,7 @@ interface UseGameOptions {
     mode?: "human" | "computer";
     botId?: string;
     username?: string;
+    timer?: number | null;
 }
 
 // Lo que devuelve el hook useGame
@@ -25,6 +25,7 @@ interface UseGameReturn {
     error: string | null;
     handleCellClick: (cellIndex: number) => void;
     handleResign: () => void;
+    handleTimeout: () => void;
     resetGame: () => void;
 }
 
@@ -60,6 +61,7 @@ export function useGame({
     mode = "human",
     botId = "random_bot",
     username,
+    timer = null,
 }: UseGameOptions = {}): UseGameReturn {
     const [gameId, setGameId] = useState<string | null>(null);
     const [cells, setCells] = useState<TableCell[]>([]);
@@ -92,7 +94,7 @@ export function useGame({
         setStatus("loading");
         setError(null);
         try {
-            const apiState = await createGame(size, mode, botId);
+            const apiState = await createGame(size, mode, botId, timer);
             setGameId(apiState.game_id);
             applyGameState(apiState);
         } catch (e) {
@@ -135,6 +137,21 @@ export function useGame({
         }
     }, [gameId, status, currentPlayer, applyGameState]);
 
+    const handleTimeout = useCallback(async () => {
+        if (!gameId || status !== "ongoing") return;
+
+        const player = currentPlayer === "PLAYER_ONE" ? 0 : 1;
+        const bot = mode === "computer" ? botId : undefined; // Por si queremos que el bot mueva automático después
+
+        setError(null);
+        try {
+            const result = await timeoutService(gameId, player, bot);
+            applyGameState(result.game_state);
+        } catch (e) {
+            setError(e instanceof Error ? e.message : "Error al ceder turno");
+        }
+    }, [gameId, status, currentPlayer, mode, botId, applyGameState]);
+
     // Reinicia la partida
     const resetGame = useCallback(() => {
         initGame();
@@ -149,6 +166,7 @@ export function useGame({
         error,
         handleCellClick,
         handleResign,
+        handleTimeout,
         resetGame,
     };
 }

@@ -28,13 +28,14 @@ export async function createGame(
     // De momento los datos pasados son default, pero se podrían personalizar desde la UI
     size: number,
     mode: "human" | "computer" = "human",
-    bot: string = "random_bot"
+    bot: string = "random_bot",
+    timer?: number | null,
 ): Promise<ApiGameState> {
     const response = await fetch(`${BACKEND_URL}/game/new`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // Añade al JSON tamaño, moodo y bot usando stringify para convertirlo a texto
-        body: JSON.stringify({ size, mode, bot }),
+        body: JSON.stringify({ size, mode, bot, timer }),
     });
     if (!response.ok) {
         const error = await response.json();
@@ -97,6 +98,32 @@ export async function resign(
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error ?? "Error al rendirse");
+    }
+    return response.json();
+}
+
+export async function timeout(
+    gameId: string,
+    player: number,
+    botId?: string
+): Promise<ApiMakeMoveResponse> {
+    const body: Record<string, unknown> = {
+        player,
+        action: "timeout",
+    };
+
+    // Si hay un bot jugando, le decimos a Rust que el bot juegue su turno automáticamente después
+    if (botId) body.bot = botId;
+
+    const response = await fetch(`${BACKEND_URL}/game/${gameId}/move`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+    });
+    
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error ?? "Error al pasar turno");
     }
     return response.json();
 }
