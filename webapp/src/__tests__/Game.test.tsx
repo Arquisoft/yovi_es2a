@@ -27,6 +27,14 @@ vi.mock('../components/AuthComprobation', () => ({
   getLoggedUser: mockGetLoggedUser,
 }));
 
+vi.mock('react-icons/fa', () => ({
+  FaUserCircle: () => null,
+}));
+
+vi.mock('../components/Navbar', () => ({
+  default: () => <nav data-testid="navbar" />,
+}));
+
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
@@ -105,9 +113,7 @@ describe('Game Component', () => {
       </MemoryRouter>
     );
 
-    const resignButton = screen.getByText('Rendirse');
-    fireEvent.click(resignButton);
-
+    fireEvent.click(screen.getByText('Rendirse'));
     expect(mockHandleResign).toHaveBeenCalled();
   });
 
@@ -120,8 +126,7 @@ describe('Game Component', () => {
       </MemoryRouter>
     );
 
-    const resignButton = screen.getByText('Rendirse');
-    expect(resignButton).toBeDisabled();
+    expect(screen.getByText('Rendirse')).toBeDisabled();
   });
 
   test('debe usar valores por defecto cuando el estado de la ubicación esté ausente', () => {

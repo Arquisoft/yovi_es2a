@@ -193,7 +193,7 @@ const Historic: React.FC = () => {
                                 <div className="game-card__main">
                                     <span className="game-card__rival">{rivalLabel(record.rival)}</span>
                                     {record.size && (
-                                        <span className="game-card__size">Tablero {record.size}×{record.size}</span>
+                                        <span className="game-card__size">{`Tablero ${record.size}×${record.size}`}</span>
                                     )}
                                 </div>
 

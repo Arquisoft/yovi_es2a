@@ -5,8 +5,6 @@ import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import '@testing-library/jest-dom'
 import Historic from '../pages/Historic'
 
-// ── Mock de servicios ────────────────────────────────────────────────────────
-
 vi.mock('../services/gameService', () => ({
     getHistory: vi.fn(),
 }))
@@ -18,7 +16,6 @@ const mockRecords = [
         _id: 'abc1',
         username: 'testuser',
         rival: 'random_bot',
-        // Se usa "1" y "2" como constantes para evitar errores con strings
         resultado: "1" as const,
         size: 7,
         createdAt: '2024-03-15T10:30:00.000Z',
@@ -48,14 +45,14 @@ describe('Historic', () => {
         render(<Historic />)
 
         await waitFor(() => {
-            expect(screen.getByText('random_bot')).toBeInTheDocument()
+            expect(screen.getByText('Random Bot')).toBeInTheDocument()
             expect(screen.getByText('invitado')).toBeInTheDocument()
         })
-        
-        // Acotamos la busqueda a la tabla
-        const tabla = screen.getByRole('table');
-        expect(within(tabla).getByText('✅ Victoria')).toBeInTheDocument()
-        expect(within(tabla).getByText('❌ Derrota')).toBeInTheDocument()
+
+        // Acotamos al contenedor de tarjetas para evitar colisión con las opciones del select
+        const lista = document.querySelector('.historic-list') as HTMLElement
+        expect(within(lista).getByText('Victoria')).toBeInTheDocument()
+        expect(within(lista).getByText('Derrota')).toBeInTheDocument()
     })
 
     test('muestra mensaje cuando no hay partidas registradas', async () => {
@@ -85,9 +82,8 @@ describe('Historic', () => {
     test('filtra por resultado al cambiar el selector', async () => {
         const user = userEvent.setup()
         render(<Historic />)
-        await waitFor(() => expect(screen.getByText('random_bot')).toBeInTheDocument())
+        await waitFor(() => expect(screen.getByText('Random Bot')).toBeInTheDocument())
 
-        // El primer select es el de resultado, el segundo el de tamaño
         const [selectResultado] = screen.getAllByRole('combobox')
         await user.selectOptions(selectResultado, '1')
 
@@ -95,10 +91,11 @@ describe('Historic', () => {
             expect(getHistory).toHaveBeenLastCalledWith('testuser', expect.objectContaining({ resultado: '1' }))
         })
     })
+
     test('filtra por rival al escribir y pulsar Buscar', async () => {
         const user = userEvent.setup()
         render(<Historic />)
-        await waitFor(() => expect(screen.getByText('random_bot')).toBeInTheDocument())
+        await waitFor(() => expect(screen.getByText('Random Bot')).toBeInTheDocument())
 
         const input = screen.getByPlaceholderText(/buscar rival/i)
         await user.type(input, 'random_bot')
@@ -112,7 +109,7 @@ describe('Historic', () => {
     test('buscar rival también se activa con Enter', async () => {
         const user = userEvent.setup()
         render(<Historic />)
-        await waitFor(() => expect(screen.getByText('random_bot')).toBeInTheDocument())
+        await waitFor(() => expect(screen.getByText('Random Bot')).toBeInTheDocument())
 
         const input = screen.getByPlaceholderText(/buscar rival/i)
         await user.type(input, 'invitado{Enter}')
@@ -125,9 +122,8 @@ describe('Historic', () => {
     test('el botón Limpiar filtros resetea todos los filtros', async () => {
         const user = userEvent.setup()
         render(<Historic />)
-        await waitFor(() => expect(screen.getByText('random_bot')).toBeInTheDocument())
+        await waitFor(() => expect(screen.getByText('Random Bot')).toBeInTheDocument())
 
-        // Activamos un filtro para que aparezca el botón de limpiar
         const selects = screen.getAllByRole('combobox')
         await user.selectOptions(selects[0], '1')
 
@@ -135,17 +131,16 @@ describe('Historic', () => {
         await user.click(limpiarBtn)
 
         await waitFor(() => {
-            // Tras limpiar, la llamada no debe llevar filtros
             expect(getHistory).toHaveBeenLastCalledWith('testuser', {})
         })
     })
 
-    test('muestra el tamaño del tablero en formato NxN', async () => {
+    test('muestra el tamaño del tablero en formato N×N', async () => {
         render(<Historic />)
 
         await waitFor(() => {
-            expect(screen.getByText('7x7')).toBeInTheDocument()
-            expect(screen.getByText('11x11')).toBeInTheDocument()
+            expect(screen.getByText('Tablero 7×7')).toBeInTheDocument()
+            expect(screen.getByText('Tablero 11×11')).toBeInTheDocument()
         })
     })
 })

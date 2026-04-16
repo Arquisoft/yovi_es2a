@@ -1,10 +1,9 @@
-// Tests de la venana principal del menú
+// Tests de la ventana principal del menú
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, test, expect, vi, afterEach } from 'vitest'
 import '@testing-library/jest-dom'
 
-// Mock para comprobar la navegación
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual<any>('react-router-dom')
@@ -16,6 +15,10 @@ vi.mock('react-router-dom', async () => {
 
 vi.mock('../components/AuthComprobation', () => ({
     useAuthComprobation: vi.fn(),
+}))
+
+vi.mock('react-icons/fa', () => ({
+    FaUserCircle: () => null,
 }))
 
 vi.mock('../components/Navbar', () => ({
@@ -35,9 +38,7 @@ describe('Menu', () => {
             </MemoryRouter>
         )
 
-// -------------------------TESTS -------------------------
-
-    test('muestra el título y las dos opciones principales', () => {
+    test('muestra el título y las opciones del menú', () => {
         renderMenu()
         expect(screen.getByText('MENU')).toBeInTheDocument()
         expect(screen.getByText('Jugar')).toBeInTheDocument()
@@ -47,7 +48,6 @@ describe('Menu', () => {
     test('el botón Jugar navega a /lobby', async () => {
         const user = userEvent.setup()
         renderMenu()
-
         await user.click(screen.getByText('Jugar'))
         expect(mockNavigate).toHaveBeenCalledWith('/lobby')
     })
@@ -55,7 +55,6 @@ describe('Menu', () => {
     test('el botón Ver datos navega a /datos', async () => {
         const user = userEvent.setup()
         renderMenu()
-
         await user.click(screen.getByText('Ver datos'))
         expect(mockNavigate).toHaveBeenCalledWith('/datos')
     })
