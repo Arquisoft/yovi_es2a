@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Historic from './Historic';
 import Stats from './Stats';
 import '../styles/DataHub.css';
+import Navbar from '../components/Navbar';
 
 type DataTab = 'historial' | 'estadisticas';
 
@@ -13,6 +14,7 @@ export default function DataHub(): JSX.Element {
     const [activeTab, setActiveTab] = useState<DataTab>('historial');
 
     return (
+        <Navbar />
         <div className="datahub-container">
             <div className="datahub-card">
                 <div className="datahub-header">
