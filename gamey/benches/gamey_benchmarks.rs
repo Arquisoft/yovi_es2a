@@ -61,7 +61,7 @@ fn bench_game_creation(c: &mut Criterion) {
             BenchmarkId::new("new", board_size),
             board_size,
             |b, &size| {
-                b.iter(|| black_box(GameY::new(size)))
+                b.iter(|| black_box(GameY::new(size, None)))
             },
         );
     }
@@ -82,7 +82,7 @@ fn bench_add_move(c: &mut Criterion) {
             board_size,
             |b, &size| {
                 b.iter_batched(
-                    || GameY::new(size),
+                    || GameY::new(size, None),
                     |mut game| {
                         let coords = Coordinates::from_index(0, size);
                         let movement = Movement::Placement {
@@ -103,7 +103,7 @@ fn bench_add_move(c: &mut Criterion) {
             board_size,
             |b, &size| {
                 b.iter_batched(
-                    || GameY::new(size),
+                    || GameY::new(size, None),
                     |mut game| {
                         let half = total_cells / 2;
                         for idx in 0..half {
@@ -141,7 +141,7 @@ fn bench_render(c: &mut Criterion) {
 
     for board_size in [5, 10, 15].iter() {
         // Create a game with some moves
-        let mut game = GameY::new(*board_size);
+        let mut game = GameY::new(*board_size, None);
         let total_cells = (board_size * (board_size + 1)) / 2;
         for idx in 0..(total_cells / 3) {
             let coords = Coordinates::from_index(idx, *board_size);
