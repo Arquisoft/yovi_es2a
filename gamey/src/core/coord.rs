@@ -14,9 +14,9 @@ use serde::{Deserialize, Serialize};
 /// - z = 0 means the cell touches side C
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Coordinates {
-    x: u32,
-    y: u32,
-    z: u32,
+    pub x: u32,
+    pub y: u32,
+    pub z: u32,
 }
 
 impl Coordinates {
