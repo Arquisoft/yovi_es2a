@@ -150,21 +150,15 @@ export function useGame({
         const bot = mode === "computer" ? botId : undefined; 
 
         setError(null);
-        try {
-            console.log(`⏰ Intentando ceder turno. Jugador actual: ${player}`); // <--- CHIVATO 1
-            
+        try {            
             const result = await timeoutService(gameId, player, bot);
-            
-            console.log("✅ Respuesta de Rust al timeout:", result); // <--- CHIVATO 2
             
             applyGameState(result.game_state);
         } catch (e) {
-            console.error("❌ ERROR AL CEDER TURNO:", e); // <--- CHIVATO 3
             setError(e instanceof Error ? e.message : "Error al ceder turno");
         }
     }, [gameId, status, currentPlayer, mode, botId, applyGameState]);
 
-    // Reinicia la partida
     const resetGame = useCallback(() => {
         initGame();
     }, [initGame]);
