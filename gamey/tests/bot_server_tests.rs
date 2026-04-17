@@ -416,25 +416,27 @@ async fn test_play_endpoint_invalid_yen() {
     let app = test_app();
     let response = app.oneshot(
         Request::builder()
-            .method("POST")
-            .uri("/v1/play")
-            .header("content-type", "application/json")
-            .body(Body::from(r#"{"position": "invalido", "bot": "random_bot"}"#))
+            .method("GET")
+            .uri("/play?position=%22invalido%22")
+            .body(Body::empty())
             .unwrap(),
     ).await.unwrap();
     // Cubre el error de parseo de YEN
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
-
+ 
 #[tokio::test]
 async fn test_play_endpoint_bot_not_found() {
     let app = test_app();
+    // YEN válido con bot que no existe
+    let yen_json = r#"{"size":3,"turn":0,"players":["B","R"],"layout":"./../..."}"#;
+    let encoded = urlencoding::encode(yen_json);
+    let uri = format!("/play?position={}&bot_id=no_existe", encoded);
     let response = app.oneshot(
         Request::builder()
-            .method("POST")
-            .uri("/v1/play")
-            .header("content-type", "application/json")
-            .body(Body::from(r#"{"position": "././.", "bot": "no_existe"}"#))
+            .method("GET")
+            .uri(&uri)
+            .body(Body::empty())
             .unwrap(),
     ).await.unwrap();
     // Cubre la validación de existencia de bot
