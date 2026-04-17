@@ -4,7 +4,7 @@ import { GameBoard } from '../components/gameBoard/GameBoard';
 import { EndGameOverlay as Overlay } from '../components/gameBoard/EndGameOverlay';
 import { useGame } from '../hooks/useGame';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuthComprobation, getLoggedUser } from '../components/AuthComprobation';
+import { useAuthComprobation } from '../components/AuthComprobation';
 import Navbar from '../components/Navbar';
 import { useEffect, useState, useRef } from 'react';
 interface GameProps {
@@ -85,37 +85,37 @@ export function Game({ size: _size }: GameProps): JSX.Element {
                                 rival={mode === "computer" ? botId : (location.state?.rival || "Jugador 2")}
             />}
 
+            {/* Aquí aplicamos la clase game-container que hace el efecto cristal */}
             <div className="game-container">
-                {/* Tablero */}
+                
+                {/* --- NUEVO: La Cabecera Arriba (Turno, Reloj y Botón) --- */}
+                <div className="game-header">
+                    <div className="game-turn">
+                        {winner ? "TERMINADO" : `Turno: ${currentPlayer}`}
+                    </div>
+
+                    {timeLeft !== null && status === "ongoing" && (
+                        <div className="game-timer" style={{ color: timeLeft <= 5 ? '#ff0055' : '' }}>
+                            ⏳ {timeLeft}s
+                        </div>
+                    )}
+
+                    <button className="btn-surrender" onClick={handleResign} disabled={status !== "ongoing"}>
+                        Rendirse
+                    </button>
+                </div>
+
+                {error && <p className="error" style={{ color: '#ff0055', marginBottom: '1rem' }}>{error}</p>}
+
+                {/* --- Tablero --- */}
                 <GameBoard
                     cells={cells}
                     size={size}
                     onCellClick={handleCellClick}
                 />
-                
-                {/* Info de la partida */}
-                <div className="game-info">
-                    {/* --- NUEVO: Reloj Visual --- */}
-                    {timeLeft !== null && status === "ongoing" && (
-                        <div style={{ fontSize: '1.5em', fontWeight: 'bold', color: timeLeft <= 5 ? 'red' : 'inherit', marginBottom: '10px' }}>
-                            ⏳ {timeLeft}s
-                        </div>
-                    )}
-
-                    {winner
-                        ? <p>TERMINADO</p>
-                        : <p>Turno: {currentPlayer}</p>
-                    }
-                    {error && <p className="error">{error}</p>}
-                    <button className="game-surrender-button" onClick={handleResign} disabled={status !== "ongoing"}>
-                        Rendirse
-                    </button>
-                </div>
             </div>
 
-            <div className="user-info">
-                <p>Jugador Loggeado: {getLoggedUser()}</p>
-            </div>
+            
         </>    
     );
 }
