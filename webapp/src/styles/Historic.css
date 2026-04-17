@@ -1,119 +1,286 @@
+/* ── Contenedor general ───────────────────────────────────────────────────── */
 .historic-container {
     width: 100%;
+    padding: 0.25rem 0;
 }
 
-.historic-container h2 {
-    font-size: 1.1rem;
-    font-weight: bold;
-    margin: 0 0 1.25rem 0;
+/* ── Cabecera ─────────────────────────────────────────────────────────────── */
+.historic-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
 }
 
-/* ── Barra de filtros ── */
+.historic-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0 0 0.2rem 0;
+    color: #111111;
+}
+
+.historic-subtitle {
+    font-size: 0.82rem;
+    color: #888888;
+    margin: 0;
+}
+
+.historic-count {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #aaaaaa;
+    background: #f4f4f4;
+    border-radius: 20px;
+    padding: 3px 10px;
+    white-space: nowrap;
+}
+
+/* ── Filtros ──────────────────────────────────────────────────────────────── */
 .historic-filters {
+    background: #f8f8f8;
+    border: 1px solid #ebebeb;
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.filter-row {
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    margin-bottom: 1rem;
     flex-wrap: wrap;
 }
- 
-.historic-filter-select,
-.historic-filter-input,
-.historic-filter-date {
-    padding: 0.35rem 0.6rem;
+
+.filter-select,
+.filter-input,
+.filter-date {
+    padding: 0.38rem 0.65rem;
     font-size: 0.82rem;
-    border: 1px solid #cccccc;
-    border-radius: 4px;
-    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+    background: #ffffff;
     color: #333333;
     outline: none;
+    font-family: inherit;
+    transition: border-color 0.15s;
 }
- 
-.historic-filter-select:focus,
-.historic-filter-input:focus,
-.historic-filter-date:focus {
+
+.filter-select:focus,
+.filter-input:focus,
+.filter-date:focus {
     border-color: #888888;
 }
- 
-.historic-filter-input {
+
+.filter-date {
+    width: 148px;
+}
+
+.filter-search {
+    display: flex;
+    gap: 0;
     flex: 1;
-    min-width: 120px;
-    max-width: 180px;
+    min-width: 180px;
+    max-width: 280px;
 }
- 
-.historic-filter-date {
-    width: 140px;
+
+.filter-search .filter-input {
+    border-radius: 6px 0 0 6px;
+    flex: 1;
+    border-right: none;
 }
- 
-.historic-filter-label {
-    font-size: 0.78rem;
-    color: #666666;
+
+.filter-btn-search {
+    padding: 0.38rem 0.85rem;
+    font-size: 0.82rem;
+    background: #222222;
+    color: #ffffff;
+    border: 1px solid #222222;
+    border-radius: 0 6px 6px 0;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
     white-space: nowrap;
 }
- 
-.historic-filter-btn {
-    padding: 0.35rem 0.75rem;
-    font-size: 0.82rem;
-    background-color: #000000;
-    color: #ffffff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+
+.filter-btn-search:hover {
+    background: #444444;
+    border-color: #444444;
 }
- 
-.historic-filter-btn:hover {
-    background-color: #333333;
+
+.filter-date-group {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
 }
- 
-.historic-filter-reset {
-    padding: 0.35rem 0.7rem;
+
+.filter-label {
+    font-size: 0.78rem;
+    color: #888888;
+    white-space: nowrap;
+}
+
+.filter-btn-clear {
+    margin-left: auto;
+    padding: 0.35rem 0.8rem;
     font-size: 0.78rem;
     background: none;
-    border: 1px solid #bbbbbb;
-    border-radius: 4px;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
     cursor: pointer;
-    color: #555555;
-}
- 
-.historic-filter-reset:hover {
-    background-color: #f0f0f0;
-}
-
-.historic-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85rem;
-}
-
-.historic-table th {
-    text-align: left;
-    padding: 0.5rem 0.75rem;
-    border-bottom: 2px solid #000000;
-    font-size: 0.75rem;
-    text-transform: uppercase;
     color: #666666;
+    font-family: inherit;
+    transition: all 0.15s;
 }
 
-.historic-table td {
-    padding: 0.6rem 0.75rem;
-    border-bottom: 1px solid #eeeeee;
+.filter-btn-clear:hover {
+    background: #f0f0f0;
+    border-color: #999999;
+    color: #333333;
 }
 
-.historic-table tr:last-child td {
-    border-bottom: none;
-}
-
-.historic-table tr:hover td {
-    background-color: #f9f9f9;
-}
-
+/* ── Estados vacío / carga / error ───────────────────────────────────────── */
 .historic-status {
     text-align: center;
-    color: #666666;
-    margin-top: 2rem;
-    font-size: 0.9rem;
+    color: #888888;
+    margin: 2rem 0;
+    font-size: 0.88rem;
 }
 
 .historic-error {
-    color: red;
+    color: #c0392b;
+}
+
+.historic-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 2.5rem 0;
+    color: #aaaaaa;
+    font-size: 0.88rem;
+}
+
+.historic-empty-icon {
+    font-size: 2rem;
+}
+
+/* ── Lista de tarjetas ────────────────────────────────────────────────────── */
+.historic-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+/* ── Tarjeta individual ───────────────────────────────────────────────────── */
+.game-card {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    background: #ffffff;
+    border: 1px solid #ebebeb;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 0.15s, transform 0.15s;
+}
+
+.game-card:hover {
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+}
+
+/* Barra lateral de color */
+.game-card__indicator {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-radius: 10px 0 0 10px;
+}
+
+.ind--win  { background: #27ae60; }
+.ind--loss { background: #e74c3c; }
+
+/* Avatar inicial del rival */
+.game-card__avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-left: 4px;
+}
+
+.avatar--win  { background: #eafaf1; color: #1e8449; }
+.avatar--loss { background: #fdedec; color: #c0392b; }
+
+/* Nombre del rival y tamaño */
+.game-card__main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.game-card__rival {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #111111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.game-card__size {
+    font-size: 0.74rem;
+    color: #aaaaaa;
+}
+
+/* Badge de resultado */
+.game-card__result {
+    flex-shrink: 0;
+}
+
+.result-badge {
+    display: inline-block;
+    font-size: 0.74rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.result-badge--win  { background: #eafaf1; color: #1e8449; }
+.result-badge--loss { background: #fdedec; color: #c0392b; }
+
+/* Fecha */
+.game-card__date {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.15rem;
+}
+
+.game-card__date-day {
+    font-size: 0.78rem;
+    color: #555555;
+    white-space: nowrap;
+}
+
+.game-card__date-time {
+    font-size: 0.71rem;
+    color: #bbbbbb;
+    white-space: nowrap;
 }

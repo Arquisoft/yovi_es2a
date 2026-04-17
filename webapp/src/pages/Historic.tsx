@@ -1,51 +1,71 @@
 import React, { useEffect, useState } from 'react';
 import { getHistory, type GameHistoryRecord, type HistoryFilters } from '../services/gameService';
+import '../styles/Historic.css';
 
-const RESULTADO_LABEL: Record<string, string> = {
-    '1': '✅ Victoria',
-    '2': '❌ Derrota',
+const BOT_LABELS: Record<string, string> = {
+    random_bot:        'Random Bot',
+    offensive_easy:    'Ofensivo Fácil',
+    offensive_medium:  'Ofensivo Medio',
+    offensive_hard:    'Ofensivo Difícil',
+    defensive_easy:    'Defensivo Fácil',
+    defensive_medium:  'Defensivo Medio',
+    defensive_hard:    'Defensivo Difícil',
+    positional_easy:   'Posicional Fácil',
+    positional_medium: 'Posicional Medio',
+    positional_hard:   'Posicional Difícil',
+    monte_carlo_bot:   'Monte Carlo',
 };
+
+function rivalLabel(rival: string): string {
+    return BOT_LABELS[rival] ?? rival;
+}
+
+function rivalInitial(rival: string): string {
+    return rivalLabel(rival).charAt(0).toUpperCase();
+}
+
+function formatDate(iso: string): { date: string; time: string } {
+    const d = new Date(iso);
+    return {
+        date: d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }),
+        time: d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+    };
+}
 
 const Historic: React.FC = () => {
     const [history, setHistory] = useState<GameHistoryRecord[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading]  = useState(true);
+    const [error, setError]      = useState<string | null>(null);
 
-    // Filtros activos (disparan petición al backend al cambiar)
-    const [filtroResultado, setFiltroResultado] = useState<string>('todos');
+    const [filtroResultado, setFiltroResultado]   = useState<string>('todos');
     const [filtroRival, setFiltroRival]           = useState<string>('');
     const [filtroFechaDesde, setFiltroFechaDesde] = useState<string>('');
     const [filtroFechaHasta, setFiltroFechaHasta] = useState<string>('');
     const [filtroSize, setFiltroSize]             = useState<string>('todos');
-
-    // Estado temporal del input de rival (se aplica al pulsar Buscar o Enter)
-    const [rivalInput, setRivalInput] = useState<string>('');
+    const [rivalInput, setRivalInput]             = useState<string>('');
 
     const username = localStorage.getItem('username');
 
     useEffect(() => {
-        if (!username) {
-            setLoading(false);
-            return;
-        }
+        if (!username) { setLoading(false); return; }
 
         setLoading(true);
         setError(null);
- 
+
         const filters: HistoryFilters = {};
-        if (filtroResultado !== 'todos')    filters.resultado  = filtroResultado as HistoryFilters['resultado'];
-        if (filtroRival.trim() !== '')      filters.rival      = filtroRival.trim();
-        if (filtroFechaDesde)              filters.fechaDesde = filtroFechaDesde;
-        if (filtroFechaHasta)              filters.fechaHasta = filtroFechaHasta;
-        if (filtroSize !== 'todos')         filters.size       = Number(filtroSize);
+        if (filtroResultado !== 'todos') filters.resultado  = filtroResultado as HistoryFilters['resultado'];
+        if (filtroRival.trim())          filters.rival      = filtroRival.trim();
+        if (filtroFechaDesde)            filters.fechaDesde = filtroFechaDesde;
+        if (filtroFechaHasta)            filters.fechaHasta = filtroFechaHasta;
+        if (filtroSize !== 'todos')      filters.size       = Number(filtroSize);
 
         getHistory(username, filters)
             .then(setHistory)
-            .catch((e) => setError(e.message))
+            .catch(e => setError(e.message))
             .finally(() => setLoading(false));
     }, [username, filtroResultado, filtroRival, filtroFechaDesde, filtroFechaHasta, filtroSize]);
-const handleBuscar = () => setFiltroRival(rivalInput);
- 
+
+    const handleBuscar  = () => setFiltroRival(rivalInput);
     const handleLimpiar = () => {
         setFiltroResultado('todos');
         setFiltroRival('');
@@ -54,125 +74,146 @@ const handleBuscar = () => setFiltroRival(rivalInput);
         setFiltroFechaHasta('');
         setFiltroSize('todos');
     };
- 
-    const hayFiltrosActivos =
-        filtroResultado !== 'todos' ||
-        filtroRival.trim() !== ''   ||
-        filtroFechaDesde !== ''     ||
-        filtroFechaHasta !== ''     ||
+
+    const hayFiltros =
+        filtroResultado !== 'todos' || filtroRival.trim() !== '' ||
+        filtroFechaDesde !== ''     || filtroFechaHasta !== ''   ||
         filtroSize !== 'todos';
- 
-    if (!username) return <p>Debes iniciar sesión para ver tu historial.</p>;
- 
+
+    if (!username) return <p className="historic-status">Debes iniciar sesión para ver tu historial.</p>;
+
     return (
         <div className="historic-container">
-            <h2>Historial de {username}</h2>
- 
-            {/* ── Filtros ── */}
-            <div className="historic-filters">
- 
-                {/* Resultado */}
-                <select
-                    value={filtroResultado}
-                    onChange={(e) => setFiltroResultado(e.target.value)}
-                    className="historic-filter-select"
-                >
-                    <option value="todos">Todos los resultados</option>
-                    <option value="1">✅ Victoria</option>
-                    <option value="2">❌ Derrota</option>
-                </select>
- 
-                {/* Tamaño tablero */}
-                <select
-                    value={filtroSize}
-                    onChange={(e) => setFiltroSize(e.target.value)}
-                    className="historic-filter-select"
-                >
-                    <option value="todos">Todos los tamaños</option>
-                    {/* Generamos opciones del 4 al 30 */}
-                    {Array.from({ length: 27 }, (_, i) => i + 4).map((size) => (
-                        <option key={size} value={size}>
-                            {size}x{size}
-                        </option>
-                    ))}
-                </select>
- 
-                {/* Rival */}
-                <input
-                    type="text"
-                    placeholder="Buscar rival..."
-                    value={rivalInput}
-                    onChange={(e) => setRivalInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleBuscar()}
-                    className="historic-filter-input"
-                />
-                <button className="historic-filter-btn" onClick={handleBuscar}>
-                    Buscar
-                </button>
- 
-                {/* Fechas */}
-                <div className="date-group">
-                    <label className="historic-filter-label">Desde</label>
-                    <input
-                        type="date"
-                        value={filtroFechaDesde}
-                        onChange={(e) => setFiltroFechaDesde(e.target.value)}
-                        className="historic-filter-date"
-                    />
-                </div>
 
-                <div className="date-group">
-                    <label className="historic-filter-label">Hasta</label>
-                    <input
-                        type="date"
-                        value={filtroFechaHasta}
-                        onChange={(e) => setFiltroFechaHasta(e.target.value)}
-                        className="historic-filter-date"
-                    />
+            {/* ── Cabecera ── */}
+            <div className="historic-head">
+                <div>
+                    <h2 className="historic-title">Historial</h2>
+                    <p className="historic-subtitle">Partidas de <strong>{username}</strong></p>
                 </div>
- 
-                {hayFiltrosActivos && (
-                    <button className="historic-filter-reset" onClick={handleLimpiar}>
-                        Limpiar filtros
-                    </button>
+                {!loading && !error && (
+                    <span className="historic-count">
+                        {history.length} {history.length === 1 ? 'partida' : 'partidas'}
+                    </span>
                 )}
             </div>
- 
+
+            {/* ── Filtros ── */}
+            <div className="historic-filters">
+                <div className="filter-row">
+                    <select
+                        value={filtroResultado}
+                        onChange={e => setFiltroResultado(e.target.value)}
+                        className="filter-select"
+                    >
+                        <option value="todos">Todos los resultados</option>
+                        <option value="1">Victoria</option>
+                        <option value="2">Derrota</option>
+                    </select>
+
+                    <select
+                        value={filtroSize}
+                        onChange={e => setFiltroSize(e.target.value)}
+                        className="filter-select"
+                    >
+                        <option value="todos">Todos los tamaños</option>
+                        {Array.from({ length: 27 }, (_, i) => i + 4).map(s => (
+                            <option key={s} value={s}>{s}×{s}</option>
+                        ))}
+                    </select>
+
+                    <div className="filter-search">
+                        <input
+                            type="text"
+                            placeholder="Buscar rival..."
+                            value={rivalInput}
+                            onChange={e => setRivalInput(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && handleBuscar()}
+                            className="filter-input"
+                        />
+                        <button className="filter-btn-search" onClick={handleBuscar}>Buscar</button>
+                    </div>
+                </div>
+
+                <div className="filter-row">
+                    <div className="filter-date-group">
+                        <label className="filter-label">Desde</label>
+                        <input
+                            type="date"
+                            value={filtroFechaDesde}
+                            onChange={e => setFiltroFechaDesde(e.target.value)}
+                            className="filter-date"
+                        />
+                    </div>
+                    <div className="filter-date-group">
+                        <label className="filter-label">Hasta</label>
+                        <input
+                            type="date"
+                            value={filtroFechaHasta}
+                            onChange={e => setFiltroFechaHasta(e.target.value)}
+                            className="filter-date"
+                        />
+                    </div>
+                    {hayFiltros && (
+                        <button className="filter-btn-clear" onClick={handleLimpiar}>
+                            × Limpiar filtros
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            {/* ── Estados ── */}
             {loading && <p className="historic-status">Cargando historial...</p>}
             {error   && <p className="historic-status historic-error">Error: {error}</p>}
- 
+
             {!loading && !error && history.length === 0 && (
-                <p className="historic-status">
-                    {hayFiltrosActivos
+                <div className="historic-empty">
+                    <span className="historic-empty-icon">📭</span>
+                    <p>{hayFiltros
                         ? 'No hay partidas que coincidan con los filtros.'
-                        : 'Todavía no tienes partidas registradas.'}
-                </p>
+                        : 'Todavía no tienes partidas registradas.'
+                    }</p>
+                </div>
             )}
- 
+
+            {/* ── Lista de tarjetas ── */}
             {!loading && !error && history.length > 0 && (
-                <table className="historic-table">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Rival</th>
-                            <th>Resultado</th>
-                            <th>Tablero</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {history.map((record) => (
-                            <tr key={record._id}>
-                                <td>{new Date(record.createdAt).toLocaleString('es-ES')}</td>
-                                <td>{record.rival}</td>
-                                <td>{RESULTADO_LABEL[record.resultado] ?? record.resultado}</td>
-                                <td>{record.size ? `${record.size}x${record.size}` : '—'}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <div className="historic-list">
+                    {history.map(record => {
+                        const { date, time } = formatDate(record.createdAt);
+                        const win = record.resultado === '1';
+                        return (
+                            <div key={record._id} className={`game-card ${win ? 'game-card--win' : 'game-card--loss'}`}>
+                                <div className={`game-card__indicator ${win ? 'ind--win' : 'ind--loss'}`} />
+
+                                <div className={`game-card__avatar ${win ? 'avatar--win' : 'avatar--loss'}`}>
+                                    {rivalInitial(record.rival)}
+                                </div>
+
+                                <div className="game-card__main">
+                                    <span className="game-card__rival">{rivalLabel(record.rival)}</span>
+                                    {record.size && (
+                                        <span className="game-card__size">{`Tablero ${record.size}×${record.size}`}</span>
+                                    )}
+                                </div>
+
+                                <div className="game-card__result">
+                                    <span className={`result-badge ${win ? 'result-badge--win' : 'result-badge--loss'}`}>
+                                        {win ? 'Victoria' : 'Derrota'}
+                                    </span>
+                                </div>
+
+                                <div className="game-card__date">
+                                    <span className="game-card__date-day">{date}</span>
+                                    <span className="game-card__date-time">{time}</span>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
             )}
         </div>
     );
 };
- 
+
 export default Historic;

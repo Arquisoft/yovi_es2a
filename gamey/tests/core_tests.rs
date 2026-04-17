@@ -10,44 +10,44 @@ use tempfile::tempdir;
 
 #[test]
 fn test_new_game_has_correct_board_size() {
-    let game = GameY::new(5);
+    let game = GameY::new(5, None);
     assert_eq!(game.board_size(), 5);
 }
 
 #[test]
 fn test_new_game_starts_with_player_0() {
-    let game = GameY::new(5);
+    let game = GameY::new(5, None);
     assert_eq!(game.next_player(), Some(PlayerId::new(0)));
 }
 
 #[test]
 fn test_new_game_is_not_over() {
-    let game = GameY::new(5);
+    let game = GameY::new(5, None);
     assert!(!game.check_game_over());
 }
 
 #[test]
 fn test_new_game_has_correct_total_cells() {
     // Total cells for triangular board: n*(n+1)/2
-    let game3 = GameY::new(3);
+    let game3 = GameY::new(3, None);
     assert_eq!(game3.total_cells(), 6); // 1+2+3 = 6
 
-    let game5 = GameY::new(5);
+    let game5 = GameY::new(5, None);
     assert_eq!(game5.total_cells(), 15); // 1+2+3+4+5 = 15
 
-    let game7 = GameY::new(7);
+    let game7 = GameY::new(7, None);
     assert_eq!(game7.total_cells(), 28); // 1+2+3+4+5+6+7 = 28
 }
 
 #[test]
 fn test_new_game_all_cells_available() {
-    let game = GameY::new(5);
+    let game = GameY::new(5, None);
     assert_eq!(game.available_cells().len(), 15);
 }
 
 #[test]
 fn test_single_cell_board_initialization() {
-    let game = GameY::new(1);
+    let game = GameY::new(1, None);
     assert_eq!(game.board_size(), 1);
     assert_eq!(game.total_cells(), 1);
     assert_eq!(game.available_cells().len(), 1);
@@ -59,7 +59,7 @@ fn test_single_cell_board_initialization() {
 
 #[test]
 fn test_single_move_changes_next_player() {
-    let mut game = GameY::new(5);
+    let mut game = GameY::new(5, None);
 
     game.add_move(Movement::Placement {
         player: PlayerId::new(0),
@@ -72,7 +72,7 @@ fn test_single_move_changes_next_player() {
 
 #[test]
 fn test_two_moves_alternate_players() {
-    let mut game = GameY::new(5);
+    let mut game = GameY::new(5, None);
 
     game.add_move(Movement::Placement {
         player: PlayerId::new(0),
@@ -91,7 +91,7 @@ fn test_two_moves_alternate_players() {
 
 #[test]
 fn test_move_decreases_available_cells() {
-    let mut game = GameY::new(3);
+    let mut game = GameY::new(3, None);
     let initial_count = game.available_cells().len();
 
     game.add_move(Movement::Placement {
@@ -105,7 +105,7 @@ fn test_move_decreases_available_cells() {
 
 #[test]
 fn test_multiple_moves_track_available_cells() {
-    let mut game = GameY::new(3); // 6 cells total
+    let mut game = GameY::new(3, None); // 6 cells total
 
     // Make 3 moves
     game.add_move(Movement::Placement {
@@ -133,7 +133,7 @@ fn test_multiple_moves_track_available_cells() {
 
 #[test]
 fn test_player_0_wins_by_connecting_three_sides() {
-    let mut game = GameY::new(3);
+    let mut game = GameY::new(3, None);
 
     // Player 0 wins by placing on bottom row (connects all 3 sides)
     let moves = vec![
@@ -174,7 +174,7 @@ fn test_player_0_wins_by_connecting_three_sides() {
 
 #[test]
 fn test_player_1_wins() {
-    let mut game = GameY::new(3);
+    let mut game = GameY::new(3, None);
 
     // Player 0 makes filler moves while player 1 wins
     let moves = vec![
@@ -219,7 +219,7 @@ fn test_player_1_wins() {
 
 #[test]
 fn test_single_cell_board_instant_win() {
-    let mut game = GameY::new(1);
+    let mut game = GameY::new(1, None);
 
     game.add_move(Movement::Placement {
         player: PlayerId::new(0),
@@ -238,7 +238,7 @@ fn test_single_cell_board_instant_win() {
 
 #[test]
 fn test_size_2_board_win() {
-    let mut game = GameY::new(2);
+    let mut game = GameY::new(2, None);
 
     // Board layout:
     //     (1,0,0)
@@ -273,7 +273,7 @@ fn test_size_2_board_win() {
 
 #[test]
 fn test_game_not_over_without_three_sides() {
-    let mut game = GameY::new(5);
+    let mut game = GameY::new(5, None);
 
     // Place pieces that touch only 2 sides
     game.add_move(Movement::Placement {
@@ -297,7 +297,7 @@ fn test_game_not_over_without_three_sides() {
 
 #[test]
 fn test_cannot_place_on_occupied_cell() {
-    let mut game = GameY::new(5);
+    let mut game = GameY::new(5, None);
 
     let coords = Coordinates::new(2, 1, 1);
 
@@ -326,7 +326,7 @@ fn test_cannot_place_on_occupied_cell() {
 
 #[test]
 fn test_check_player_turn_wrong_player() {
-    let game = GameY::new(5);
+    let game = GameY::new(5, None);
 
     let movement = Movement::Placement {
         player: PlayerId::new(1), // Should be 0's turn
@@ -347,7 +347,7 @@ fn test_check_player_turn_wrong_player() {
 
 #[test]
 fn test_check_player_turn_correct_player() {
-    let game = GameY::new(5);
+    let game = GameY::new(5, None);
 
     let movement = Movement::Placement {
         player: PlayerId::new(0),
@@ -363,7 +363,7 @@ fn test_check_player_turn_correct_player() {
 
 #[test]
 fn test_resign_ends_game_with_opponent_winning() {
-    let mut game = GameY::new(5);
+    let mut game = GameY::new(5, None);
 
     game.add_move(Movement::Action {
         player: PlayerId::new(0),
@@ -382,7 +382,7 @@ fn test_resign_ends_game_with_opponent_winning() {
 
 #[test]
 fn test_player_1_resign_makes_player_0_win() {
-    let mut game = GameY::new(5);
+    let mut game = GameY::new(5, None);
 
     // Player 0 makes a move
     game.add_move(Movement::Placement {
@@ -409,7 +409,7 @@ fn test_player_1_resign_makes_player_0_win() {
 
 #[test]
 fn test_swap_changes_next_player() {
-    let mut game = GameY::new(5);
+    let mut game = GameY::new(5, None);
 
     game.add_move(Movement::Action {
         player: PlayerId::new(0),
@@ -423,7 +423,7 @@ fn test_swap_changes_next_player() {
 
 #[test]
 fn test_swap_after_opening_move() {
-    let mut game = GameY::new(5);
+    let mut game = GameY::new(5, None);
 
     // Player 0 makes opening move
     game.add_move(Movement::Placement {
@@ -450,7 +450,7 @@ fn test_swap_after_opening_move() {
 
 #[test]
 fn test_yen_round_trip_empty_board() {
-    let game = GameY::new(3);
+    let game = GameY::new(3, None);
     let yen: YEN = (&game).into();
     let loaded_game = GameY::try_from(yen.clone()).unwrap();
 
@@ -463,7 +463,7 @@ fn test_yen_round_trip_empty_board() {
 
 #[test]
 fn test_yen_round_trip_with_moves() {
-    let mut game = GameY::new(4);
+    let mut game = GameY::new(4, None);
 
     game.add_move(Movement::Placement {
         player: PlayerId::new(0),
@@ -586,7 +586,7 @@ fn test_save_and_load_game_file() {
     let dir = tempdir().unwrap();
     let file_path = dir.path().join("test_game.yen");
 
-    let mut game = GameY::new(4);
+    let mut game = GameY::new(4, None);
     game.add_move(Movement::Placement {
         player: PlayerId::new(0),
         coords: Coordinates::new(3, 0, 0),
@@ -732,7 +732,7 @@ fn test_corner_touches_two_sides() {
 
 #[test]
 fn test_render_empty_board() {
-    let game = GameY::new(3);
+    let game = GameY::new(3, None);
     let options = RenderOptions {
         show_3d_coords: false,
         show_idx: false,
@@ -746,7 +746,7 @@ fn test_render_empty_board() {
 
 #[test]
 fn test_render_with_pieces() {
-    let mut game = GameY::new(3);
+    let mut game = GameY::new(3, None);
     game.add_move(Movement::Placement {
         player: PlayerId::new(0),
         coords: Coordinates::new(2, 0, 0),
@@ -771,7 +771,7 @@ fn test_render_with_pieces() {
 
 #[test]
 fn test_render_with_3d_coords() {
-    let game = GameY::new(2);
+    let game = GameY::new(2, None);
     let options = RenderOptions {
         show_3d_coords: true,
         show_idx: false,
@@ -786,7 +786,7 @@ fn test_render_with_3d_coords() {
 
 #[test]
 fn test_render_with_indices() {
-    let game = GameY::new(2);
+    let game = GameY::new(2, None);
     let options = RenderOptions {
         show_3d_coords: false,
         show_idx: true,
@@ -804,7 +804,7 @@ fn test_render_with_indices() {
 
 #[test]
 fn test_full_game_on_size_4_board() {
-    let mut game = GameY::new(4);
+    let mut game = GameY::new(4, None);
 
     // Play a sequence of moves
     let moves = vec![
@@ -834,7 +834,7 @@ fn test_full_game_on_size_4_board() {
 
 #[test]
 fn test_union_find_correctly_merges_components() {
-    let mut game = GameY::new(4);
+    let mut game = GameY::new(4, None);
 
     // Create two separate components for player 0
     // Component 1: touches side A

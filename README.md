@@ -4,7 +4,25 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_es2a&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_es2a)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_es2a&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_es2a)
 
-This project is a template with some basic functionality for the ASW labs.
+This project implements a distributed system for the Game Y, developed as part of the Software Architecture course. It includes a web interface, a user management service, and a game engine.
+
+# URL Deployment: http://68.221.24.159/
+
+## Team
+
+- Sergio González Martínez (UO300798@uniovi.es)
+- Iyán Díaz Pereda (UO300006@uniovi.es)
+- Pablo Arias Fernández (UO300305@uniovi.es)
+- Enol de la Calle Iglesias (UO301431@uniovi.es)
+- Iyán Álvarez Casanovas (UO301299@uniovi.es)
+
+**Course:** Software  Architecture  
+**Academic Year:** 2025/2026
+
+## Architecture Overview
+
+- Frontend (React) → communicates with → Users API (Node.js)
+- Game engine (Rust) → provides game logic and bots
 
 ## Project Structure
 

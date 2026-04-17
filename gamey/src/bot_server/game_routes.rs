@@ -30,6 +30,7 @@ pub struct CreateGameRequest {
     /// Identificador del bot cuando mode == "computer". Por defecto: "random_bot".
     #[serde(default = "default_bot")]
     pub bot: String,
+    pub timer: Option<u32>,
 }
 
 fn default_board_size() -> u32 { 7 }
@@ -174,7 +175,7 @@ pub async fn create_game(
     Json(req): Json<CreateGameRequest>,
 ) -> impl IntoResponse {
     let game_id = Uuid::new_v4();
-    let game = GameY::new(req.size);
+    let game = GameY::new(req.size, req.timer);
 
     let games_arc = state.games();
     let mut games = games_arc.lock().await;
@@ -245,6 +246,10 @@ pub async fn make_move(
         "resign" => Movement::Action {
             player,
             action: GameAction::Resign,
+        },
+        "timeout" => Movement::Action {
+            player,
+            action: GameAction::Timeout,
         },
         "place" => {
             let idx = match req.cell_index {
