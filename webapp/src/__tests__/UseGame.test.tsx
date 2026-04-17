@@ -57,7 +57,7 @@ describe('useGame', () => {
             expect(result.current.status).toBe('ongoing')
         })
 
-        expect(createGame).toHaveBeenCalledWith(7, 'human', 'random_bot')
+        expect(createGame).toHaveBeenCalledWith(7, 'human', 'random_bot', null)
     })
 
     test('convierte las celdas de la API al formato TableCell correctamente', async () => {
