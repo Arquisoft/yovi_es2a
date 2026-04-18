@@ -183,3 +183,22 @@ test('muestra error cuando placeToken falla', async () => {
         expect(placeToken).toHaveBeenCalledWith('game-123', 0, 1, 'defensive_easy')
     })
 })
+
+    test('handleTimeout termina la partida (forzando rendición por tiempo)', async () => {
+        vi.mocked(resign).mockResolvedValue({ 
+            game_state: mockFinishedState, 
+            applied_move: { player: 0, action: 'timeout', cell_index: null }, 
+            bot_move: null 
+        })
+
+        const { result } = renderHook(() => useGame({ timer: 30 }))
+        await waitFor(() => expect(result.current.status).toBe('ongoing'))
+
+        act(() => {
+            result.current.handleTimeout()
+        })
+
+        await waitFor(() => {
+            expect(result.current.status).toBe('finished')
+        })
+    })
