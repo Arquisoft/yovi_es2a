@@ -28,7 +28,7 @@ export async function createGame(
     // De momento los datos pasados son default, pero se podrían personalizar desde la UI
     size: number,
     mode: "human" | "computer" = "human",
-    bot: string = "random_bot"
+    bot: string = "random_bot",
 ): Promise<ApiGameState> {
     const response = await fetch(`${BACKEND_URL}/game/new`, {
         method: "POST",
@@ -183,4 +183,23 @@ export interface HistoryFilters {
     fechaDesde?: string;
     fechaHasta?: string;
     size?: number;
+}
+
+export interface RankingEntry {
+    position: number;
+    username: string;
+    score: number;
+    totalGames: number;
+    wins: number;
+}
+
+// Devuelve el top 10 de jugadores ordenados por puntuación de ranking
+export async function getRanking(): Promise<RankingEntry[]> {
+    const response = await fetch(`${USERS_URL}/ranking`);
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error ?? 'Error al obtener el ranking');
+    }
+    const data = await response.json();
+    return data.ranking;
 }

@@ -255,4 +255,81 @@ app.get('/stats/:username', async (req, res) => {
   }
 });
 
+// ─── PESOS DE DIFICULTAD para la fórmula de ranking ───────────────────────
+// Score(j) = Σ d(i) · W(V_i, N_i)
+// W(V,N)   = (V/N) · C(N)
+// C(N)     = 1 − exp(−N / K)    [K=10: ~30 partidas para confianza plena]
+const RIVAL_WEIGHTS = {
+  random_bot:        1.0,
+  offensive_easy:    1.5,
+  defensive_easy:    1.5,
+  positional_easy:   1.5,
+  offensive_medium:  2.5,
+  defensive_medium:  2.5,
+  positional_medium: 2.5,
+  offensive_hard:    4.0,
+  defensive_hard:    4.0,
+  positional_hard:   4.0,
+  monte_carlo_bot:   7.0,
+};
+const HUMAN_WEIGHT = 5.0;
+const K = 10;
+
+function difficultyWeight(rival) {
+  return RIVAL_WEIGHTS[rival] ?? HUMAN_WEIGHT;
+}
+
+function confidenceFactor(n) {
+  return 1 - Math.exp(-n / K);
+}
+
+function calcScore(rivalStats) {
+  let score = 0;
+  for (const [rival, s] of Object.entries(rivalStats)) {
+    if (s.total === 0) continue;
+    const winRate = s.wins / s.total;
+    const confidence = confidenceFactor(s.total);
+    // Victorias absolutas como factor dominante,
+    // eficacia como bonus significativo pero no principal (α = 1.0),
+    // confianza estadística para penalizar muestras pequeñas.
+    score += difficultyWeight(rival) * s.wins * confidence * (1 + winRate);
+  }
+  return Math.round(score * 100) / 100;
+}
+
+// ENDPOINT GET /ranking
+// Devuelve el top 10 de jugadores ordenados por puntuación de ranking.
+app.get('/ranking', async (req, res) => {
+  try {
+    const allRecords = await GameRecord.find({}).lean();
+
+    // Agrupar por usuario y construir rivalStats para cada uno
+    const userMap = {};
+    for (const r of allRecords) {
+      if (!userMap[r.username]) userMap[r.username] = {};
+      const rm = userMap[r.username];
+      if (!rm[r.rival]) rm[r.rival] = { wins: 0, losses: 0, total: 0 };
+      rm[r.rival].total++;
+      if (r.resultado === '1') rm[r.rival].wins++;
+      else                     rm[r.rival].losses++;
+    }
+
+    // Calcular puntuación y construir ranking
+    const ranking = Object.entries(userMap)
+      .map(([username, rivalStats]) => ({
+        username,
+        score: calcScore(rivalStats),
+        totalGames: Object.values(rivalStats).reduce((s, v) => s + v.total, 0),
+        wins: Object.values(rivalStats).reduce((s, v) => s + v.wins, 0),
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 10)
+      .map((entry, idx) => ({ ...entry, position: idx + 1 }));
+
+    res.status(200).json({ ranking });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default app;
