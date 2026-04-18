@@ -147,4 +147,43 @@ describe('GET /ranking', () => {
             expect(entry.position).toBe(idx + 1)
         })
     })
+
+    
+
+    // ── Cálculo de totales ─────────────────────────────────────────────────
+
+    it('totalGames refleja el total de partidas jugadas por el usuario', async () => {
+        mockFindResult(partidasAlice)
+
+        const res = await request(app).get('/ranking')
+
+        expect(res.body.ranking[0].totalGames).toBe(5)
+    })
+
+    it('wins refleja solo las victorias del usuario', async () => {
+        mockFindResult(partidasAlice)
+
+        const res = await request(app).get('/ranking')
+
+        expect(res.body.ranking[0].wins).toBe(3)
+    })
+
+    it('score es un número mayor que 0 si hay victorias', async () => {
+        mockFindResult(partidasAlice)
+
+        const res = await request(app).get('/ranking')
+
+        expect(res.body.ranking[0].score).toBeGreaterThan(0)
+    })
+
+    it('un usuario con solo derrotas tiene score 0', async () => {
+        mockFindResult([
+            { username: 'loser', rival: 'random_bot', resultado: '2' },
+            { username: 'loser', rival: 'random_bot', resultado: '2' },
+        ])
+
+        const res = await request(app).get('/ranking')
+
+        expect(res.body.ranking[0].score).toBe(0)
+    })
 })
