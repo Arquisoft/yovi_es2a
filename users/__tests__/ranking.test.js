@@ -112,4 +112,39 @@ describe('GET /ranking', () => {
         expect(entry).toHaveProperty('totalGames')
         expect(entry).toHaveProperty('wins')
     })
+
+    // ── Posiciones y orden ─────────────────────────────────────────────────
+
+    it('con un solo usuario aparece en posición 1', async () => {
+        mockFindResult(partidasAlice)
+
+        const res = await request(app).get('/ranking')
+
+        expect(res.body.ranking).toHaveLength(1)
+        expect(res.body.ranking[0].position).toBe(1)
+        expect(res.body.ranking[0].username).toBe('alice')
+    })
+
+    it('ordena correctamente por puntuación descendente', async () => {
+        mockFindResult(partidasMultiUsuario)
+
+        const res = await request(app).get('/ranking')
+        const ranking = res.body.ranking
+
+        // bob gana contra monte_carlo (d=7) así que debe superar a alice (d=1)
+        expect(ranking[0].username).toBe('bob')
+        expect(ranking[1].username).toBe('alice')
+        expect(ranking[0].score).toBeGreaterThan(ranking[1].score)
+    })
+
+    it('las posiciones son consecutivas empezando en 1', async () => {
+        mockFindResult(partidasMultiUsuario)
+
+        const res = await request(app).get('/ranking')
+        const ranking = res.body.ranking
+
+        ranking.forEach((entry, idx) => {
+            expect(entry.position).toBe(idx + 1)
+        })
+    })
 })
