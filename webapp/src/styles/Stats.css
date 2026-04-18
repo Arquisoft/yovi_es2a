@@ -1,53 +1,73 @@
+/* --- STATS.CSS (Estilo Oscuro/Neón) --- */
 .stats-container {
     padding: 1rem;
+    color: white;
 }
 
 .stats-subtitle {
     margin: 1.5rem 0 0.5rem;
     font-size: 1rem;
-    opacity: 0.8;
+    color: #a1a1a1;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
 }
 
-/* Grid de tarjetas */
+/* Grid de tarjetas superiores */
 .stats-cards {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
+    gap: 1rem;
+    margin-bottom: 2rem;
 }
 
 .stats-card {
-    background: rgba(255, 255, 255, 0.06);
-    border-radius: 10px;
-    padding: 0.75rem 1.1rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.2rem 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     min-width: 90px;
     flex: 1;
+    transition: transform 0.2s ease;
 }
 
+.stats-card:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Líneas inferiores de colores Neón */
 .stats-card.win {
-    border-bottom: 3px solid #4caf50;
+    border-bottom: 3px solid #00ff88; /* Verde Neón */
+    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.1);
 }
 
 .stats-card.loss {
-    border-bottom: 3px solid #f44336;
+    border-bottom: 3px solid #ff0055; /* Rosa Neón */
+    box-shadow: 0 4px 15px rgba(255, 0, 85, 0.1);
 }
 
 .stats-card.streak {
-    border-bottom: 3px solid #ff9800;
+    border-bottom: 3px solid #ffcc00; /* Dorado/Amarillo Neón */
+    box-shadow: 0 4px 15px rgba(255, 204, 0, 0.1);
 }
 
 /* Texto dentro de las tarjetas */
 .stats-value {
-    font-size: 1.6rem;
-    font-weight: 700;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .stats-label {
-    font-size: 0.72rem;
-    opacity: 0.7;
-    margin-top: 2px;
+    font-size: 0.75rem;
+    color: #a1a1a1;
+    margin-top: 5px;
     text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }

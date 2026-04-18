@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { TableCell, Player } from "../types/game";
-import { createGame, placeToken, resign as resignService, saveGameResult } from "../services/gameService";
 import type { ApiGameState } from "../types/gameApi";
-
+import { createGame, placeToken, resign as resignService, saveGameResult, timeout as timeoutService } from "../services/gameService"; // <-- SOLUCIÓN AL ERROR 2
 //  ────────────────────Tipos────────────────────────────────────────────────────────────
 
 // Opciones de configuración de la partida
@@ -13,6 +12,7 @@ interface UseGameOptions {
     mode?: "human" | "computer";
     botId?: string;
     username?: string;
+    timer?: number | null;
 }
 
 // Lo que devuelve el hook useGame
@@ -25,7 +25,10 @@ interface UseGameReturn {
     error: string | null;
     handleCellClick: (cellIndex: number) => void;
     handleResign: () => void;
+    handleTimeout: () => void;
     resetGame: () => void;
+
+    moveCount: number;
 }
 
 //  ───────────────Funciones útiles de conversión────────────────────────────────────────────────
@@ -60,6 +63,7 @@ export function useGame({
     mode = "human",
     botId = "random_bot",
     username,
+    timer = null,
 }: UseGameOptions = {}): UseGameReturn {
     const [gameId, setGameId] = useState<string | null>(null);
     const [cells, setCells] = useState<TableCell[]>([]);
@@ -68,12 +72,16 @@ export function useGame({
     const [status, setStatus] = useState<"ongoing" | "finished" | "loading">("loading");
     const [error, setError] = useState<string | null>(null);
 
+    const [moveCount, setMoveCount] = useState<number>(0); 
+
     // Aplica un ApiGameState al estado local de React
     const applyGameState = useCallback((apiState: ApiGameState) => {
         setCells(apiStateToCell(apiState));
         setCurrentPlayer(playerIdToPlayer(apiState.next_player));
         setWinner(playerIdToPlayer(apiState.winner));
         setStatus(apiState.status);
+
+        setMoveCount(prev => prev + 1);
         
     // Solo guardamos cuando termina la partida y hay un usuario logueado
         if (apiState.status === "finished" && username) {
@@ -92,7 +100,7 @@ export function useGame({
         setStatus("loading");
         setError(null);
         try {
-            const apiState = await createGame(size, mode, botId);
+            const apiState = await createGame(size, mode, botId, timer);
             setGameId(apiState.game_id);
             applyGameState(apiState);
         } catch (e) {
@@ -135,7 +143,22 @@ export function useGame({
         }
     }, [gameId, status, currentPlayer, applyGameState]);
 
-    // Reinicia la partida
+    const handleTimeout = useCallback(async () => {
+        if (!gameId || status !== "ongoing") return;
+
+        const player = currentPlayer === "PLAYER_ONE" ? 0 : 1;
+        const bot = mode === "computer" ? botId : undefined; 
+
+        setError(null);
+        try {            
+            const result = await timeoutService(gameId, player, bot);
+            
+            applyGameState(result.game_state);
+        } catch (e) {
+            setError(e instanceof Error ? e.message : "Error al ceder turno");
+        }
+    }, [gameId, status, currentPlayer, mode, botId, applyGameState]);
+
     const resetGame = useCallback(() => {
         initGame();
     }, [initGame]);
@@ -149,6 +172,8 @@ export function useGame({
         error,
         handleCellClick,
         handleResign,
+        handleTimeout,
         resetGame,
+        moveCount,
     };
 }

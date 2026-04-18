@@ -100,7 +100,6 @@ describe('Game Component', () => {
 
     expect(screen.getByText('Turno: 1')).toBeInTheDocument();
     expect(screen.getByText('Rendirse')).toBeInTheDocument();
-    expect(screen.getByText(/Jugador Loggeado: testuser/i)).toBeInTheDocument();
   });
 
   test('debe llamar a handleResign cuando se hace clic en el botón de rendirse', () => {

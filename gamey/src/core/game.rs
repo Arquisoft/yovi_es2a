@@ -18,6 +18,8 @@ pub struct GameY {
     // Size of the board (length of one side of the triangular board).
     board_size: u32,
 
+    pub timer_duration: Option<u32>,
+
     // Mapping from coordinates to identifiers of players who placed stones there.
     board_map: HashMap<Coordinates, (SetIdx, PlayerId)>,
 
@@ -43,10 +45,11 @@ pub enum Cell {
 
 impl GameY {
     /// Creates a new game with the specified board size and number of players.
-    pub fn new(board_size: u32) -> Self {
+    pub fn new(board_size: u32, timer_duration: Option<u32>) -> Self {
         let total_cells = (board_size * (board_size + 1)) / 2;
         Self {
             board_size,
+            timer_duration,
             board_map: HashMap::new(),
             history: Vec::new(),
             sets: Vec::new(),
@@ -210,7 +213,7 @@ impl GameY {
                     winner: other_player(player),
                 };
             }
-            GameAction::Swap => {
+            GameAction::Swap | GameAction::Timeout => { 
                 self.status = GameStatus::Ongoing {
                     next_player: other_player(player),
                 };
@@ -451,7 +454,7 @@ impl TryFrom<YEN> for GameY {
     type Error = GameYError;
 
     fn try_from(game: YEN) -> Result<Self> {
-        let mut ygame = GameY::new(game.size());
+        let mut ygame = GameY::new(game.size(), None);
         let rows: Vec<&str> = game.layout().split('/').collect();
         if rows.len() as u32 != game.size() {
             return Err(GameYError::InvalidYENLayout {
@@ -566,7 +569,7 @@ mod tests {
 
     #[test]
     fn test_game_initialization() {
-        let game = GameY::new(7);
+        let game = GameY::new(7, None);
         assert_eq!(game.board_size, 7);
         assert_eq!(game.history.len(), 0);
         match game.status {
@@ -586,7 +589,7 @@ mod tests {
 
     #[test]
     fn test_interior_cell_has_six_neighbors() {
-        let board = GameY::new(5);
+        let board = GameY::new(5,None);
         let cell = Coordinates::new(2, 1, 1);
 
         let neighbors = board.get_neighbors(&cell);
@@ -606,7 +609,7 @@ mod tests {
 
     #[test]
     fn test_corner_cell_has_two_neighbors() {
-        let board = GameY::new(5);
+        let board = GameY::new(5,None);
         let top_corner = Coordinates::new(4, 0, 0);
 
         let neighbors = board.get_neighbors(&top_corner);
@@ -619,7 +622,7 @@ mod tests {
 
     #[test]
     fn test_edge_cell_has_four_neighbors() {
-        let board = GameY::new(5);
+        let board = GameY::new(5,None);
         let edge_cell = Coordinates::new(0, 2, 2);
 
         let neighbors = board.get_neighbors(&edge_cell);
@@ -637,7 +640,7 @@ mod tests {
 
     #[test]
     fn test_winning_condition() {
-        let mut game = GameY::new(3);
+        let mut game = GameY::new(3,None);
 
         let moves = vec![
             Movement::Placement {
@@ -676,7 +679,7 @@ mod tests {
 
     #[test]
     fn test_yen_conversion() {
-        let mut game = GameY::new(3);
+        let mut game = GameY::new(3,None);
 
         let moves = vec![
             Movement::Placement {

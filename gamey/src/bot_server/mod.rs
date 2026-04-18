@@ -61,7 +61,7 @@ pub fn create_router(state: AppState) -> axum::Router {
         .route("/game/{game_id}",          axum::routing::get(game_routes::get_game))
         .route("/game/{game_id}/move",     axum::routing::post(game_routes::make_move))
         // ── API para bots externos (nuevo) ───────────────────────────────────
-        .route("/v1/play",                 axum::routing::post(game_routes::play))
+        .route("/play", axum::routing::get(game_routes::play_competition))
         .layer(cors)
         .with_state(state)
 }

@@ -10,6 +10,8 @@ pub enum GameAction {
     Swap,
     /// The player resigns the game, conceding victory to the opponent.
     Resign,
+
+    Timeout,
 }
 
 impl Display for GameAction {
@@ -17,6 +19,7 @@ impl Display for GameAction {
         match self {
             GameAction::Swap => write!(f, "Swap"),
             GameAction::Resign => write!(f, "Resign"),
+            GameAction::Timeout => write!(f, "Timeout"),
         }
     }
 }

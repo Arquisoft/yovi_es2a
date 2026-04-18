@@ -1,3 +1,4 @@
+/* --- LOBBY.CSS (Estilo Cristal/Neón) --- */
 .lobby-container {
     width: 100%;
     min-height: 100vh;
@@ -9,25 +10,31 @@
 }
 
 .lobby-card {
-    background: #ffffff; 
-    border-radius: 4px;
+    /* Efecto Cristal (Glassmorphism) */
+    background: rgba(15, 15, 20, 0.65); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); 
+    border-radius: 24px;
     padding: 2.5rem;
     width: 100%;
     max-width: 500px;
-    color: #000000;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    color: #ffffff; /* Texto principal blanco */
     position: relative;
 }
 
 .lobby-title {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: bold;
     margin: 0 0 0.5rem 0;
     text-align: center;
+    color: #00f0ff; /* Titulo Neón */
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
 }
 
 .lobby-subtitle {
-    color: #666666;
+    color: #a1a1a1;
     text-align: center;
     margin: 0 0 2rem 0;
     font-size: 0.9rem;
@@ -40,14 +47,15 @@
     margin-bottom: 2rem;
 }
 
+/* Botones genéricos de selección */
 .mode-btn, .bot-btn, .diff-btn {
-    background: #bcc3ce;
-    border: none;
-    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
     padding: 1rem;
-    color: #333333;
+    color: #e0e0e0;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     font-family: inherit;
 }
 
@@ -59,23 +67,28 @@
 .diff-btn {
     padding: 0.75rem;
     font-weight: bold;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
+    text-transform: uppercase;
 }
 
 .mode-btn:hover, .bot-btn:hover, .diff-btn:hover {
-    background: #a3aab5;
+    background: rgba(255, 255, 255, 0.05);
 }
 
+/* Estado activo (Seleccionado) */
 .mode-btn.active, .bot-btn.active, .diff-btn.active {
-    background: #000000;
+    background: rgba(0, 240, 255, 0.1);
     color: #ffffff;
+    border-color: #00f0ff;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
 }
 
 .mode-icon {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     display: block;
     margin-bottom: 0.5rem;
     text-align: center;
+    color: #00f0ff;
 }
 
 .mode-label, .bot-name {
@@ -90,7 +103,7 @@
 
 .mode-desc, .bot-desc {
     font-size: 0.75rem;
-    opacity: 0.8;
+    opacity: 0.6;
     text-align: center;
 }
 
@@ -99,15 +112,16 @@
 .config-title {
     font-size: 0.8rem;
     font-weight: bold;
-    color: #666666;
+    color: #a1a1a1;
     margin: 0 0 0.5rem 0;
     text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .bot-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
+    gap: 0.8rem;
     margin-bottom: 1.5rem;
 }
 
@@ -119,36 +133,43 @@
 
 .human-info {
     text-align: center;
-    color: #666666;
+    color: #a1a1a1;
     font-size: 0.9rem;
     margin-bottom: 1.5rem;
     padding: 1rem;
-    background: #f0f0f0;
-    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
 }
 
+/* Botón gigante de PLAY */
 .play-btn {
     width: 100%;
-    padding: 1rem;
-    border-radius: 4px;
+    padding: 1.2rem;
+    border-radius: 12px;
     border: none;
-    background: #e0e0e0;
-    color: #888888;
-    font-weight: bold;
-    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    color: #555;
+    font-weight: 800;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
     cursor: not-allowed;
     margin-top: 1rem;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 .play-btn.ready {
-    background: #000000;
-    color: #ffffff;
+    background: #00f0ff;
+    color: #000;
     cursor: pointer;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
 }
 
 .play-btn.ready:hover {
-    background: #333333;
+    background: #00c0cc;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 240, 255, 0.6);
 }
 
 .lobby-header {
@@ -157,28 +178,30 @@
     margin-bottom: 0.5rem;
 }
 
+/* Opcional: El botoncito de Historial si lo tienes arriba a la derecha */
 .history-btn {
-    background: none;
-    border: 1px solid #cccccc;
-    border-radius: 4px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
     padding: 0.35rem 0.75rem;
     font-size: 0.8rem;
     cursor: pointer;
-    color: #555555;
+    color: #e0e0e0;
     transition: all 0.2s ease;
 }
 
 .history-btn:hover {
-    background: #f0f0f0;
-    border-color: #999999;
-    color: #000000;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #ffffff;
+    color: #ffffff;
 }
 
+/* Panel de Historial (Si se abre encima del Lobby) */
 .history-panel {
     position: absolute;
     inset: 0;
-    background: #ffffff;
-    border-radius: 4px;
+    background: rgba(15, 15, 20, 0.95); /* Muy oscuro para tapar lo de atrás */
+    border-radius: 24px;
     padding: 1.5rem;
     overflow-y: auto;
     z-index: 10;
@@ -195,13 +218,13 @@
     border: none;
     font-size: 1.2rem;
     cursor: pointer;
-    color: #555555;
+    color: #a1a1a1;
     padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
+    border-radius: 8px;
+    transition: all 0.2s ease;
 }
 
 .history-close-btn:hover {
-    background: #f0f0f0;
-    color: #000000;
+    background: rgba(255, 71, 87, 0.2);
+    color: #ff4757;
 }

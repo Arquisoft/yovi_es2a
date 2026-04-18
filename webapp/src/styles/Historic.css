@@ -16,30 +16,31 @@
     font-size: 1.15rem;
     font-weight: 700;
     margin: 0 0 0.2rem 0;
-    color: #111111;
+    color: #ffffff; /* Texto blanco */
 }
 
 .historic-subtitle {
     font-size: 0.82rem;
-    color: #888888;
+    color: #a1a1a1;
     margin: 0;
 }
 
 .historic-count {
     font-size: 0.78rem;
     font-weight: 600;
-    color: #aaaaaa;
-    background: #f4f4f4;
+    color: #00f0ff; /* Cian Neón */
+    background: rgba(0, 240, 255, 0.1);
+    border: 1px solid rgba(0, 240, 255, 0.3);
     border-radius: 20px;
     padding: 3px 10px;
     white-space: nowrap;
 }
 
-/* ── Filtros ──────────────────────────────────────────────────────────────── */
+/* ── Filtros (Caja de búsqueda y selectores) ──────────────────────────────── */
 .historic-filters {
-    background: #f8f8f8;
-    border: 1px solid #ebebeb;
-    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
     padding: 0.85rem 1rem;
     margin-bottom: 1.5rem;
     display: flex;
@@ -54,24 +55,27 @@
     flex-wrap: wrap;
 }
 
+/* Inputs y Selects */
 .filter-select,
 .filter-input,
 .filter-date {
     padding: 0.38rem 0.65rem;
     font-size: 0.82rem;
-    border: 1px solid #dddddd;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 6px;
-    background: #ffffff;
-    color: #333333;
+    background: rgba(15, 15, 20, 0.8);
+    color: #ffffff;
     outline: none;
     font-family: inherit;
-    transition: border-color 0.15s;
+    transition: all 0.2s ease;
+    color-scheme: dark; /* Para que el calendario nativo salga oscuro */
 }
 
 .filter-select:focus,
 .filter-input:focus,
 .filter-date:focus {
-    border-color: #888888;
+    border-color: #00f0ff;
+    box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
 }
 
 .filter-date {
@@ -95,19 +99,20 @@
 .filter-btn-search {
     padding: 0.38rem 0.85rem;
     font-size: 0.82rem;
-    background: #222222;
-    color: #ffffff;
-    border: 1px solid #222222;
+    background: #00f0ff;
+    color: #000000;
+    font-weight: bold;
+    border: none;
     border-radius: 0 6px 6px 0;
     cursor: pointer;
     font-family: inherit;
-    transition: background 0.15s;
+    transition: all 0.2s ease;
     white-space: nowrap;
 }
 
 .filter-btn-search:hover {
-    background: #444444;
-    border-color: #444444;
+    background: #00c0cc;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
 }
 
 .filter-date-group {
@@ -118,7 +123,7 @@
 
 .filter-label {
     font-size: 0.78rem;
-    color: #888888;
+    color: #a1a1a1;
     white-space: nowrap;
 }
 
@@ -126,31 +131,31 @@
     margin-left: auto;
     padding: 0.35rem 0.8rem;
     font-size: 0.78rem;
-    background: none;
-    border: 1px solid #cccccc;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 6px;
     cursor: pointer;
-    color: #666666;
+    color: #e0e0e0;
     font-family: inherit;
-    transition: all 0.15s;
+    transition: all 0.2s ease;
 }
 
 .filter-btn-clear:hover {
-    background: #f0f0f0;
-    border-color: #999999;
-    color: #333333;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #ffffff;
+    color: #ffffff;
 }
 
 /* ── Estados vacío / carga / error ───────────────────────────────────────── */
 .historic-status {
     text-align: center;
-    color: #888888;
+    color: #a1a1a1;
     margin: 2rem 0;
     font-size: 0.88rem;
 }
 
 .historic-error {
-    color: #c0392b;
+    color: #ff4757;
 }
 
 .historic-empty {
@@ -159,12 +164,14 @@
     align-items: center;
     gap: 0.5rem;
     padding: 2.5rem 0;
-    color: #aaaaaa;
+    color: #a1a1a1;
     font-size: 0.88rem;
 }
 
 .historic-empty-icon {
     font-size: 2rem;
+    color: #00f0ff;
+    opacity: 0.5;
 }
 
 /* ── Lista de tarjetas ────────────────────────────────────────────────────── */
@@ -174,37 +181,38 @@
     gap: 0.55rem;
 }
 
-/* ── Tarjeta individual ───────────────────────────────────────────────────── */
+/* ── Tarjeta individual de Partida ────────────────────────────────────────── */
 .game-card {
     display: flex;
     align-items: center;
     gap: 0.85rem;
-    background: #ffffff;
-    border: 1px solid #ebebeb;
-    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
     padding: 0.75rem 1rem;
     position: relative;
     overflow: hidden;
-    transition: box-shadow 0.15s, transform 0.15s;
+    transition: all 0.2s ease;
 }
 
 .game-card:hover {
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
 }
 
-/* Barra lateral de color */
+/* Barra lateral de color (Neón) */
 .game-card__indicator {
     position: absolute;
     left: 0;
     top: 0;
     bottom: 0;
     width: 4px;
-    border-radius: 10px 0 0 10px;
+    border-radius: 12px 0 0 12px;
 }
 
-.ind--win  { background: #27ae60; }
-.ind--loss { background: #e74c3c; }
+.ind--win  { background: #00ff88; box-shadow: 0 0 8px #00ff88; } /* Verde Neón */
+.ind--loss { background: #ff0055; box-shadow: 0 0 8px #ff0055; } /* Rosa/Rojo Neón */
 
 /* Avatar inicial del rival */
 .game-card__avatar {
@@ -220,8 +228,8 @@
     margin-left: 4px;
 }
 
-.avatar--win  { background: #eafaf1; color: #1e8449; }
-.avatar--loss { background: #fdedec; color: #c0392b; }
+.avatar--win  { background: rgba(0, 255, 136, 0.1); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.3); }
+.avatar--loss { background: rgba(255, 0, 85, 0.1); color: #ff0055; border: 1px solid rgba(255, 0, 85, 0.3); }
 
 /* Nombre del rival y tamaño */
 .game-card__main {
@@ -235,7 +243,7 @@
 .game-card__rival {
     font-size: 0.9rem;
     font-weight: 600;
-    color: #111111;
+    color: #ffffff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -243,7 +251,7 @@
 
 .game-card__size {
     font-size: 0.74rem;
-    color: #aaaaaa;
+    color: #a1a1a1;
 }
 
 /* Badge de resultado */
@@ -254,15 +262,15 @@
 .result-badge {
     display: inline-block;
     font-size: 0.74rem;
-    font-weight: 700;
-    padding: 3px 10px;
+    font-weight: 800;
+    padding: 4px 12px;
     border-radius: 20px;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.5px;
     text-transform: uppercase;
 }
 
-.result-badge--win  { background: #eafaf1; color: #1e8449; }
-.result-badge--loss { background: #fdedec; color: #c0392b; }
+.result-badge--win  { background: rgba(0, 255, 136, 0.15); color: #00ff88; box-shadow: 0 0 10px rgba(0, 255, 136, 0.2); }
+.result-badge--loss { background: rgba(255, 0, 85, 0.15); color: #ff0055; box-shadow: 0 0 10px rgba(255, 0, 85, 0.2); }
 
 /* Fecha */
 .game-card__date {
@@ -275,12 +283,12 @@
 
 .game-card__date-day {
     font-size: 0.78rem;
-    color: #555555;
+    color: #e0e0e0;
     white-space: nowrap;
 }
 
 .game-card__date-time {
     font-size: 0.71rem;
-    color: #bbbbbb;
+    color: #888888;
     white-space: nowrap;
 }
