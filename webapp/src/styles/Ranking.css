@@ -1,0 +1,171 @@
+/* --- RANKING.CSS (Estilo Cristal/Neón) --- */
+
+.ranking-container {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+.ranking-card {
+    background: rgba(15, 15, 20, 0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 24px;
+    padding: 2rem 2.5rem;
+    width: 100%;
+    max-width: 700px;
+    color: #ffffff;
+    margin-top: 1.5rem;
+}
+
+.ranking-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.ranking-back-btn {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 0.4rem 0.85rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: #e0e0e0;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.ranking-back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #ffffff;
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.ranking-title {
+    font-size: 1.6rem;
+    font-weight: bold;
+    margin: 0;
+    color: #ffd700;
+    text-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+    letter-spacing: 0.05em;
+}
+
+.ranking-subtitle {
+    font-size: 0.85rem;
+    color: #a1a1a1;
+    margin: 0 0 1.75rem 0;
+}
+
+.ranking-status {
+    text-align: center;
+    padding: 2rem 0;
+    color: #a1a1a1;
+    font-size: 0.9rem;
+}
+
+.ranking-error {
+    color: #ff6b6b;
+}
+
+/* ── Tabla ── */
+.ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.ranking-table thead tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.ranking-table th {
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+    color: #a1a1a1;
+    text-align: left;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.ranking-table td {
+    padding: 0.75rem 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    vertical-align: middle;
+}
+
+.ranking-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.ranking-table tbody tr:hover td {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+/* Fila del usuario logueado */
+.ranking-row-me td {
+    background: rgba(0, 240, 255, 0.05);
+}
+
+.ranking-row-me:hover td {
+    background: rgba(0, 240, 255, 0.08) !important;
+}
+
+/* Columnas */
+.col-pos {
+    width: 48px;
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+.col-user {
+    min-width: 140px;
+}
+
+.col-score {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.col-games,
+.col-wins {
+    text-align: right;
+    color: #a1a1a1;
+}
+
+/* Nombre y badge */
+.ranking-username {
+    margin-right: 0.4rem;
+    color: #e0e0e0;
+}
+
+.ranking-you-badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    background: rgba(0, 240, 255, 0.15);
+    color: #00f0ff;
+    border: 1px solid rgba(0, 240, 255, 0.4);
+    border-radius: 20px;
+    padding: 1px 8px;
+    font-weight: 600;
+    vertical-align: middle;
+    text-shadow: 0 0 6px rgba(0, 240, 255, 0.6);
+}
+
+/* Puntuación destacada */
+.ranking-score {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #ffd700;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+}

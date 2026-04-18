@@ -1,4 +1,4 @@
-// Ofrece dos opciones: "Jugar" (→ /lobby) y "Ver datos" (→ /datos)
+// Ofrece tres opciones: "Jugar" (→ /lobby), "Ver datos" (→ /datos) y "Ranking" (→ /ranking)
 import { useNavigate } from 'react-router-dom';
 import { useAuthComprobation } from '../components/AuthComprobation';
 import Navbar from '../components/Navbar';
@@ -34,6 +34,16 @@ export default function Menu(): JSX.Element {
                         <span className="menu-option-icon">📊</span>
                         <span className="menu-option-label">Ver datos</span>
                         <span className="menu-option-desc">Historial y estadísticas</span>
+                    </button>
+
+                    {/* Opción 3: navega a /ranking para ver la clasificación global */}
+                    <button
+                        className="menu-option-btn ranking"
+                        onClick={() => navigate('/ranking')}
+                    >
+                        <span className="menu-option-icon">🏆</span>
+                        <span className="menu-option-label">Ranking</span>
+                        <span className="menu-option-desc">Top 10 jugadores</span>
                     </button>
                 </div>
             </div>

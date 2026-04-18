@@ -212,3 +212,22 @@ export interface HistoryFilters {
     fechaHasta?: string;
     size?: number;
 }
+
+export interface RankingEntry {
+    position: number;
+    username: string;
+    score: number;
+    totalGames: number;
+    wins: number;
+}
+
+// Devuelve el top 10 de jugadores ordenados por puntuación de ranking
+export async function getRanking(): Promise<RankingEntry[]> {
+    const response = await fetch(`${USERS_URL}/ranking`);
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error ?? 'Error al obtener el ranking');
+    }
+    const data = await response.json();
+    return data.ranking;
+}

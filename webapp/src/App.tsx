@@ -4,11 +4,10 @@ import Game from "./pages/Game";
 import Lobby from "./pages/Lobby";
 import Menu from "./pages/Menu";
 import DataHub from "./pages/Datahub";
+import Ranking from "./pages/Ranking";
 import ColorBends from "./components/Background";
 
-
 function App() { 
-    
   return (
   <div className="app-container">
     <ColorBends
@@ -27,7 +26,6 @@ function App() {
       transparent
       autoRotate={0}
     />
-
     <HashRouter>
       <Routes>
         <Route path="/" element={<AuthForm />} />
@@ -35,6 +33,7 @@ function App() {
         <Route path="/lobby" element={<Lobby />} />
         <Route path="/datos" element={<DataHub />} />
         <Route path="/game" element={<Game />} />
+        <Route path="/ranking" element={<Ranking />} />
         <Route path="/historic" element={<Navigate to="/datos" replace />} />
         <Route path="/stats" element={<Navigate to="/datos" replace />} />
       </Routes>
