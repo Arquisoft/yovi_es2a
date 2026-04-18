@@ -273,4 +273,31 @@ describe('GET /ranking', () => {
 
         expect(lee.score).toBeGreaterThan(karen.score)
     })
+
+    // ── Límite de 10 resultados ────────────────────────────────────────────
+
+    it('devuelve como máximo 10 jugadores aunque haya más', async () => {
+        // Generamos 15 usuarios distintos con 1 partida ganada cada uno
+        const muchasPartidas = Array.from({ length: 15 }, (_, i) => ({
+            username: `user${i}`,
+            rival: 'random_bot',
+            resultado: '1',
+        }))
+        mockFindResult(muchasPartidas)
+
+        const res = await request(app).get('/ranking')
+
+        expect(res.body.ranking.length).toBeLessThanOrEqual(10)
+    })
+
+    // ── Errores ────────────────────────────────────────────────────────────
+
+    it('devuelve 500 si la base de datos falla', async () => {
+        mockFindThrows()
+
+        const res = await request(app).get('/ranking')
+
+        expect(res.status).toBe(500)
+        expect(res.body).toHaveProperty('error')
+    })
 })
