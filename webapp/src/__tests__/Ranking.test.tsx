@@ -1,4 +1,5 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import '@testing-library/jest-dom'
 import type { RankingEntry } from '../services/gameService'
@@ -179,5 +180,64 @@ describe('Ranking', () => {
         await waitFor(() =>
             expect(screen.getByText('4')).toBeInTheDocument()
         )
+    })
+
+    // ── Usuario actual destacado ───────────────────────────────────────────
+
+    it('muestra la etiqueta "tú" junto al usuario actual', async () => {
+        // alice está en localStorage como usuario actual
+        renderRanking()
+
+        await waitFor(() =>
+            expect(screen.getByText('tú')).toBeInTheDocument()
+        )
+    })
+
+    it('no muestra la etiqueta "tú" para otros jugadores', async () => {
+        renderRanking()
+
+        await waitFor(() =>
+            expect(screen.getByText('bob')).toBeInTheDocument()
+        )
+
+        // Solo debe haber una etiqueta "tú"
+        expect(screen.getAllByText('tú')).toHaveLength(1)
+    })
+
+    it('la fila del usuario actual tiene la clase CSS de destacado', async () => {
+        renderRanking()
+
+        await waitFor(() =>
+            expect(screen.getByText('alice')).toBeInTheDocument()
+        )
+
+        const filaAlice = screen.getByText('alice').closest('tr')
+        expect(filaAlice).toHaveClass('ranking-row-me')
+    })
+
+    it('las filas de otros usuarios no tienen la clase de destacado', async () => {
+        renderRanking()
+
+        await waitFor(() =>
+            expect(screen.getByText('bob')).toBeInTheDocument()
+        )
+
+        const filaBob = screen.getByText('bob').closest('tr')
+        expect(filaBob).not.toHaveClass('ranking-row-me')
+    })
+
+    // ── Navegación ─────────────────────────────────────────────────────────
+
+    it('el botón de volver navega al menú', async () => {
+        const user = userEvent.setup()
+        renderRanking()
+
+        await waitFor(() =>
+            expect(screen.getByText(/menú/i)).toBeInTheDocument()
+        )
+
+        await user.click(screen.getByText(/menú/i))
+
+        expect(mockNavigate).toHaveBeenCalledWith('/menu')
     })
 })
