@@ -140,4 +140,44 @@ describe('Ranking', () => {
         expect(within(filaCarol).getByText('10')).toBeInTheDocument() // totalGames carol
         expect(within(filaCarol).getByText('1')).toBeInTheDocument()  // wins carol
     })
+
+    // ── Medallas top 3 ────────────────────────────────────────────────────
+
+    it('muestra 🥇 para el primer puesto', async () => {
+        renderRanking()
+
+        await waitFor(() =>
+            expect(screen.getByText('🥇')).toBeInTheDocument()
+        )
+    })
+
+    it('muestra 🥈 para el segundo puesto', async () => {
+        renderRanking()
+
+        await waitFor(() =>
+            expect(screen.getByText('🥈')).toBeInTheDocument()
+        )
+    })
+
+    it('muestra 🥉 para el tercer puesto', async () => {
+        renderRanking()
+
+        await waitFor(() =>
+            expect(screen.getByText('🥉')).toBeInTheDocument()
+        )
+    })
+
+    it('muestra el número de posición en lugar de medalla para puestos > 3', async () => {
+        const rankingConMas: RankingEntry[] = [
+            ...rankingMock,
+            { position: 4, username: 'dave', score: 1.0, totalGames: 2, wins: 1 },
+        ]
+        vi.mocked(getRanking).mockResolvedValue(rankingConMas)
+
+        renderRanking()
+
+        await waitFor(() =>
+            expect(screen.getByText('4')).toBeInTheDocument()
+        )
+    })
 })
