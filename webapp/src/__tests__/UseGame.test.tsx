@@ -10,7 +10,6 @@ const mockApiState = {
     game_id: 'game-123',
     board_size: 7,
     total_cells: 49,
-    // Se usan simplificaciones de las coordenadas para mayor facilidad
     cells: [
         { index: 0, coords: [0, 0, 0] as [number, number, number], player: null },
         { index: 1, coords: [1, 0, 0] as [number, number, number], player: null },
@@ -34,9 +33,10 @@ vi.mock('../services/gameService', () => ({
     placeToken: vi.fn(),
     resign: vi.fn(),
     saveGameResult: vi.fn(),
+    timeout: vi.fn(),
 }))
 
-import { createGame, placeToken, resign, saveGameResult } from '../services/gameService'
+import { createGame, placeToken, resign, saveGameResult, timeout } from '../services/gameService'
 
 describe('useGame', () => {
     beforeEach(() => {
@@ -50,7 +50,6 @@ describe('useGame', () => {
     test('inicia en estado "loading" y pasa a "ongoing" tras crear partida', async () => {
         const { result } = renderHook(() => useGame())
 
-        // Al montar debe estar cargando
         expect(result.current.status).toBe('loading')
 
         await waitFor(() => {
@@ -125,7 +124,6 @@ describe('useGame', () => {
             result.current.resetGame()
         })
 
-        // createGame se llama dos veces: al montar y al resetear
         await waitFor(() => {
             expect(createGame).toHaveBeenCalledTimes(2)
         })
@@ -157,18 +155,18 @@ describe('useGame', () => {
         })
     })
 
-test('muestra error cuando placeToken falla', async () => {
-    vi.mocked(placeToken).mockRejectedValue(new Error('Movimiento inválido'))
+    test('muestra error cuando placeToken falla', async () => {
+        vi.mocked(placeToken).mockRejectedValue(new Error('Movimiento inválido'))
 
-    const { result } = renderHook(() => useGame())
-    await waitFor(() => expect(result.current.status).toBe('ongoing'))
+        const { result } = renderHook(() => useGame())
+        await waitFor(() => expect(result.current.status).toBe('ongoing'))
 
-    result.current.handleCellClick(0)
+        result.current.handleCellClick(0)
 
-    await waitFor(() => {
-        expect(result.current.error).toBe('Movimiento inválido')
+        await waitFor(() => {
+            expect(result.current.error).toBe('Movimiento inválido')
+        })
     })
-})
 
     test('pasa el botId correcto al placeToken en modo computer', async () => {
         vi.mocked(placeToken).mockResolvedValue({ game_state: mockApiState, applied_move: { player: 0, action: 'place', cell_index: 0 }, bot_move: null })
@@ -182,13 +180,12 @@ test('muestra error cuando placeToken falla', async () => {
 
         expect(placeToken).toHaveBeenCalledWith('game-123', 0, 1, 'defensive_easy')
     })
-})
 
     test('handleTimeout termina la partida (forzando rendición por tiempo)', async () => {
-        vi.mocked(resign).mockResolvedValue({ 
-            game_state: mockFinishedState, 
-            applied_move: { player: 0, action: 'timeout', cell_index: null }, 
-            bot_move: null 
+        vi.mocked(timeout).mockResolvedValue({
+            game_state: mockFinishedState,
+            applied_move: { player: 0, action: 'timeout', cell_index: null },
+            bot_move: null
         })
 
         const { result } = renderHook(() => useGame({ timer: 30 }))
@@ -198,7 +195,9 @@ test('muestra error cuando placeToken falla', async () => {
             result.current.handleTimeout()
         })
 
+        
         await waitFor(() => {
             expect(result.current.status).toBe('finished')
         })
     })
+})
