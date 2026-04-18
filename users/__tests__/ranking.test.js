@@ -186,4 +186,91 @@ describe('GET /ranking', () => {
 
         expect(res.body.ranking[0].score).toBe(0)
     })
+
+    
+
+    // ── Fórmula: dificultad ────────────────────────────────────────────────
+
+    it('victoria contra rival difícil puntúa más que contra rival fácil', async () => {
+        // charlie gana 1 vez contra monte_carlo (d=7), dave gana 1 vez contra random (d=1)
+        mockFindResult([
+            { username: 'charlie', rival: 'monte_carlo_bot', resultado: '1' },
+            { username: 'charlie', rival: 'monte_carlo_bot', resultado: '2' },
+            { username: 'dave',    rival: 'random_bot',      resultado: '1' },
+            { username: 'dave',    rival: 'random_bot',      resultado: '2' },
+        ])
+
+        const res = await request(app).get('/ranking')
+        const ranking = res.body.ranking
+
+        const charlie = ranking.find(e => e.username === 'charlie')
+        const dave    = ranking.find(e => e.username === 'dave')
+
+        expect(charlie.score).toBeGreaterThan(dave.score)
+    })
+
+    it('rival desconocido (humano) usa el peso por defecto de 5.0', async () => {
+        // eve gana contra humano (d=5), frank gana contra random (d=1), mismas partidas
+        mockFindResult([
+            { username: 'eve',   rival: 'jugador_humano', resultado: '1' },
+            { username: 'eve',   rival: 'jugador_humano', resultado: '2' },
+            { username: 'frank', rival: 'random_bot',     resultado: '1' },
+            { username: 'frank', rival: 'random_bot',     resultado: '2' },
+        ])
+
+        const res = await request(app).get('/ranking')
+        const ranking = res.body.ranking
+
+        const eve   = ranking.find(e => e.username === 'eve')
+        const frank = ranking.find(e => e.username === 'frank')
+
+        expect(eve.score).toBeGreaterThan(frank.score)
+    })
+
+    // ── Fórmula: eficacia ──────────────────────────────────────────────────
+
+    it('más victorias absolutas supera a mejor eficacia cuando la diferencia es grande', async () => {
+        // ivan: 20 victorias en 40 partidas (50%), julia: 5 victorias en 5 partidas (100%)
+        const partidasIvan = Array.from({ length: 20 }, () =>
+            ({ username: 'ivan', rival: 'random_bot', resultado: '1' })
+        ).concat(Array.from({ length: 20 }, () =>
+            ({ username: 'ivan', rival: 'random_bot', resultado: '2' })
+        ))
+
+        const partidasJulia = Array.from({ length: 5 }, () =>
+            ({ username: 'julia', rival: 'random_bot', resultado: '1' })
+        )
+
+        mockFindResult([...partidasIvan, ...partidasJulia])
+
+        const res = await request(app).get('/ranking')
+        const ranking = res.body.ranking
+
+        const ivan  = ranking.find(e => e.username === 'ivan')
+        const julia = ranking.find(e => e.username === 'julia')
+
+        expect(ivan.score).toBeGreaterThan(julia.score)
+    })
+
+    // ── Fórmula: confianza estadística C(N) ───────────────────────────────
+
+    it('1 partida ganada no genera una puntuación desproporcionada', async () => {
+        // karen gana 1 partida, lee gana 10 — karen no debe superar a lee
+        mockFindResult([
+            { username: 'karen', rival: 'random_bot', resultado: '1' },
+            ...Array.from({ length: 10 }, () =>
+                ({ username: 'lee', rival: 'random_bot', resultado: '1' })
+            ).concat(Array.from({ length: 2 }, () =>
+                ({ username: 'lee', rival: 'random_bot', resultado: '2' })
+            )),
+        ])
+
+        const res = await request(app).get('/ranking')
+        const ranking = res.body.ranking
+
+        const karen = ranking.find(e => e.username === 'karen')
+        const lee   = ranking.find(e => e.username === 'lee')
+
+        expect(lee.score).toBeGreaterThan(karen.score)
+    })
 })
