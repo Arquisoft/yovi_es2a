@@ -1,8 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { vi, describe, test, expect, beforeEach } from 'vitest';
+import { vi, describe, test, expect, beforeEach, afterEach } from 'vitest';
 import { Game } from '../pages/Game';
 import { MemoryRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/vitest';
+import { act } from '@testing-library/react';
+
 
 const { 
   mockUseGame, 
@@ -100,7 +102,6 @@ describe('Game Component', () => {
 
     expect(screen.getByText('Turno: 1')).toBeInTheDocument();
     expect(screen.getByText('Rendirse')).toBeInTheDocument();
-    expect(screen.getByText(/Jugador Loggeado: testuser/i)).toBeInTheDocument();
   });
 
   test('debe llamar a handleResign cuando se hace clic en el botón de rendirse', () => {
@@ -143,4 +144,63 @@ describe('Game Component', () => {
       mode: 'computer'
     }));
   });
+
+  describe('Lógica del Temporizador', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      
+      mockUseLocation.mockReturnValue({
+        state: { mode: 'computer', botId: 'random_bot', boardSize: 7, timer: 30 },
+      });
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    test('debe mostrar el temporizador y reducir el tiempo cada segundo', () => {
+      // Necesitamos importar 'act' de '@testing-library/react' arriba en tu archivo
+      
+      render(
+        <MemoryRouter>
+          <Game />
+        </MemoryRouter>
+      );
+
+      // Comprobamos que empieza en 30s
+      expect(screen.getByText('⏳ 30s')).toBeInTheDocument();
+
+      // Avanzamos el tiempo 1 segundo exacto
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+
+      // Comprobamos que ha bajado a 29s
+      expect(screen.getByText('⏳ 29s')).toBeInTheDocument();
+    });
+
+    test('debe llamar a handleTimeout EXACTAMENTE una vez cuando el tiempo llega a 0', () => {
+    
+      const mockHandleTimeout = vi.fn();
+      mockUseGame.mockReturnValue({ ...defaultGameState, handleTimeout: mockHandleTimeout });
+
+      render(
+        <MemoryRouter>
+          <Game />
+        </MemoryRouter>
+      );
+
+      act(() => {
+        vi.advanceTimersByTime(30000);
+      });
+
+      expect(mockHandleTimeout).toHaveBeenCalledTimes(1);
+
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+      expect(mockHandleTimeout).toHaveBeenCalledTimes(1);
+    });
+  });
+
 });

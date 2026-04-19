@@ -1,3 +1,4 @@
+/* --- MENU.CSS (Estilo Cristal/Neón) --- */
 .menu-container {
     width: 100%;
     min-height: 100vh;
@@ -9,13 +10,17 @@
 }
 
 .menu-card {
-    background: #ffffff;
-    border-radius: 4px;
+    /* Efecto Cristal (Glassmorphism) */
+    background: rgba(15, 15, 20, 0.65); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); 
+    border-radius: 24px;
     padding: 3rem 2.5rem;
     width: 100%;
     max-width: 420px;
-    color: #000000;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    color: #ffffff; /* Texto blanco */
     text-align: center;
 }
 
@@ -24,10 +29,12 @@
     font-weight: bold;
     margin: 0 0 0.5rem 0;
     letter-spacing: 0.15em;
+    color: #00f0ff; /* Titulo en Cian Neón */
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
 }
 
 .menu-subtitle {
-    color: #666666;
+    color: #a1a1a1;
     margin: 0 0 2.5rem 0;
     font-size: 0.95rem;
 }
@@ -35,7 +42,7 @@
 .menu-options {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.2rem;
 }
 
 .menu-option-btn {
@@ -44,38 +51,55 @@
     align-items: center;
     gap: 0.35rem;
     padding: 1.5rem 1rem;
-    border: none;
-    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
     cursor: pointer;
     font-family: inherit;
-    transition: all 0.2s ease;
-    background: #bcc3ce;
-    color: #333333;
+    transition: all 0.3s ease;
+    background: rgba(0, 0, 0, 0.4);
+    color: #e0e0e0;
 }
 
 .menu-option-btn:hover {
-    background: #a3aab5;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
 }
 
+/* Efecto Neón Cian para Jugar */
 .menu-option-btn.play:hover {
-    background: #222222;
+    background: rgba(0, 240, 255, 0.1);
+    border-color: #00f0ff;
     color: #ffffff;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
 }
 
+/* Efecto Neón Magenta para Datos */
 .menu-option-btn.data:hover {
-    background: #444444;
+    background: rgba(255, 0, 255, 0.1);
+    border-color: #ff00ff;
     color: #ffffff;
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+
+}
+
+/* Efecto Neón Dorado para Ranking */
+.menu-option-btn.ranking:hover {
+    background: rgba(255, 215, 0, 0.1);
+    border-color: #ffd700;
+    color: #ffffff;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+
 }
 
 .menu-option-icon {
-    font-size: 2rem;
+    font-size: 2.2rem;
+    margin-bottom: 5px;
 }
 
 .menu-option-label {
     font-size: 1.1rem;
     font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 .menu-option-desc {

@@ -51,6 +51,9 @@ export default function Lobby(): JSX.Element {
     const [difficulty, setDifficulty] = useState<Difficulty>("easy");
     const [boardSize, setBoardSize] = useState(7); // Valor inicial 7
 
+    const [useTimer, setUseTimer] = useState(false);
+    const [timerSeconds, setTimerSeconds] = useState(30);
+
     useEffect(() => {
             if (username == null) {
                 navigate('/');
@@ -58,12 +61,12 @@ export default function Lobby(): JSX.Element {
         }, [username, navigate]);
 
     const handlePlay = () => {
+        const timerValue = useTimer ? timerSeconds : null;
         if (mode === "human") {
-            navigate('/game', { state: { mode: "human", boardSize } });
+            navigate('/game', { state: { mode: "human", boardSize, timer: timerValue } });
         } else if (mode === "computer") {
             const botId = getBotId(botType, difficulty);
-            navigate('/game', { state: { mode: "computer", botId, boardSize } });
-        }
+            navigate('/game', { state: { mode: "computer", botId, boardSize, timer: timerValue } });        }
     };
 
     return (
@@ -101,6 +104,36 @@ export default function Lobby(): JSX.Element {
                         onChange={e => setBoardSize(Number(e.target.value))}
                         style={{ width: '100%', marginTop: 8 }}
                     />
+                </div>
+
+                <div className="timer-selector" style={{ marginBottom: 24 }}>
+                    <label style={{ fontWeight: 500, display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                        <input
+                            type="checkbox"
+                            checked={useTimer}
+                            onChange={(e) => setUseTimer(e.target.checked)}
+                            style={{ width: '18px', height: '18px' }}
+                        />
+                        ⏱️ Activar Temporizador
+                    </label>
+
+                    {useTimer && (
+                        <div style={{ marginTop: 12, paddingLeft: 26 }}>
+                            <label htmlFor="timer-range" style={{ fontSize: '0.9em' }}>
+                                Tiempo por turno: <span style={{ fontWeight: 700 }}>{timerSeconds} segundos</span>
+                            </label>
+                            <input
+                                id="timer-range"
+                                type="range"
+                                min={10}
+                                max={60}
+                                step={1}
+                                value={timerSeconds}
+                                onChange={e => setTimerSeconds(Number(e.target.value))}
+                                style={{ width: '100%', marginTop: 8 }}
+                            />
+                        </div>
+                    )}
                 </div>
 
                 <div className="mode-selector">
