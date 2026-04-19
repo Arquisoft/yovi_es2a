@@ -23,15 +23,13 @@ connectDB();
 
 //Bloque condicional neceseario para los test al hacer deploy, borra los usuarios durante los test
 //E2E, evitando errores de duplicado en la base de datos
-if (process.env.NODE_ENV === 'test') {
+//TODO: Cambiar endpoint para que sea + seguro, ahora se puede borrar de todo
   app.delete('/testing/deleteuser/:username', async (req, res) => {
     //Miramos el parámetro para evitar inyección en la query, por el aviso de SonarCloud
     const username = String(req.params.username);
     await User.deleteOne({ username: username });
     res.status(200).json({ message: 'User deleted' });
   });
-}
-
 //Añade metricas para Prometheus
 const metricsMiddleware = promBundle({ includeMethod: true });
 app.use(metricsMiddleware);
@@ -116,7 +114,7 @@ app.post('/login', async (req, res) => {
 
     // comparar la contraseña (usando bcrypt en el futuro)
     if (!(await Hashing.verifyPassword(user.password, password))) {
-       return res.status(401).json({ error: "Invalid password" });
+      return res.status(401).json({ error: "Invalid password" });
     }
 
     res.status(200).json({ 
