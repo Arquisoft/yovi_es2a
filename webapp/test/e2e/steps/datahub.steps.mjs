@@ -3,10 +3,6 @@ import assert from 'assert'
 import { TEST_USER, TEST_PASS, API_URL, BASE_URL } from '../support/setup.mjs'
 
 Given('The server is prepared for datahub', async function () {
-    // 1. Partimos de un estado limpio
-    await fetch(`${API_URL}/testing/deleteuser/${TEST_USER}`, { method: 'DELETE' })
-
-    // 2. Creamos el usuario de test
     const reg = await fetch(`${API_URL}/createuser`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -14,7 +10,7 @@ Given('The server is prepared for datahub', async function () {
     })
     assert.ok(reg.ok, 'No se pudo registrar el usuario de test para datahub')
 
-    // 3. Guardamos 3 partidas directamente via /savegame
+    // Guardamos 3 partidas directamente via /savegame
     //    resultado '1' = victoria, '2' = derrota
     await fetch(`${API_URL}/savegame`, {
         method: 'POST',
@@ -54,7 +50,7 @@ When('I click on the statistics tab', async function () {
 
 When('I filter history by victory', async function () {
     await this.page.selectOption('.filter-select', '1')
-    // Esperamos a que no haya ninguna carta de derrota visible
+    // Esperamos a que no quede ninguna derrota visible
     await this.page.waitForFunction(() => 
         document.querySelectorAll('.game-card--loss').length === 0
     , { timeout: 5000 })
@@ -73,10 +69,14 @@ Then('I should see the statistics cards', async function () {
 })
 
 Then('The history table should only show victories', async function () {
-    const cards = await this.page.locator('.game-card').all()
-    assert.ok(cards.length > 0, 'No hay partidas en el historial')
+    await this.page.waitForSelector('.game-card--win', { state: 'visible', timeout: 5000 });
+
+    const cards = await this.page.locator('.game-card').all();
+    
+    assert.ok(cards.length > 0, 'No hay partidas en el historial después de filtrar');
+
     for (const card of cards) {
-        const text = await card.innerText()
-        assert.ok(text.includes('VICTORIA'), `Tarjeta no es victoria: ${text}`)
+        const text = await card.textContent();
+        assert.ok(text.includes('Victoria'), `Se encontró una tarjeta que no es victoria. Contenido: ${text}`);
     }
-})
+});

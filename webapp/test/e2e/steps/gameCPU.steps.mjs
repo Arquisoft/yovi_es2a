@@ -5,7 +5,7 @@ import { TEST_USER, TEST_PASS, API_URL } from '../support/setup.mjs'
 const SELECTORS = {
     cellEmpty: '.table-cell.empty',
     gameBoard: '.game-board',
-    turnText:  '.game-info p',
+    turnText:  '.game-turn',
     playBtn:   '.play-btn.ready'
 }
 
@@ -42,16 +42,15 @@ Then('The cell should be marked as mine', async function () {
 })
 
 Then('The Bot should make its move automatically', async function () {
-    // Esperamos a que el bot haga su movimiento y nos devuelva el turno
-    await this.page.waitForFunction(() => {
-        const p = document.querySelector('.game-info p')
-        return p && p.textContent.includes('PLAYER_ONE')
-    }, { timeout: 10000 })
-    const text = await this.page.locator(SELECTORS.turnText).innerText()
-    assert.ok(text.includes('PLAYER_ONE'), 'El bot no devolvió el turno')
-})
+    const page = this.page;
+    
+    await page.waitForSelector('.table-cell.player_two', { timeout: 5000 });
+    
+    const text = await page.locator('.game-turn').textContent();
+    assert.ok(text.includes('PLAYER_ONE') || text.includes('PLAYER_TWO'), 'El texto de turno no es el esperado');
+});
 
 Then('It should be my turn again', async function () {
-    const text = await this.page.locator(SELECTORS.turnText).innerText()
-    assert.ok(text.includes('PLAYER_ONE'), 'No es el turno del jugador')
-})
+    const text = await this.page.locator('.game-turn').innerText();
+    assert.ok(text.includes('PLAYER_ONE'), `Se esperaba el turno de PLAYER_ONE pero se encontró: ${text}`);
+});

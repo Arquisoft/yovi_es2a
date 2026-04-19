@@ -23,7 +23,7 @@ connectDB();
 
 //Bloque condicional neceseario para los test al hacer deploy, borra los usuarios durante los test
 //E2E, evitando errores de duplicado en la base de datos
-//TODO: Cambiar endpoint para que sea + seguro, ahora se puede borrar de todo
+// Se poría cambiar endpoint para que sea + seguro, ahora se puede borrar de todo
   app.delete('/testing/deleteuser/:username', async (req, res) => {
     //Miramos el parámetro para evitar inyección en la query, por el aviso de SonarCloud
     const username = String(req.params.username);

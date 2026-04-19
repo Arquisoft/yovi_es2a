@@ -29,8 +29,9 @@ Given('I have an active game against {string} {string}', async function (difficu
 })
 
 When('I click on the surrender button', async function () {
-    await this.page.click('.game-surrender-button')
-})
+    const page = this.page;
+    await this.page.click('.btn-surrender');
+});
 
 Then('I should see the game board', async function () {
     const isVisible = await this.page.locator('.game-board').isVisible()
