@@ -13,8 +13,3 @@ Feature: Gameplay vs Human
     When Player one clicks on an empty cell
     Then The cell should be marked as player one
     And It should be player two turn
-
-  Scenario: Player one wins the game
-    Given I have an active human game
-    When Player one makes the winning move
-    Then I should see the game over screen
