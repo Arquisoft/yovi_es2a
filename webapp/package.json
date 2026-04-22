@@ -17,6 +17,7 @@
     "start:all": "concurrently \"npm run dev\" \"cross-env NODE_ENV=test npm --prefix ../users start\""
   },
   "dependencies": {
+    "dompurify": "^3.4.1",
     "mongoose": "^9.2.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -29,6 +30,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^14.3.1",
     "@testing-library/user-event": "^14.6.1",
+    "@types/dompurify": "^3.0.5",
     "@types/node": "^24.10.1",
     "@types/react": "^18.3.27",
     "@types/react-dom": "^18.3.7",
