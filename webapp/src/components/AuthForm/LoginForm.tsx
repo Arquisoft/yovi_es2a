@@ -1,9 +1,11 @@
 import './AuthForm.css'
 import React, { useState} from 'react';
 import { useAuthComprobation } from '../AuthComprobation';
+import { useNavigate} from 'react-router-dom';
 
 const AuthForm: React.FC = () => {
   useAuthComprobation();
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -34,6 +36,8 @@ const AuthForm: React.FC = () => {
       if (res.ok) {
         const sanitizedUsername = username.replace(/[<>"'&]/g, "");
         localStorage.setItem("username", sanitizedUsername);
+
+        navigate('/menu');
       } else {
         setError(data.error || 'Something went wrong');
       }
