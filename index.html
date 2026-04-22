@@ -452,7 +452,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_stakeholders">1.3. Stakeholders</a></li>
 </ul>
 </li>
-<li><a href="#section-architecture-constraints">2. Restricciones de la Arquitectura</a></li>
+<li><a href="#section-architecture-constraints">2. Restricciones de la Arquitectura</a>
+<ul class="sectlevel2">
+<li><a href="#_restricciones_técnicas">2.1. Restricciones Técnicas</a></li>
+<li><a href="#_restricciones_organizativas">2.2. Restricciones Organizativas</a></li>
+<li><a href="#_restricciones_del_equipo_de_desarrollo">2.3. Restricciones del Equipo de Desarrollo</a></li>
+<li><a href="#_restricciones_políticas_y_convenciones">2.4. Restricciones Políticas y Convenciones</a></li>
+</ul>
+</li>
 <li><a href="#section-context-and-scope">3. Contexto y Alcance</a>
 <ul class="sectlevel2">
 <li><a href="#_contexto_de_negocio">3.1. Contexto de negocio</a></li>
@@ -481,6 +488,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_escenario_4_fin_de_partida_y_guardado_en_historial">6.4. Escenario 4: Fin de partida y guardado en historial</a></li>
 <li><a href="#_escenario_5_consulta_general_del_historial">6.5. Escenario 5: Consulta general del historial</a></li>
 <li><a href="#_escenario_6_consulta_de_historial_con_filtrado">6.6. Escenario 6: Consulta de historial con filtrado</a></li>
+<li><a href="#_escenario_7_cierre_de_sesión">6.7. Escenario 7: Cierre de sesión</a></li>
 </ul>
 </li>
 <li><a href="#section-deployment-view">7. Vista de Despliegue</a>
@@ -519,7 +527,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_deuda_técnica">11.2. Deuda Técnica</a></li>
 </ul>
 </li>
-<li><a href="#section-glossary">12. Glosario</a></li>
+<li><a href="#section-tests">12. Estrategia de Pruebas</a>
+<ul class="sectlevel2">
+<li><a href="#_pruebas_end_to_end_e2e">12.1. Pruebas End-to-End (E2E)</a></li>
+<li><a href="#_pruebas_unitarias_y_de_integración_test_normales">12.2. Pruebas Unitarias y de Integración (Test normales)</a></li>
+<li><a href="#_pruebas_de_carga">12.3. Pruebas de Carga</a></li>
+</ul>
+</li>
+<li><a href="#section-glossary">13. Glosario</a></li>
 </ul>
 </div>
 </div>
@@ -640,19 +655,19 @@ Entre ellos se incluyen</p>
 <p><strong>Jugador vs Jugador:</strong> Partidas en tiempo real entre dos usuarios humanos en el mismo dispositivo.</p>
 </li>
 <li>
-<p><strong>Jugador vs Máquina:</strong> Desafio contra un agente inteligente. El sistema permite seleccionar entre múltiples estrategias (Aleatoria, Defensiva, Ofensiva, Posicional y Monte Carlos)  algunas con diferentes niveles de dificultad, pudiendo ser ajustado por el usuario.</p>
+<p><strong>Jugador vs Máquina:</strong> Desafio contra un agente inteligente. El sistema permite seleccionar entre múltiples estrategias (Aleatoria, Defensiva, Ofensiva, Posicional y Monte Carlo)  algunas con diferentes niveles de dificultad, pudiendo ser ajustado por el usuario.</p>
 </li>
 <li>
-<p>**Interaccion mediante API (Bot vs Bot Externo): El sistema expone una interfaz API REST que permite a bots externos competir contra la IA del sistema o gestionar partidas de forma automatizada mediante la notación YEN.</p>
+<p><strong>Interacción mediante API (Bot vs Bot Externo):</strong> El sistema expone una interfaz API REST que permite a bots externos competir contra la IA del sistema o gestionar partidas de forma automatizada mediante la notación YEN.</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p><strong>Gestión de Usuarios:</strong> Los usuarios gestiona la autenticación mediante el registro e inicio de sesión de usuarios. Garantiza la persistencia de los datos, manteniendo un perfil actualizado de cada jugador.</p>
+<p><strong>Gestión de Usuarios:</strong> El sistema gestiona la autenticación mediante el registro e inicio de sesión. Además, garantiza la persistencia de los datos, manteniendo un perfil actualizado de cada jugador.</p>
 </li>
 <li>
-<p><strong>Historial y Persistencia:</strong> El sistema registra de forma automática el resultado de cada partida finalizada. Los usuarios disponen de un panel de consulta donde pueden visualizar su historia de victorias y derrotas, permitiendo el filtrado de los registros por fecha, tipo de oponente y tamaño del tablero.</p>
+<p><strong>Historial y Persistencia:</strong> El sistema registra de forma automática el resultado de cada partida finalizada. Los usuarios disponen de un panel de consulta donde pueden visualizar su historial de victorias y derrotas, permitiendo el filtrado de los registros por fecha, tipo de oponente y tamaño del tablero.</p>
 </li>
 <li>
 <p><strong>Plataforma:</strong> La aplicación es plenamente accesible desde navegadores web modernos. El sistema se distribuye mediante contenedores Docker, lo que garantiza un despliegue ágil y consistente en cualquier entorno que lo soporte.</p>
@@ -709,7 +724,7 @@ Si existen documentos de requisitos, esta descripción general debe hacer refere
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Usabilidad</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">La aplicación presenta un tablero hexagonal que puede resultar visualmente complejo al inicio. Por ello, se debe priorizar una interfaz clara que resalte los movimientos válidos para reducir la curva de aprendizaje y hacer el juego accesible a todos los públicos.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">La aplicación presenta un tablero triangular con casillas hexagonales que puede resultar visualmente complejo al inicio. Por ello, se debe priorizar una interfaz clara que resalte los movimientos válidos para reducir la curva de aprendizaje y hacer el juego accesible a todos los públicos.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
@@ -823,16 +838,16 @@ Estas partes interesadas determinan el alcance y el nivel de detalle de su traba
 <p>Sergio González Martínez - <a href="mailto:uo300798@uniovi.es">uo300798@uniovi.es</a></p>
 </li>
 <li>
-<p>Pablo Arias Fernández - <a href="mailto:uo3000007@uniovi.es">uo3000007@uniovi.es</a></p>
+<p>Pablo Arias Fernández - <a href="mailto:uo300305@uniovi.es">uo300305@uniovi.es</a></p>
 </li>
 <li>
-<p>Iyán Díaz Pereda - <a href="mailto:uo3000006@uniovi.es">uo3000006@uniovi.es</a></p>
+<p>Iyán Díaz Pereda - <a href="mailto:uo300006@uniovi.es">uo300006@uniovi.es</a></p>
 </li>
 <li>
-<p>Enol de la Calle Iglesias - <a href="mailto:uo3000888@uniovi.es">uo3000888@uniovi.es</a></p>
+<p>Enol de la Calle Iglesias - <a href="mailto:uo301431@uniovi.es">uo301431@uniovi.es</a></p>
 </li>
 <li>
-<p>Iyán Álvarez Casasnovas - <a href="mailto:uo3009006@uniovi.es">uo3009006@uniovi.es</a></p>
+<p>Iyán Álvarez Casasnovas - <a href="mailto:uo301299@uniovi.es">uo301299@uniovi.es</a></p>
 </li>
 </ul>
 </div></div></td>
@@ -896,9 +911,8 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </div>
 </div>
 </div>
-<div class="paragraph">
-<p>Restricciones Técnicas</p>
-</div>
+<div class="sect2">
+<h3 id="_restricciones_técnicas">2.1. Restricciones Técnicas</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -912,26 +926,26 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lógica del Juego Y</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">El sistema debe implementar las reglas del Juego Y: conexión de tres lados de un tablero triangular/hexagonal.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Lógica del Juego Y</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">El sistema debe implementar las reglas del Juego Y: conexión de tres lados de un tablero triangular.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Modos de Juego</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">La aplicación debe soportar partidas de dos jugadores (local o red) y un modo de un jugador contra la IA.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Modos de Juego</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">La aplicación debe soportar partidas de dos jugadores (local) y un modo de un jugador contra la IA.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Interfaz Gráfica</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Interfaz Gráfica</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">El tablero debe representarse de forma clara y permitir la interacción táctil o mediante ratón para colocar las fichas.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Despliegue con Docker</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Despliegue con Docker</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">El sistema se despliega mediante contenedores Docker para garantizar portabilidad y reproducibilidad del entorno de ejecución.</p></td>
 </tr>
 </tbody>
 </table>
-<div class="paragraph">
-<p>Restricciones Organizativas</p>
 </div>
+<div class="sect2">
+<h3 id="_restricciones_organizativas">2.2. Restricciones Organizativas</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -945,22 +959,22 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Gestión de Tareas</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Gestión de Tareas</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Uso obligatorio de GitHub Issues para el seguimiento de las tareas.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Registro de Decisiones</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Registro de Decisiones</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">La Wiki de GitHub se utiliza para documentar actas de reuniones, decisiones de diseño y acuerdos del equipo.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Control de Versiones</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Uso de GitHub como plataforma centralizada, aplicando una estrategia de ramas por cada funcionalidad para no romper la lógica principal del juego.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Control de Versiones</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Uso de GitHub como plataforma centralizada, aplicando una estrategia de ramas por cada funcionalidad para no romper la lógica principal del juego, asegurándonos de que master sea siempre funcional.</p></td>
 </tr>
 </tbody>
 </table>
-<div class="paragraph">
-<p>Restricciones del Equipo de Desarrollo</p>
 </div>
+<div class="sect2">
+<h3 id="_restricciones_del_equipo_de_desarrollo">2.3. Restricciones del Equipo de Desarrollo</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -974,18 +988,18 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Curva de aprendizaje</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Curva de aprendizaje</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">El desarrollo del sistema se basa en tecnologías como Rust y Docker, lo que condiciona las decisiones de implementación y arquitectura.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Coordinación Inicial</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Coordinación Inicial</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Al no haber trabajado juntos antes, se enfatizará la comunicación constante para evitar conflictos.</p></td>
 </tr>
 </tbody>
 </table>
-<div class="paragraph">
-<p>Restricciones Políticas y Convenciones</p>
 </div>
+<div class="sect2">
+<h3 id="_restricciones_políticas_y_convenciones">2.4. Restricciones Políticas y Convenciones</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -999,20 +1013,21 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Estándar arc42</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Estándar arc42</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Seguimiento estricto de la estructura arc42 para documentar la arquitectura del juego.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Interoperabilidad</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Interoperabilidad</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">El motor del juego debe estar separado de la interfaz para permitir posibles cambios de UI en el futuro.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Idioma</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Idioma</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Documentación técnica en español y código fuente/comentarios en español.</p></td>
 </tr>
 </tbody>
 </table>
 <div style="page-break-after: always;"></div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1652,7 +1667,17 @@ Se ha optado por una arquitectura cliente-servidor desacoplada para permitir que
 </table>
 </div>
 <div class="sect3">
-<h4 id="_servicio_de_juego">5.3.2. Servicio de Juego</h4>
+<h4 id="_user_controller">5.3.2. User Controller</h4>
+<div class="paragraph">
+<p>Propósito: mantener una navegación segura permitiendo únicamente jugar y acceder a seccioens específicas a usuarios registrados en el sistema.
+Responsabilidades:
+- Registro de usuarios
+- Login
+- Logout</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_servicio_de_juego">5.3.3. Servicio de Juego</h4>
 <div class="paragraph">
 <p>Propósito: Cerebro de la ejecución. Recibe intentos de movimiento, consulta validez al motor, actualiza el estado y notifica a los jugadores.</p>
 </div>
@@ -1661,19 +1686,19 @@ Se ha optado por una arquitectura cliente-servidor desacoplada para permitir que
 </div>
 </div>
 <div class="sect3">
-<h4 id="_servicio_de_emparejamiento_matchmaking">5.3.3. Servicio de Emparejamiento (Matchmaking)</h4>
+<h4 id="_servicio_de_emparejamiento_matchmaking">5.3.4. Servicio de Emparejamiento (Matchmaking)</h4>
 <div class="paragraph">
 <p>Propósito: Gestionar la cola de jugadores. Instancia nuevos juegos a través del Game Service cuando se cumplen las condiciones de emparejamiento.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_capa_de_persistencia">5.3.4. Capa de Persistencia</h4>
+<h4 id="_capa_de_persistencia">5.3.5. Capa de Persistencia</h4>
 <div class="paragraph">
 <p>Propósito: Aislar las consultas y el mapeo de datos de MongoDB del resto de la lógica de negocio.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_esquema_de_base_de_datos_modelo_relacional_en_mongodb">5.3.5. Esquema de Base de Datos (Modelo Relacional en MongoDB)</h4>
+<h4 id="_esquema_de_base_de_datos_modelo_relacional_en_mongodb">5.3.6. Esquema de Base de Datos (Modelo Relacional en MongoDB)</h4>
 <div class="paragraph">
 <p>A pesar de utilizar una base de datos NoSQL, el sistema mantiene una relación lógica entre los usuarios y sus registros de juego. El <code>username</code> actúa como clave de enlace entre ambas colecciones.</p>
 </div>
@@ -1805,6 +1830,17 @@ Se ha optado por una arquitectura cliente-servidor desacoplada para permitir que
 <img src="./images/runtime-history-filtered.png" alt="runtime history filtered" width="839" height="362">
 </div>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_escenario_7_cierre_de_sesión">6.7. Escenario 7: Cierre de sesión</h3>
+<div class="paragraph">
+<p>El usuario cierra su sesión desde la interfaz. El frontend elimina los datos locales (localStorage) y notifica al servicio <code>users</code>, que invalida la sesión en la base de datos.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/runtime-logout.png" alt="runtime logout" width="697" height="316">
+</div>
+</div>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
@@ -1866,9 +1902,6 @@ You will mainly capture scenarios in your documentation to communicate your arch
 <p>See <a href="https://docs.arc42.org/section-6/">Runtime View</a> in the arc42 documentation.</p>
 </div>
 </div>
-</div>
-<div class="paragraph">
-<p>Esta sección se irá rellenando conforme avance el desarrollo del proyecto.</p>
 </div>
 <div style="page-break-after: always;"></div>
 </div>
@@ -2872,7 +2905,160 @@ optimización estética o de experiencia de usuario, que deberá mejorarse en it
 </div>
 </div>
 <div class="sect1">
-<h2 id="section-glossary">12. Glosario</h2>
+<h2 id="section-tests">12. Estrategia de Pruebas</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>En esta sección se describe la estrategia de aseguramiento de la calidad (QA) seguida durante el desarrollo de Yovi, detallando los diferentes niveles de pruebas realizados para garantizar la robustez del sistema.</p>
+</div>
+<div class="sect2">
+<h3 id="_pruebas_end_to_end_e2e">12.1. Pruebas End-to-End (E2E)</h3>
+
+</div>
+<div class="sect2">
+<h3 id="_pruebas_unitarias_y_de_integración_test_normales">12.2. Pruebas Unitarias y de Integración (Test normales)</h3>
+
+</div>
+<div class="sect2">
+<h3 id="_pruebas_de_carga">12.3. Pruebas de Carga</h3>
+<div class="paragraph">
+<p>Las pruebas de carga evalúan la capacidad de respuesta del sistema bajo condiciones de uso intensivo y estrés. Para el proyecto Yovi, se han diseñado pruebas de estrés utilizando Gatling para validar la robustez del servidor desarrollado en Rust.</p>
+</div>
+<div class="sect3">
+<h4 id="_escenario_de_prueba">12.3.1. Escenario de Prueba</h4>
+<div class="paragraph">
+<p>Se generó el script TestCargaLoginJugar.scala para simular un flujo de usuario completo y realista. El escenario incluye:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Autenticación:</strong> Petición POST /login.</p>
+</li>
+<li>
+<p><strong>Inicialización:</strong> Petición POST /game/new (partida contra invitado).</p>
+</li>
+<li>
+<p><strong>Interactividad:</strong> Ciclo de 4 movimientos mediante POST /game/{id}/move.</p>
+</li>
+<li>
+<p><strong>Finalización:</strong> Acción de rendición y guardado automático en el historial (POST /savegame).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Para simular el comportamiento humano real, se han intercalado tiempos de lectura o de pensar la jugada (pause(1), pause(3)…​.) entre cada petición.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_configuración_de_carga_e_inyección">12.3.2. Configuración de Carga e Inyección:</h4>
+<div class="paragraph">
+<p>Se estableció una estrategia de Ramp-up para observar la degradación progresiva del servicio:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Usuarios concurrentes:</strong> 50.</p>
+</li>
+<li>
+<p><strong>Periodo de inyección:</strong> 30 segundos.</p>
+</li>
+<li>
+<p><strong>Instrucción:</strong> rampUsers(50).during(30.seconds).</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_analisis_de_resultados_y_gráficas">12.3.3. Analisis de Resultados y Gráficas</h4>
+<div class="paragraph">
+<p>Para evaluar el comportamiento del sistema, se han extraído las siguientes gráficas del informe generado por Gatling:</p>
+</div>
+<div class="sect4">
+<h5 id="_distribución_global_y_rangos_de_respuesta">Distribución Global y Rangos de respuesta</h5>
+<div class="paragraph">
+<p>Esta primera imagen presenta un resumen global de la ejecución a través de dos gráficas:</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="./images/12-gatling_ranges.png" alt="Distribución de rangos de respuesta y peticiones">
+</div>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="./images/12-gatling_errors.png" alt="Errores 422">
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Response Time Ranges (Izquierda):</strong> Clasifica los tiempos de respuesta del servidor en rangos de calidad. Como se puede observar, el 100% de las peticiones exitosas (las 750 representadas en la barra verde) se resolvieron en menos de 800 ms, ubicándose en el rango óptimo de Gatling. No se registró ninguna petición en los rangos de latencia media (800-1200 ms) ni alta (&gt;1200 ms).</p>
+</li>
+<li>
+<p><strong>Columna "Failed" y Gráfico Circular:</strong> La barra roja de la izquierda y los segmentos rojos del gráfico circular representan las 200 peticiones clasificadas como "KO". Es crucial destacar que, tras analizar los logs, todas corresponden a respuestas HTTP 422 (Unprocessable Entity). Esto confirma que el motor del juego en Rust funciona perfectamente bajo estrés: al realizar peticiones automatizadas a alta velocidad, el script intentó realizar movimientos ilegales (pisar fichas ya colocadas). El servidor analizó la petición, aplicó las reglas del juego Y, y bloqueó la trampa devolviendo el error correcto de forma inmediata.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_evolución_de_carga_y_rendimiento">Evolución de Carga y Rendimiento</h5>
+<div class="paragraph">
+<p>Para entender cómo el servidor asimila la concurrencia a lo largo del tiempo, analizamos la inyección de usuarios frente a la capacidad de respuesta del sistema:</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="./images/12-gatling_active_users.png" alt="Evolución de usuarios activos">
+</div>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="./images/12-gatling_responses.png" alt="Respuestas por segundo">
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Asimilación de Usuarios:</strong> La primera gráfica muestra cómo la estrategia de inyección (ramp-up) logra mantener un pico estable de hasta 24 usuarios virtuales operando e interactuando de forma simultánea.</p>
+</li>
+<li>
+<p><strong>Throughput:</strong> La segunda gráfica demuestra el alto rendimiento del backend. El servidor es capaz de procesar y responder a picos de más de 30 peticiones por segundo sostenidas en el tiempo, sin evidenciar signos de saturación, encolamiento de peticiones o caídas de red.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_estabilidad_de_la_latencia">Estabilidad de la Latencia</h5>
+<div class="imageblock text-center">
+<div class="content">
+<img src="./images/12-gatling_distribution.png" alt="Distribución de tiempos de respuesta">
+</div>
+</div>
+<div class="paragraph">
+<p>El histograma de distribución de tiempos de respuesta ilustra claramente la eficiencia del código en Rust. La abrumadora mayoría de las peticiones exitosas (la gran concentración de barras verdes a la izquierda) se resuelven en latencias mínimas, inferiores a 50 milisegundos. Esto garantiza una experiencia multijugador fluida y libre de lag.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_conclusiones_de_rendimiento">12.3.4. Conclusiones de Rendimiento</h4>
+<div class="paragraph">
+<p>Tras la ejecución y análisis de la prueba de carga, el equipo extrae las siguientes conclusiones sobre la arquitectura:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Solidez Arquitectónica:</strong> El servidor gestiona la concurrencia de 50 usuarios de manera correcta. No se han detectado fugas de memoria, caídas del servicio ni bloqueos de hilos. La latencia se mantiene estable independientemente de la carga de usuarios activos.</p>
+</li>
+<li>
+<p><strong>Seguridad y Condiciones de Carrera:</strong> Como se adelantó previamente, la totalidad de los 200 errores (HTTP 422) son una consecuencia de la configuración de la simulación. Al establecer pausas muy cortas (apenas 1 segundo para "pensar la jugada") combinadas con la alta latencia de inyección, se generaron escenarios donde los usuarios virtuales enviaban movimientos a una velocidad sobrehumana. Esto provocó intentos de ocupar casillas que habían sido reclamadas por el rival escasos milisegundos antes.
+El hecho de que el servidor respondiera con un 422 demuestra su robustez: el backend es capaz de auditar el estado del tablero en tiempo real, procesar la concurrencia correctamente y bloquear movimientos ilegales, validando así la integridad del sistema anti-trampas.</p>
+</li>
+</ol>
+</div>
+<div style="page-break-after: always;"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="section-glossary">13. Glosario</h2>
 <div class="sectionbody">
 <div class="sidebarblock arc42help">
 <div class="content">
@@ -2970,7 +3156,7 @@ optimización estética o de experiencia de usuario, que deberá mejorarse en it
 <div id="footer">
 <div id="footer-text">
 Version 8.2 EN<br>
-Last updated 2026-02-16 19:06:00 +0100
+Last updated 2026-04-22 18:38:04 +0200
 </div>
 </div>
 </body>
