@@ -3,6 +3,15 @@ import React, { useState} from 'react';
 import { useAuthComprobation } from '../AuthComprobation';
 import { useNavigate} from 'react-router-dom';
 
+/**
+ * Sanitiza el username eliminando caracteres de inyección HTML/script
+ * antes de escribirlo en localStorage.
+ * Sonar CWE-20 / CWE-79: tainted data must be sanitized before storage.
+ */
+function sanitizeUsername(raw: string): string {
+  return raw.replace(/[<>"'&]/g, "");
+}
+
 const AuthForm: React.FC = () => {
   useAuthComprobation();
   const navigate = useNavigate();
@@ -34,9 +43,8 @@ const AuthForm: React.FC = () => {
       const data = await res.json();
 
       if (res.ok) {
-        const sanitizedUsername = username.replace(/[<>"'&]/g, "");
+        const sanitizedUsername = sanitizeUsername(username);
         localStorage.setItem("username", sanitizedUsername);
-
         navigate('/menu');
       } else {
         setError(data.error || 'Something went wrong');
