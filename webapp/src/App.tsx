@@ -5,6 +5,7 @@ import Lobby from "./pages/Lobby";
 import Menu from "./pages/Menu";
 import DataHub from "./pages/Datahub";
 import Ranking from "./pages/Ranking";
+import UserNetwork from "./pages/UserNetwork";
 import ColorBends from "./components/Background";
 
 function App() { 
@@ -32,6 +33,7 @@ function App() {
         <Route path="/menu" element={<Menu />} />
         <Route path="/lobby" element={<Lobby />} />
         <Route path="/datos" element={<DataHub />} />
+        <Route path="/red" element={<UserNetwork />} />
         <Route path="/game" element={<Game />} />
         <Route path="/ranking" element={<Ranking />} />
         <Route path="/historic" element={<Navigate to="/datos" replace />} />
