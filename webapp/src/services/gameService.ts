@@ -1,5 +1,5 @@
 // Esta clase contiene todas las conexiones entre la API de rust y la lógica del juego en React.
-
+ 
 // Sobre el flujo desde React:
 //1. React arranca → POST /game/new
 //                   El servidor crea un GameY, le asigna un ID único (uuid)
@@ -13,16 +13,42 @@
 //
 //3. React consulta → GET /game/{id}
 //                    El servidor busca la partida y devuelve su estado actual.
-
+ 
 // Importamos los tipos de la API
 import type { ApiGameState, ApiMakeMoveResponse } from "../types/gameApi";
-
+ 
 // Si está vacío usamos localHost, en otro caso funciona con la ip. Debería funcionar en el despliegue
 const BACKEND_URL = import.meta.env.VITE_GAMEY_URL ?? "http://localhost:4000";
-
+ 
 const USERS_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
-
-
+ 
+// ─── Helpers de validación ────────────────────────────────────────────────────
+// Sonar CWE-20 / OWASP A03: los valores que vienen del exterior y se usan para
+// construir URLs deben validarse antes de la interpolación para evitar
+// path traversal y manipulación de rutas.
+ 
+/** Valida que un gameId tiene formato UUID v4 estricto. */
+function assertValidGameId(gameId: string): void {
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!UUID_RE.test(gameId)) {
+        throw new Error(`Invalid gameId format: "${gameId}"`);
+    }
+}
+ 
+/**
+ * Valida y sanitiza un nombre de usuario antes de usarlo en una URL.
+ * Solo permite letras, dígitos, guiones y guiones bajos (allowlist explícita).
+ * Sonar CWE-20: tainted data must be validated before URL construction.
+ */
+function assertValidUsername(username: string): void {
+    const USERNAME_RE = /^[a-zA-Z0-9_\-]{3,64}$/;
+    if (!USERNAME_RE.test(username)) {
+        throw new Error(`Invalid username format: "${username}"`);
+    }
+}
+ 
+// ─── Funciones de servicio ────────────────────────────────────────────────────
+ 
 // Llamada que crea el juego
 export async function createGame(
     // De momento los datos pasados son default, pero se podrían personalizar desde la UI
@@ -34,7 +60,7 @@ export async function createGame(
     const response = await fetch(`${BACKEND_URL}/game/new`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // Añade al JSON tamaño, moodo y bot usando stringify para convertirlo a texto
+        // Añade al JSON tamaño, modo y bot usando stringify para convertirlo a texto
         body: JSON.stringify({ size, mode, bot, timer }),
     });
     if (!response.ok) {
@@ -43,9 +69,10 @@ export async function createGame(
     }
     return response.json();
 }
-
+ 
 // Obtiene el estado de la partida por su ID
 export async function getGame(gameId: string): Promise<ApiGameState> {
+    assertValidGameId(gameId);
     // Llamamos a la API de rust y le pedimos que nos devuelva el estado de la partida con ese ID
     const response = await fetch(`${BACKEND_URL}/game/${gameId}`);
     // Si sale mal obtenemos el error y lo mostramos
@@ -56,7 +83,7 @@ export async function getGame(gameId: string): Promise<ApiGameState> {
     // En cualquier otro caso obtenemos el Json (YEN)
     return response.json();
 }
-
+ 
 // Hace un movimiento en la partida
 export async function placeToken(
     gameId: string,
@@ -64,15 +91,16 @@ export async function placeToken(
     cellIndex: number,
     botId?: string
 ): Promise<ApiMakeMoveResponse> {
-
+    assertValidGameId(gameId);
+ 
     const body: Record<string, unknown> = {
         player,
         action: "place",
         cell_index: cellIndex,
     };
-
+ 
     if (botId) body.bot = botId;
-
+ 
     const response = await fetch(`${BACKEND_URL}/game/${gameId}/move`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -84,12 +112,13 @@ export async function placeToken(
     }
     return response.json();
 }
-
+ 
 // Método para que un jugador se rinda en una partida
 export async function resign(
     gameId: string,
     player: number
 ): Promise<ApiMakeMoveResponse> {
+    assertValidGameId(gameId);
     const response = await fetch(`${BACKEND_URL}/game/${gameId}/move`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -101,34 +130,36 @@ export async function resign(
     }
     return response.json();
 }
-
+ 
 export async function timeout(
     gameId: string,
     player: number,
     botId?: string
 ): Promise<ApiMakeMoveResponse> {
+    assertValidGameId(gameId);
+ 
     const body: Record<string, unknown> = {
         player,
         action: "timeout",
         cell_index: null,
     };
-
+ 
     // Si hay un bot jugando, le decimos a Rust que el bot juegue su turno automáticamente después
     if (botId) body.bot = botId;
-
+ 
     const response = await fetch(`${BACKEND_URL}/game/${gameId}/move`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
     });
-    
+ 
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error ?? "Error al pasar turno");
     }
     return response.json();
 }
-
+ 
 // Guarda el resultado de una partida finalizada en el historial del usuario.
 // resultado: '1' = gana el usuario logueado, '2' = pierde
 export async function saveGameResult(
@@ -147,12 +178,14 @@ export async function saveGameResult(
         throw new Error(error.error ?? "Error al guardar la partida");
     }
 }
-
+ 
 // Devuelve el historial de partidas de un usuario con filtros opcionales
 export async function getHistory(
     username: string,
     filters: HistoryFilters = {}
 ): Promise<GameHistoryRecord[]> {
+    assertValidUsername(username);
+ 
     const params = new URLSearchParams();
     if (filters.resultado)          params.set("resultado", filters.resultado);
     if (filters.rival?.trim())      params.set("rival", filters.rival.trim());
@@ -169,7 +202,7 @@ export async function getHistory(
     const data = await response.json();
     return data.history;
 }
-
+ 
 export interface GameHistoryRecord {
     _id: string;
     username: string;
@@ -178,7 +211,7 @@ export interface GameHistoryRecord {
     size?: number;
     createdAt: string;
 }
-
+ 
 export interface UserStats {
   username: string;
   total: number;
@@ -194,16 +227,17 @@ export interface UserStats {
     total: number;
   }>;
 }
-
+ 
 export async function getStats(username: string): Promise<UserStats> {
-  const response = await fetch(`${USERS_URL}/stats/${username}`);
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error ?? 'Error al obtener las estadísticas');
-  }
-  return response.json();
+    assertValidUsername(username);
+    const response = await fetch(`${USERS_URL}/stats/${username}`);
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error ?? 'Error al obtener las estadísticas');
+    }
+    return response.json();
 }
-
+ 
 // Filtros opcionales para getHistory
 export interface HistoryFilters {
     resultado?: "1" | "2";
@@ -212,7 +246,7 @@ export interface HistoryFilters {
     fechaHasta?: string;
     size?: number;
 }
-
+ 
 export interface RankingEntry {
     position: number;
     username: string;
@@ -220,7 +254,7 @@ export interface RankingEntry {
     totalGames: number;
     wins: number;
 }
-
+ 
 // Devuelve el top 10 de jugadores ordenados por puntuación de ranking
 export async function getRanking(): Promise<RankingEntry[]> {
     const response = await fetch(`${USERS_URL}/ranking`);
