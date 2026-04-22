@@ -80,7 +80,7 @@ A continuación se detallan los objetivos de calidad prioritarios para el sistem
 
 | 1
 | **Usabilidad**
-| La aplicación presenta un tablero hexagonal que puede resultar visualmente complejo al inicio. Por ello, se debe priorizar una interfaz clara que resalte los movimientos válidos para reducir la curva de aprendizaje y hacer el juego accesible a todos los públicos.
+| La aplicación presenta un tablero triangular con casillas hexagonales que puede resultar visualmente complejo al inicio. Por ello, se debe priorizar una interfaz clara que resalte los movimientos válidos para reducir la curva de aprendizaje y hacer el juego accesible a todos los públicos.
 
 | 2
 | **Mantenibilidad**
