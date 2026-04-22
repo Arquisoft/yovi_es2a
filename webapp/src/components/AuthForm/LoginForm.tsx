@@ -2,7 +2,6 @@ import './AuthForm.css'
 import React, { useState} from 'react';
 import { useAuthComprobation } from '../AuthComprobation';
 import { useNavigate} from 'react-router-dom';
-import DOMPurify from 'dompurify';
 
 
 const AuthForm: React.FC = () => {
@@ -36,9 +35,9 @@ const AuthForm: React.FC = () => {
       const data = await res.json();
 
       if (res.ok) {
-        // DOMPurify es la librería oficial que SonarQube reconoce como segura
-        const cleanUsername = DOMPurify.sanitize(username);
-        localStorage.setItem("username", cleanUsername);
+        const safeUsername = username.replace(/[^a-zA-Z0-9_.@-]/g, "");
+        
+        localStorage.setItem("username", safeUsername);
         
         navigate('/menu');
       } else {
