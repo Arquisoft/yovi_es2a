@@ -35,9 +35,9 @@ Para evaluar el comportamiento del sistema, se han extraído las siguientes grá
 ===== Distribución Global y Rangos de respuesta
 Esta primera imagen presenta un resumen global de la ejecución a través de dos gráficas:
 
-image::13-gatling_ranges.png[Distribución de rangos de respuesta y peticiones, align="center"]
+image::12-gatling_ranges.png[Distribución de rangos de respuesta y peticiones, align="center"]
 
-image::13-gatling_errors.png[Errores 422, align="center"]
+image::12-gatling_errors.png[Errores 422, align="center"]
 
 * **Response Time Ranges (Izquierda):** Clasifica los tiempos de respuesta del servidor en rangos de calidad. Como se puede observar, el 100% de las peticiones exitosas (las 750 representadas en la barra verde) se resolvieron en menos de 800 ms, ubicándose en el rango óptimo de Gatling. No se registró ninguna petición en los rangos de latencia media (800-1200 ms) ni alta (>1200 ms).
 * **Columna "Failed" y Gráfico Circular:** La barra roja de la izquierda y los segmentos rojos del gráfico circular representan las 200 peticiones clasificadas como "KO". Es crucial destacar que, tras analizar los logs, todas corresponden a respuestas HTTP 422 (Unprocessable Entity). Esto confirma que el motor del juego en Rust funciona perfectamente bajo estrés: al realizar peticiones automatizadas a alta velocidad, el script intentó realizar movimientos ilegales (pisar fichas ya colocadas). El servidor analizó la petición, aplicó las reglas del juego Y, y bloqueó la trampa devolviendo el error correcto de forma inmediata.
@@ -45,14 +45,14 @@ image::13-gatling_errors.png[Errores 422, align="center"]
 ===== Evolución de Carga y Rendimiento
 Para entender cómo el servidor asimila la concurrencia a lo largo del tiempo, analizamos la inyección de usuarios frente a la capacidad de respuesta del sistema:
 
-image::13-gatling_active_users.png[Evolución de usuarios activos, align="center"]
-image::13-gatling_responses.png[Respuestas por segundo, align="center"]
+image::12-gatling_active_users.png[Evolución de usuarios activos, align="center"]
+image::12-gatling_responses.png[Respuestas por segundo, align="center"]
 
 * **Asimilación de Usuarios:** La primera gráfica muestra cómo la estrategia de inyección (ramp-up) logra mantener un pico estable de hasta 24 usuarios virtuales operando e interactuando de forma simultánea.
 * **Throughput:** La segunda gráfica demuestra el alto rendimiento del backend. El servidor es capaz de procesar y responder a picos de más de 30 peticiones por segundo sostenidas en el tiempo, sin evidenciar signos de saturación, encolamiento de peticiones o caídas de red.
 
 ===== Estabilidad de la Latencia
-image::13-gatling_distribution.png[Distribución de tiempos de respuesta, align="center"]
+image::12-gatling_distribution.png[Distribución de tiempos de respuesta, align="center"]
 
 El histograma de distribución de tiempos de respuesta ilustra claramente la eficiencia del código en Rust. La abrumadora mayoría de las peticiones exitosas (la gran concentración de barras verdes a la izquierda) se resuelven en latencias mínimas, inferiores a 50 milisegundos. Esto garantiza una experiencia multijugador fluida y libre de lag.
 
