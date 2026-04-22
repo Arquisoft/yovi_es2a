@@ -36,9 +36,10 @@ const AuthForm: React.FC = () => {
       const data = await res.json();
 
       if (res.ok) {
-    localStorage.setItem("username", DOMPurify.sanitize(username));
-    navigate('/menu');
-} else {
+          const serverUsername = String(data.user?.username ?? '');
+          localStorage.setItem("username", serverUsername);
+          navigate('/menu');
+      } else {
         setError(data.error || 'Something went wrong');
       }
     } catch (err) {
