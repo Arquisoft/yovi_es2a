@@ -131,7 +131,6 @@ mod tests {
     };
     // Importamos ServiceExt para poder usar 'oneshot' y enviar peticiones en memoria
     use tower::ServiceExt;
-    use std::net::TcpListener;
 
     // 1. Test del handler de estado de forma directa
     #[tokio::test]
