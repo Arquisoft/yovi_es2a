@@ -36,9 +36,9 @@ const AuthForm: React.FC = () => {
       const data = await res.json();
 
       if (res.ok) {
-          localStorage.setItem("username", username); // ya está sanitizado desde el onChange
-          navigate('/menu');
-      } else {
+    localStorage.setItem("username", DOMPurify.sanitize(username));
+    navigate('/menu');
+} else {
         setError(data.error || 'Something went wrong');
       }
     } catch (err) {
