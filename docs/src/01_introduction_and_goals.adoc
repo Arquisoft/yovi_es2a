@@ -35,13 +35,13 @@ A continuación se describen los requisitos funcionales esenciales agrupados por
 
 * **Modos de Juego:** Se requiere soportar dos tipos de partidas:
 ** **Jugador vs Jugador:** Partidas en tiempo real entre dos usuarios humanos en el mismo dispositivo.
-** **Jugador vs Máquina:** Desafio contra un agente inteligente. El sistema permite seleccionar entre múltiples estrategias (Aleatoria, Defensiva, Ofensiva, Posicional y Monte Carlos)  algunas con diferentes niveles de dificultad, pudiendo ser ajustado por el usuario.
-** **Interaccion mediante API (Bot vs Bot Externo): El sistema expone una interfaz API REST que permite a bots externos competir contra la IA del sistema o gestionar partidas de forma automatizada mediante la notación YEN. 
+** **Jugador vs Máquina:** Desafio contra un agente inteligente. El sistema permite seleccionar entre múltiples estrategias (Aleatoria, Defensiva, Ofensiva, Posicional y Monte Carlo)  algunas con diferentes niveles de dificultad, pudiendo ser ajustado por el usuario.
+** **Interacción mediante API (Bot vs Bot Externo):** El sistema expone una interfaz API REST que permite a bots externos competir contra la IA del sistema o gestionar partidas de forma automatizada mediante la notación YEN. 
 
 
-* **Gestión de Usuarios:** Los usuarios gestiona la autenticación mediante el registro e inicio de sesión de usuarios. Garantiza la persistencia de los datos, manteniendo un perfil actualizado de cada jugador.
+* **Gestión de Usuarios:** El sistema gestiona la autenticación mediante el registro e inicio de sesión. Además, garantiza la persistencia de los datos, manteniendo un perfil actualizado de cada jugador.
 
-* **Historial y Persistencia:** El sistema registra de forma automática el resultado de cada partida finalizada. Los usuarios disponen de un panel de consulta donde pueden visualizar su historia de victorias y derrotas, permitiendo el filtrado de los registros por fecha, tipo de oponente y tamaño del tablero.
+* **Historial y Persistencia:** El sistema registra de forma automática el resultado de cada partida finalizada. Los usuarios disponen de un panel de consulta donde pueden visualizar su historial de victorias y derrotas, permitiendo el filtrado de los registros por fecha, tipo de oponente y tamaño del tablero.
 
 * **Plataforma:** La aplicación es plenamente accesible desde navegadores web modernos. El sistema se distribuye mediante contenedores Docker, lo que garantiza un despliegue ágil y consistente en cualquier entorno que lo soporte.
 
@@ -80,7 +80,7 @@ A continuación se detallan los objetivos de calidad prioritarios para el sistem
 
 | 1
 | **Usabilidad**
-| La aplicación presenta un tablero hexagonal que puede resultar visualmente complejo al inicio. Por ello, se debe priorizar una interfaz clara que resalte los movimientos válidos para reducir la curva de aprendizaje y hacer el juego accesible a todos los públicos.
+| La aplicación presenta un tablero triangular con casillas hexagonales que puede resultar visualmente complejo al inicio. Por ello, se debe priorizar una interfaz clara que resalte los movimientos válidos para reducir la curva de aprendizaje y hacer el juego accesible a todos los públicos.
 
 | 2
 | **Mantenibilidad**
@@ -149,10 +149,10 @@ endif::arc42help[]
 
 | **Equipo de Desarrollo**
 a| * Sergio González Martínez - uo300798@uniovi.es
- * Pablo Arias Fernández - uo3000007@uniovi.es
- * Iyán Díaz Pereda - uo3000006@uniovi.es
- * Enol de la Calle Iglesias - uo3000888@uniovi.es
- * Iyán Álvarez Casasnovas - uo3009006@uniovi.es
+ * Pablo Arias Fernández - uo300305@uniovi.es
+ * Iyán Díaz Pereda - uo300006@uniovi.es
+ * Enol de la Calle Iglesias - uo301431@uniovi.es
+ * Iyán Álvarez Casasnovas - uo301299@uniovi.es
 
 | Desarrollar la aplicación asignada utilizando buenas prácticas, trabajar correctamente en equipo siguiendo la metodología ágil y lograr una solución basada en microservicios que sea mantenible, escalable y usable, y cumplir con los requisitos de calidad del sistema.
 
