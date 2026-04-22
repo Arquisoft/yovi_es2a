@@ -2,6 +2,7 @@ import './AuthForm.css'
 import React, { useState} from 'react';
 import { useAuthComprobation } from '../AuthComprobation';
 import { useNavigate} from 'react-router-dom';
+import DOMPurify from 'dompurify';
 
 
 const AuthForm: React.FC = () => {
@@ -35,11 +36,8 @@ const AuthForm: React.FC = () => {
       const data = await res.json();
 
       if (res.ok) {
-        const safeUsername = username.replace(/[^a-zA-Z0-9_.@-]/g, "");
-        
-        localStorage.setItem("username", safeUsername);
-        
-        navigate('/menu');
+          localStorage.setItem("username", username); // ya está sanitizado desde el onChange
+          navigate('/menu');
       } else {
         setError(data.error || 'Something went wrong');
       }
@@ -63,7 +61,7 @@ const AuthForm: React.FC = () => {
             id="username"
             type="text"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => setUsername(DOMPurify.sanitize(e.target.value))}
             className="form-input"
             required
           />
