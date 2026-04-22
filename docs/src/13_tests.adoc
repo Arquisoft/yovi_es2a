@@ -40,25 +40,25 @@ image::13-gatling_ranges.png[Distribución de rangos de respuesta y peticiones, 
 image::13-gatling_errors.png[Errores 422, align="center"]
 
 * **Response Time Ranges (Izquierda):** Clasifica los tiempos de respuesta del servidor en rangos de calidad. Como se puede observar, el 100% de las peticiones exitosas (las 750 representadas en la barra verde) se resolvieron en menos de 800 ms, ubicándose en el rango óptimo de Gatling. No se registró ninguna petición en los rangos de latencia media (800-1200 ms) ni alta (>1200 ms).
-* **Columna "Failed" y Gráfico Circular (Derecha):** La barra roja de la izquierda y los segmentos rojos del gráfico circular representan las 200 peticiones clasificadas como "KO". Es crucial destacar que, tras analizar los logs, todas corresponden a respuestas **HTTP 422 (Unprocessable Entity)**. Esto confirma que el motor del juego en Rust funciona perfectamente bajo estrés: al realizar peticiones automatizadas a alta velocidad, el script intentó realizar movimientos ilegales (pisar fichas ya colocadas). El servidor analizó la petición, aplicó las reglas del juego Y, y bloqueó la trampa devolviendo el error correcto de forma inmediata.
+* **Columna "Failed" y Gráfico Circular:** La barra roja de la izquierda y los segmentos rojos del gráfico circular representan las 200 peticiones clasificadas como "KO". Es crucial destacar que, tras analizar los logs, todas corresponden a respuestas HTTP 422 (Unprocessable Entity). Esto confirma que el motor del juego en Rust funciona perfectamente bajo estrés: al realizar peticiones automatizadas a alta velocidad, el script intentó realizar movimientos ilegales (pisar fichas ya colocadas). El servidor analizó la petición, aplicó las reglas del juego Y, y bloqueó la trampa devolviendo el error correcto de forma inmediata.
 
 ===== Evolución de Carga y Rendimiento
 Para entender cómo el servidor asimila la concurrencia a lo largo del tiempo, analizamos la inyección de usuarios frente a la capacidad de respuesta del sistema:
 
-image::13-gatling_active_users.png[Evolución de usuarios activos, width=600, align="center"]
-image::13-gatling_responses.png[Respuestas por segundo, width=600, align="center"]
+image::13-gatling_active_users.png[Evolución de usuarios activos, align="center"]
+image::13-gatling_responses.png[Respuestas por segundo, align="center"]
 
 * **Asimilación de Usuarios:** La primera gráfica muestra cómo la estrategia de inyección (ramp-up) logra mantener un pico estable de hasta 24 usuarios virtuales operando e interactuando de forma simultánea.
 * **Throughput:** La segunda gráfica demuestra el alto rendimiento del backend. El servidor es capaz de procesar y responder a picos de más de 30 peticiones por segundo sostenidas en el tiempo, sin evidenciar signos de saturación, encolamiento de peticiones o caídas de red.
 
 ===== Estabilidad de la Latencia
-image::13-gatling_distribution.png[Distribución de tiempos de respuesta, width=600, align="center"]
+image::13-gatling_distribution.png[Distribución de tiempos de respuesta, align="center"]
 
-El histograma de distribución de tiempos de respuesta ilustra claramente la eficiencia del código en Rust. La abrumadora mayoría de las peticiones exitosas (la gran concentración de barras verdes a la izquierda) se resuelven en latencias mínimas, inferiores a **50 milisegundos**. Esto garantiza una experiencia multijugador fluida y libre de *lag*.
+El histograma de distribución de tiempos de respuesta ilustra claramente la eficiencia del código en Rust. La abrumadora mayoría de las peticiones exitosas (la gran concentración de barras verdes a la izquierda) se resuelven en latencias mínimas, inferiores a 50 milisegundos. Esto garantiza una experiencia multijugador fluida y libre de lag.
 
 ==== Conclusiones de Rendimiento
 Tras la ejecución y análisis de la prueba de carga, el equipo extrae las siguientes conclusiones sobre la arquitectura:
 
-1. **Solidez Arquitectónica:** El servidor gestiona la concurrencia de 50 usuarios de manera impecable. No se han detectado fugas de memoria, caídas del servicio (crashes) ni bloqueos de hilos (deadlocks). La latencia se mantiene estable independientemente de la carga de usuarios activos.
-2. **Seguridad y Condiciones de Carrera (Race Conditions):** Como se adelantó previamente, la totalidad de los 200 "errores" (HTTP 422) son un subproducto de la configuración de la simulación. Al establecer pausas muy cortas (apenas 1 segundo de *think time*) combinadas con la alta latencia de inyección, se generaron escenarios donde los usuarios virtuales enviaban movimientos a una velocidad sobrehumana. Esto provocó intentos de ocupar casillas que habían sido reclamadas por el rival escasos milisegundos antes. 
-El hecho de que el servidor respondiera con un 422 demuestra su robustez: el backend es capaz de auditar el estado del tablero en tiempo real, procesar la concurrencia correctamente y **bloquear movimientos ilegales**, validando así la integridad del sistema anti-trampas.
+1. **Solidez Arquitectónica:** El servidor gestiona la concurrencia de 50 usuarios de manera correcta. No se han detectado fugas de memoria, caídas del servicio ni bloqueos de hilos. La latencia se mantiene estable independientemente de la carga de usuarios activos.
+2. **Seguridad y Condiciones de Carrera:** Como se adelantó previamente, la totalidad de los 200 errores (HTTP 422) son una consecuencia de la configuración de la simulación. Al establecer pausas muy cortas (apenas 1 segundo para "pensar la jugada") combinadas con la alta latencia de inyección, se generaron escenarios donde los usuarios virtuales enviaban movimientos a una velocidad sobrehumana. Esto provocó intentos de ocupar casillas que habían sido reclamadas por el rival escasos milisegundos antes. 
+El hecho de que el servidor respondiera con un 422 demuestra su robustez: el backend es capaz de auditar el estado del tablero en tiempo real, procesar la concurrencia correctamente y bloquear movimientos ilegales, validando así la integridad del sistema anti-trampas.
