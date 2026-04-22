@@ -441,3 +441,305 @@ pub async fn play_competition(
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{bot_server::state::AppState, GameY, RandomBot, YBotRegistry};
+    use axum::{
+        extract::{Json, Path, Query, State},
+        http::StatusCode,
+        response::IntoResponse,
+    };
+    use std::sync::Arc;
+    use uuid::Uuid;
+
+    // ==========================================
+    // TESTS DE CREACIÓN Y OBTENCIÓN DE PARTIDAS
+    // ==========================================
+
+    #[test]
+    fn test_defaults() {
+        assert_eq!(default_board_size(), 7);
+        assert_eq!(default_mode(), "computer");
+        assert_eq!(default_bot(), "random_bot");
+    }
+
+    #[tokio::test]
+    async fn test_create_game_success() {
+        let state = AppState::new(YBotRegistry::new());
+        let req = CreateGameRequest {
+            size: 7,
+            mode: "human".to_string(),
+            bot: "random_bot".to_string(),
+            timer: None,
+        };
+
+        let response = create_game(State(state.clone()), Json(req)).await.into_response();
+        assert_eq!(response.status(), StatusCode::CREATED);
+
+        // CORRECCIÓN APLICADA AQUÍ
+        let games_arc = state.games();
+        let games = games_arc.lock().await;
+        assert_eq!(games.len(), 1);
+    }
+
+    #[tokio::test]
+    async fn test_get_game_success() {
+        let state = AppState::new(YBotRegistry::new());
+        let game_id = Uuid::new_v4();
+        {
+            // CORRECCIÓN APLICADA AQUÍ
+            let games_arc = state.games();
+            let mut games = games_arc.lock().await;
+            games.insert(game_id, GameY::new(7, None));
+        }
+
+        let response = get_game(State(state), Path(game_id)).await.into_response();
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn test_get_game_not_found() {
+        let state = AppState::new(YBotRegistry::new());
+        let response = get_game(State(state), Path(Uuid::new_v4())).await.into_response();
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+    }
+
+    // ==========================================
+    // TESTS DE MOVIMIENTOS (MAKE_MOVE)
+    // ==========================================
+
+    #[tokio::test]
+    async fn test_make_move_success_place() {
+        let state = AppState::new(YBotRegistry::new());
+        let game_id = Uuid::new_v4();
+        {
+            let games_arc = state.games();
+            let mut games = games_arc.lock().await;
+            games.insert(game_id, GameY::new(7, None));
+        }
+
+        let req = MakeMoveRequest {
+            player: 0,
+            action: "place".to_string(),
+            cell_index: Some(0),
+            bot: None,
+        };
+
+        let response = make_move(State(state), Path(game_id), Json(req)).await.into_response();
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn test_make_move_success_resign() {
+        let state = AppState::new(YBotRegistry::new());
+        let game_id = Uuid::new_v4();
+        {
+            let games_arc = state.games();
+            let mut games = games_arc.lock().await;
+            games.insert(game_id, GameY::new(7, None));
+        }
+
+        let req = MakeMoveRequest {
+            player: 0,
+            action: "resign".to_string(),
+            cell_index: None,
+            bot: None,
+        };
+
+        let response = make_move(State(state), Path(game_id), Json(req)).await.into_response();
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn test_make_move_missing_cell_index() {
+        let state = AppState::new(YBotRegistry::new());
+        let game_id = Uuid::new_v4();
+        {
+            let games_arc = state.games();
+            let mut games = games_arc.lock().await;
+            games.insert(game_id, GameY::new(7, None));
+        }
+
+        let req = MakeMoveRequest {
+            player: 0,
+            action: "place".to_string(),
+            cell_index: None, // Provoca BAD_REQUEST
+            bot: None,
+        };
+
+        let response = make_move(State(state), Path(game_id), Json(req)).await.into_response();
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    }
+
+    #[tokio::test]
+    async fn test_make_move_invalid_action() {
+        let state = AppState::new(YBotRegistry::new());
+        let game_id = Uuid::new_v4();
+        {
+            let games_arc = state.games();
+            let mut games = games_arc.lock().await;
+            games.insert(game_id, GameY::new(7, None));
+        }
+
+        let req = MakeMoveRequest {
+            player: 0,
+            action: "voltereta".to_string(),
+            cell_index: Some(0),
+            bot: None,
+        };
+
+        let response = make_move(State(state), Path(game_id), Json(req)).await.into_response();
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    }
+
+    #[tokio::test]
+    async fn test_make_move_bot_success() {
+        let registry = YBotRegistry::new().with_bot(Arc::new(RandomBot));
+        let state = AppState::new(registry);
+        let game_id = Uuid::new_v4();
+        {
+            let games_arc = state.games();
+            let mut games = games_arc.lock().await;
+            games.insert(game_id, GameY::new(7, None));
+        }
+
+        let req = MakeMoveRequest {
+            player: 0,
+            action: "place".to_string(),
+            cell_index: Some(0),
+            bot: Some("random_bot".to_string()),
+        };
+
+        let response = make_move(State(state), Path(game_id), Json(req)).await.into_response();
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn test_make_move_bot_not_found() {
+        let state = AppState::new(YBotRegistry::new()); // Sin bots registrados
+        let game_id = Uuid::new_v4();
+        {
+            let games_arc = state.games();
+            let mut games = games_arc.lock().await;
+            games.insert(game_id, GameY::new(7, None));
+        }
+
+        let req = MakeMoveRequest {
+            player: 0,
+            action: "place".to_string(),
+            cell_index: Some(0),
+            bot: Some("bot_inexistente".to_string()),
+        };
+
+        let response = make_move(State(state), Path(game_id), Json(req)).await.into_response();
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    }
+
+    #[tokio::test]
+    async fn test_make_move_occupied_cell() {
+        let state = AppState::new(YBotRegistry::new());
+        let game_id = Uuid::new_v4();
+        {
+            let games_arc = state.games();
+            let mut games = games_arc.lock().await;
+            let mut game = GameY::new(7, None);
+            // Ocupamos la celda 0
+            game.add_move(crate::Movement::Placement {
+                player: crate::PlayerId::new(0),
+                coords: crate::Coordinates::from_index(0, 7),
+            }).unwrap();
+            games.insert(game_id, game);
+        }
+
+        // Intentamos mover a la misma celda (turno del jugador 1)
+        let req = MakeMoveRequest {
+            player: 1,
+            action: "place".to_string(),
+            cell_index: Some(0),
+            bot: None,
+        };
+
+        let response = make_move(State(state), Path(game_id), Json(req)).await.into_response();
+        assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY); // Error 422
+    }
+
+
+    // ==========================================
+    // TESTS DEL TORNEO (PLAY_COMPETITION)
+    // ==========================================
+
+    #[tokio::test]
+    async fn test_play_competition_success() {
+        let registry = YBotRegistry::new().with_bot(Arc::new(RandomBot));
+        let state = AppState::new(registry);
+        
+        let yen_json = serde_json::json!({
+            "size": 3,
+            "turn": 0,
+            "players": ["B", "R"],
+            "layout": "B/BB/BBR"
+        }).to_string();
+
+        let query = CompetitionPlayQuery {
+            position: yen_json,
+            bot_id: Some("random_bot".to_string()),
+        };
+
+        let response = play_competition(State(state), Query(query)).await.into_response();
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn test_play_competition_invalid_json() {
+        let state = AppState::new(YBotRegistry::new());
+        let query = CompetitionPlayQuery {
+            position: "esto_no_es_json".to_string(),
+            bot_id: None,
+        };
+
+        let response = play_competition(State(state), Query(query)).await.into_response();
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    }
+
+    #[tokio::test]
+    async fn test_play_competition_bot_not_found() {
+        let state = AppState::new(YBotRegistry::new());
+        let yen_json = serde_json::json!({
+            "size": 1,
+            "turn": 0,
+            "players": ["B", "R"],
+            "layout": "."
+        }).to_string();
+
+        let query = CompetitionPlayQuery {
+            position: yen_json,
+            bot_id: Some("bot_falso".to_string()),
+        };
+
+        let response = play_competition(State(state), Query(query)).await.into_response();
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    }
+
+    #[tokio::test]
+    async fn test_play_competition_game_already_over() {
+        let registry = YBotRegistry::new().with_bot(Arc::new(RandomBot));
+        let state = AppState::new(registry);
+        
+        let yen_json = serde_json::json!({
+            "size": 2,
+            "turn": 0,
+            "players": ["B", "R"],
+            "layout": "B/BB"
+        }).to_string();
+
+        let query = CompetitionPlayQuery {
+            position: yen_json,
+            bot_id: Some("random_bot".to_string()),
+        };
+
+        let response = play_competition(State(state), Query(query)).await.into_response();
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+}
