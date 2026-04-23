@@ -300,9 +300,32 @@ describe('Users Service Endpoints', () => {
         });
     });
 
+    // ─── TESTS DE BÚSQUEDA DE GRUPOS ───────────────────────────────────────
 
-    
+    describe('GET /groups', () => {
+        it('devuelve la lista de grupos públicos', async () => {
+            Group.find.mockReturnValueOnce({
+                select: vi.fn().mockReturnThis(),
+                sort: vi.fn().mockReturnThis(),
+                lean: vi.fn().mockResolvedValue([{ name: 'Grupo Público' }])
+            });
+            const res = await request(app).get('/groups');
+            expect(res.status).toBe(200);
+            expect(res.body.groups[0].name).toBe('Grupo Público');
+        });
+    });
 
+    describe('GET /group/:groupId', () => {
+        it('devuelve los detalles de un grupo', async () => {
+            Group.findById.mockReturnValueOnce(createChainableMock({ name: 'Grupo 1' }));
+            GroupMember.find.mockReturnValueOnce({
+                select: vi.fn().mockReturnThis(),
+                lean: vi.fn().mockResolvedValue([{ username: 'iyan2', role: 'admin' }])
+            });
 
-    
+            const res = await request(app).get('/group/group1');
+            expect(res.status).toBe(200);
+            expect(res.body.group.name).toBe('Grupo 1');
+        });
+    });
 });
