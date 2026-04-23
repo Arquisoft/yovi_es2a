@@ -229,6 +229,78 @@ describe('Users Service Endpoints', () => {
         });
     });
 
+    // ─── TESTS DE MANEJO DE ERRORES (Catch blocks) ─────────────────────────
+    describe('Manejo de Errores 500', () => {
+        it('devuelve 500 si la base de datos falla al crear usuario', async () => {
+            // Forzamos un error en el mock
+            const originalMock = User.findOne;
+            User.findOne = vi.fn().mockRejectedValue(new Error('DB connection failed'));
+            
+            const res = await request(app).post('/login').send({ username: 'iyan2', password: '123' });
+            expect(res.status).toBe(500);
+            expect(res.body.error).toBe('Internal server error');            
+            // Restauramos el mock
+            User.findOne = originalMock;
+        });
+    });
+
+    describe('GET /user/:username', () => {
+        it('devuelve los datos públicos del usuario', async () => {
+            // Mock con select() encadenado
+            User.findOne.mockReturnValueOnce({ select: vi.fn().mockResolvedValue({ username: 'iyan2' }) });
+            GameRecord.find.mockReturnValueOnce(createChainableMock([{ resultado: '1' }]));
+
+            const res = await request(app).get('/user/iyan2');
+            expect(res.status).toBe(200);
+            expect(res.body.stats.wins).toBe(1);
+        });
+
+        it('falla si el usuario no existe', async () => {
+            User.findOne.mockReturnValueOnce({ select: vi.fn().mockResolvedValue(null) });
+            const res = await request(app).get('/user/falso');
+            expect(res.status).toBe(404);
+        });
+    });
+
+    describe('POST /addfriend/:friendUsername', () => {
+        it('añade un amigo correctamente', async () => {
+            // El endpoint hace Promise.all con dos findOne
+            User.findOne
+                .mockResolvedValueOnce({ username: 'iyan2' }) // current user
+                .mockResolvedValueOnce({ username: 'amigo1' }); // friend
+            
+            const res = await request(app).post('/addfriend/amigo1').set('x-user', 'iyan2');
+            expect(res.status).toBe(201);
+            expect(res.body.message).toBe('Friend added');
+        });
+
+        it('falla si te intentas añadir a ti mismo', async () => {
+            const res = await request(app).post('/addfriend/iyan2').set('x-user', 'iyan2');
+            expect(res.status).toBe(400);
+        });
+    });
+
+    describe('DELETE /removefriend/:friendUsername', () => {
+        it('elimina un amigo correctamente', async () => {
+            Friend.deleteOne.mockResolvedValueOnce({ deletedCount: 1 });
+            const res = await request(app).delete('/removefriend/amigo1').set('x-user', 'iyan2');
+            expect(res.status).toBe(200);
+        });
+    });
+
+    describe('GET /friends/:username', () => {
+        it('devuelve la lista de amigos', async () => {
+            Friend.find.mockReturnValueOnce(createChainableMock([{ to: 'amigo1' }]));
+            User.findOne.mockReturnValueOnce({ select: vi.fn().mockResolvedValue({ username: 'amigo1' }) });
+            GameRecord.find.mockReturnValueOnce(createChainableMock([]));
+
+            const res = await request(app).get('/friends/iyan2');
+            expect(res.status).toBe(200);
+            expect(res.body.friends[0].username).toBe('amigo1');
+        });
+    });
+
+
     
 
 
