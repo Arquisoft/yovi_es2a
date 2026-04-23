@@ -184,7 +184,7 @@ describe('BrowseGroups', () => {
         render(<BrowseGroups onGroupJoined={onGroupJoined} />)
         
         await waitFor(() => {
-            expect(screen.getAllByText('Grupo A')[0] || screen.getByText((content, element) => 
+            expect(screen.getAllByText('Grupo A')[0] || screen.getByText((_, element) => 
                 element?.textContent === 'Grupo A')).toBeInTheDocument()
         })
         
