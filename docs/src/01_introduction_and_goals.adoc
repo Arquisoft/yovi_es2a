@@ -43,6 +43,8 @@ A continuación se describen los requisitos funcionales esenciales agrupados por
 
 * **Historial y Persistencia:** El sistema registra de forma automática el resultado de cada partida finalizada. Los usuarios disponen de un panel de consulta donde pueden visualizar su historial de victorias y derrotas, permitiendo el filtrado de los registros por fecha, tipo de oponente y tamaño del tablero.
 
+* **Ranking Global:** El sistema mantiene una tabla de clasificación pública con los diez mejores jugadores. La puntuación se calcula automáticamente a partir del historial de partidas de cada usuario, ponderando las victorias según la dificultad del oponente derrotado. El usuario logueado puede ver su posición resaltada dentro del ranking.
+
 * **Plataforma:** La aplicación es plenamente accesible desde navegadores web modernos. El sistema se distribuye mediante contenedores Docker, lo que garantiza un despliegue ágil y consistente en cualquier entorno que lo soporte.
 
 ifdef::arc42help[]
@@ -165,6 +167,5 @@ a| * Jose Emilio Labra Gayo - labra@uniovi.es
 
 | **Usuarios Finales**
 | Jugadores de la aplicación
-| Disfrutar de una buena experiencia de usuario, pudiendo jugar partidas de forma fluida, utilizar diferentes estrategias en el tablero hexagonal y consultar sus estadísticas.
-
+| Disfrutar de una buena experiencia de usuario, pudiendo jugar partidas de forma fluida, utilizar diferentes estrategias en el tablero hexagonal, consultar sus estadísticas y comparar su rendimiento con otros jugadores mediante el ranking globa
 |===
