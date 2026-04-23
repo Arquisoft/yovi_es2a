@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getGroups, joinGroup, createGroup, type GroupData } from '../services/gameService';
+import { getGroups, getMyGroups, joinGroup, createGroup, type GroupData } from '../services/gameService';
 
 interface BrowseGroupsProps {
     onGroupJoined?: () => void;
@@ -31,14 +31,14 @@ const BrowseGroups: React.FC<BrowseGroupsProps> = ({ onGroupJoined }) => {
         setError(null);
 
         try {
-            const data = await getGroups();
-            setGroups(data);
+            const [allGroups, myGroupMemberships] = await Promise.all([
+                getGroups(),
+                getMyGroups()
+            ]);
+            setGroups(allGroups);
             
             // Marcar grupos a los que el usuario ya pertenece
-            // Por ahora asumimos que si el usuario es el creador, ya es miembro
-            const myGroupIds = new Set(
-                data.filter(g => g.createdBy === currentUser).map(g => g._id)
-            );
+            const myGroupIds = new Set(myGroupMemberships.map(g => g._id as string));
             setMyGroups(myGroupIds);
         } catch (e) {
             setError(e instanceof Error ? e.message : 'Error al cargar grupos');
@@ -57,11 +57,10 @@ const BrowseGroups: React.FC<BrowseGroupsProps> = ({ onGroupJoined }) => {
         setError(null);
 
         try {
-            const newGroup = await createGroup(formData.name, formData.description);
-            setGroups([newGroup as any, ...groups]);
-            setMyGroups(new Set(myGroups).add(newGroup._id));
+            await createGroup(formData.name, formData.description);
             setFormData({ name: '', description: '' });
             setShowCreateForm(false);
+            loadGroups(); // Refresh to get updated membership status
             if (onGroupJoined) onGroupJoined();
         } catch (e) {
             setError(e instanceof Error ? e.message : 'Error al crear grupo');
@@ -74,6 +73,7 @@ const BrowseGroups: React.FC<BrowseGroupsProps> = ({ onGroupJoined }) => {
         try {
             await joinGroup(groupId);
             setMyGroups(new Set(myGroups).add(groupId));
+            loadGroups(); // Refresh to get updated membership status
             if (onGroupJoined) onGroupJoined();
         } catch (e) {
             setError(e instanceof Error ? e.message : 'Error al unirse al grupo');

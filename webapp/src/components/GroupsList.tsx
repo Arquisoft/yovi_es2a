@@ -41,7 +41,8 @@ const GroupsList: React.FC<GroupsListProps> = ({ onGroupLeft }) => {
 
         try {
             await leaveGroup(groupId);
-            setGroups(groups.filter(g => g._id !== groupId));
+            // Reload groups from server to ensure consistency
+            await loadGroups();
             if (onGroupLeft) onGroupLeft();
         } catch (e) {
             setError(e instanceof Error ? e.message : 'Error al salir del grupo');

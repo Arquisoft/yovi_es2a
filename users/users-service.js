@@ -475,7 +475,7 @@ app.get('/groups', async (req, res) => {
 });
 
 // ENDPOINT POST /creategroup
-// Crea un nuevo grupo (el creador se añade automáticamente como admin)
+// Crea un nuevo grupo (el creador se añade automáticamente como admin, y deja cualquier grupo anterior)
 app.post('/creategroup', async (req, res) => {
   const { name, description } = req.body ?? {};
   const createdBy = req.headers['x-user'] ? String(req.headers['x-user']) : null;
@@ -489,6 +489,18 @@ app.post('/creategroup', async (req, res) => {
     const user = await User.findOne({ username: createdBy });
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Si el usuario ya está en un grupo, lo sacamos de él
+    const existingMembership = await GroupMember.findOne({ username: createdBy });
+    if (existingMembership) {
+      await GroupMember.deleteOne({ _id: existingMembership._id });
+      
+      // Verificar si el grupo anterior quedó vacío
+      const remainingMembers = await GroupMember.countDocuments({ groupId: existingMembership.groupId });
+      if (remainingMembers === 0) {
+        await Group.deleteOne({ _id: existingMembership.groupId });
+      }
     }
 
     const group = new Group({
@@ -541,7 +553,7 @@ app.get('/group/:groupId', async (req, res) => {
 });
 
 // ENDPOINT POST /joingroup/:groupId
-// Un usuario se une a un grupo público
+// Un usuario se une a un grupo público (solo puede estar en un grupo a la vez)
 app.post('/joingroup/:groupId', async (req, res) => {
   const groupId = req.params.groupId;
   const username = req.headers['x-user'] ? String(req.headers['x-user']) : null;
@@ -566,6 +578,12 @@ app.post('/joingroup/:groupId', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    // Verificar si el usuario ya está en algún grupo
+    const existingMembership = await GroupMember.findOne({ username });
+    if (existingMembership) {
+      return res.status(409).json({ error: 'Users can only be in one group at a time. Leave your current group first.' });
+    }
+
     // Crear membresía
     const member = new GroupMember({
       groupId,
@@ -584,7 +602,7 @@ app.post('/joingroup/:groupId', async (req, res) => {
 });
 
 // ENDPOINT DELETE /leavegroup/:groupId
-// Un usuario sale de un grupo
+// Un usuario sale de un grupo (si el grupo queda vacío, se elimina)
 app.delete('/leavegroup/:groupId', async (req, res) => {
   const groupId = req.params.groupId;
   const username = req.headers['x-user'] ? String(req.headers['x-user']) : null;
@@ -598,6 +616,14 @@ app.delete('/leavegroup/:groupId', async (req, res) => {
     if (result.deletedCount === 0) {
       return res.status(404).json({ error: 'Not a member of this group' });
     }
+
+    // Verificar si el grupo quedó vacío
+    const remainingMembers = await GroupMember.countDocuments({ groupId });
+    if (remainingMembers === 0) {
+      // Eliminar el grupo si no tiene miembros
+      await Group.deleteOne({ _id: groupId });
+    }
+
     res.status(200).json({ message: 'Left group' });
   } catch (err) {
     res.status(500).json({ error: err.message });
