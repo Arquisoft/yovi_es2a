@@ -10,7 +10,9 @@ vi.mock('../src/models/User.js', () => {
 });
 
 vi.mock('mongoose', async () => {
-    function Schema() {}
+    function Schema() {
+        this.index = vi.fn();
+    }
     return {
         default: {
             Schema,
