@@ -62,6 +62,9 @@ vi.mock('mongoose', async () => {
     function Schema() {
         this.index = vi.fn();
     }
+    Schema.Types = {
+        ObjectId: function ObjectId() {}
+    };
     return {
         default: {
             Schema,
