@@ -5,6 +5,9 @@ import YAML from 'js-yaml';
 import promBundle from 'express-prom-bundle';
 import User from './src/models/User.js';
 import GameRecord from './src/models/GameRecord.js';
+import Friend from './src/models/Friend.js';
+import Group from './src/models/Group.js';
+import GroupMember from './src/models/GroupMember.js';
 import dotenv from 'dotenv';
 import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
@@ -45,8 +48,8 @@ try {
 //Este bloque permite que el fronted pueda hacer peticiones al backend
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,X-User');
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
 });
@@ -328,6 +331,334 @@ app.get('/ranking', async (req, res) => {
       .map((entry, idx) => ({ ...entry, position: idx + 1 }));
 
     res.status(200).json({ ranking });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FRIENDS ENDPOINTS
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ENDPOINT GET /user/:username
+// Devuelve datos públicos de un usuario (username, estadísticas resumidas)
+app.get('/user/:username', async (req, res) => {
+  const username = String(req.params.username);
+
+  try {
+    const user = await User.findOne({ username }).select('username');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Obtener estadísticas resumidas
+    const records = await GameRecord.find({ username }).lean();
+    const total = records.length;
+    const wins = records.filter(r => r.resultado === '1').length;
+    const losses = records.filter(r => r.resultado === '2').length;
+    const winRate = total > 0 ? Math.round((wins / total) * 1000) / 10 : 0;
+
+    res.status(200).json({
+      username,
+      stats: { total, wins, losses, winRate }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ENDPOINT POST /addfriend/:friendUsername
+// Agrega un amigo al usuario actual (usa username del header X-User)
+app.post('/addfriend/:friendUsername', async (req, res) => {
+  const currentUser = req.headers['x-user'] ? String(req.headers['x-user']) : null;
+  const friendUsername = req.params.friendUsername ? String(req.params.friendUsername) : null;
+
+  if (!currentUser || !friendUsername) {
+    return res.status(400).json({ error: 'Current user and friend username are required' });
+  }
+
+  if (currentUser === friendUsername) {
+    return res.status(400).json({ error: 'Cannot add yourself as a friend' });
+  }
+
+  try {
+    // Verificar que ambos usuarios existan
+    const [current, friend] = await Promise.all([
+      User.findOne({ username: currentUser }),
+      User.findOne({ username: friendUsername })
+    ]);
+
+    if (!current || !friend) {
+      return res.status(404).json({ error: 'One or both users not found' });
+    }
+
+    // Crear relación de amistad
+    const friendRecord = new Friend({ from: currentUser, to: friendUsername });
+    await friendRecord.save();
+
+    res.status(201).json({ message: 'Friend added', friend: friendRecord });
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(409).json({ error: 'Already friends with this user' });
+    }
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ENDPOINT DELETE /removefriend/:friendUsername
+// Remueve un amigo del usuario actual
+app.delete('/removefriend/:friendUsername', async (req, res) => {
+  const currentUser = req.headers['x-user'] ? String(req.headers['x-user']) : null;
+  const friendUsername = req.params.friendUsername ? String(req.params.friendUsername) : null;
+
+  if (!currentUser || !friendUsername) {
+    return res.status(400).json({ error: 'Current user and friend username are required' });
+  }
+
+  try {
+    const result = await Friend.deleteOne({ from: currentUser, to: friendUsername });
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: 'Friendship not found' });
+    }
+    res.status(200).json({ message: 'Friend removed' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ENDPOINT GET /friends/:username
+// Devuelve la lista de amigos de un usuario
+app.get('/friends/:username', async (req, res) => {
+  const username = String(req.params.username);
+
+  try {
+    const friendships = await Friend.find({ from: username }).lean();
+    const friendUsernames = friendships.map(f => f.to);
+    
+    // Obtener datos públicos de cada amigo
+    const friends = [];
+    for (const friendUsername of friendUsernames) {
+      const user = await User.findOne({ username: friendUsername }).select('username');
+      if (user) {
+        const records = await GameRecord.find({ username: friendUsername }).lean();
+        const total = records.length;
+        const wins = records.filter(r => r.resultado === '1').length;
+        const winRate = total > 0 ? Math.round((wins / total) * 1000) / 10 : 0;
+        
+        friends.push({
+          username: friendUsername,
+          stats: { total, wins, winRate }
+        });
+      }
+    }
+
+    res.status(200).json({ username, friends });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GROUPS ENDPOINTS
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ENDPOINT GET /groups
+// Devuelve lista de todos los grupos públicos
+app.get('/groups', async (req, res) => {
+  try {
+    const groups = await Group.find({ isPublic: true })
+      .select('_id name description createdBy createdAt')
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.status(200).json({ groups });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ENDPOINT POST /creategroup
+// Crea un nuevo grupo (el creador se añade automáticamente como admin, y deja cualquier grupo anterior)
+app.post('/creategroup', async (req, res) => {
+  const { name, description } = req.body ?? {};
+  const createdBy = req.headers['x-user'] ? String(req.headers['x-user']) : null;
+
+  if (!name || !createdBy) {
+    return res.status(400).json({ error: 'Group name and creator are required' });
+  }
+
+  try {
+    // Verificar que el usuario existe
+    const user = await User.findOne({ username: createdBy });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Si el usuario ya está en un grupo, lo sacamos de él
+    const existingMembership = await GroupMember.findOne({ username: createdBy });
+    if (existingMembership) {
+      await GroupMember.deleteOne({ _id: existingMembership._id });
+      
+      // Verificar si el grupo anterior quedó vacío
+      const remainingMembers = await GroupMember.countDocuments({ groupId: existingMembership.groupId });
+      if (remainingMembers === 0) {
+        await Group.deleteOne({ _id: existingMembership.groupId });
+      }
+    }
+
+    const group = new Group({
+      name: String(name),
+      description: description ? String(description) : '',
+      createdBy,
+      isPublic: true
+    });
+    await group.save();
+
+    // Agregar creador como admin
+    const member = new GroupMember({
+      groupId: group._id,
+      username: createdBy,
+      role: 'admin'
+    });
+    await member.save();
+
+    res.status(201).json({
+      message: 'Group created',
+      group: { _id: group._id, name: group.name, description: group.description }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ENDPOINT GET /group/:groupId
+// Devuelve detalles de un grupo y sus miembros
+app.get('/group/:groupId', async (req, res) => {
+  const groupId = req.params.groupId;
+
+  try {
+    const group = await Group.findById(groupId).lean();
+    if (!group) {
+      return res.status(404).json({ error: 'Group not found' });
+    }
+
+    const members = await GroupMember.find({ groupId })
+      .select('username role')
+      .lean();
+
+    res.status(200).json({
+      group,
+      members
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ENDPOINT POST /joingroup/:groupId
+// Un usuario se une a un grupo público (solo puede estar en un grupo a la vez)
+app.post('/joingroup/:groupId', async (req, res) => {
+  const groupId = req.params.groupId;
+  const username = req.headers['x-user'] ? String(req.headers['x-user']) : null;
+
+  if (!username) {
+    return res.status(400).json({ error: 'User is required' });
+  }
+
+  try {
+    const group = await Group.findById(groupId);
+    if (!group) {
+      return res.status(404).json({ error: 'Group not found' });
+    }
+
+    if (!group.isPublic) {
+      return res.status(403).json({ error: 'Cannot join private groups' });
+    }
+
+    // Verificar que el usuario existe
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Verificar si el usuario ya está en algún grupo
+    const existingMembership = await GroupMember.findOne({ username });
+    if (existingMembership) {
+      return res.status(409).json({ error: 'Users can only be in one group at a time. Leave your current group first.' });
+    }
+
+    // Crear membresía
+    const member = new GroupMember({
+      groupId,
+      username,
+      role: 'member'
+    });
+    await member.save();
+
+    res.status(201).json({ message: 'Joined group', member });
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(409).json({ error: 'Already a member of this group' });
+    }
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ENDPOINT DELETE /leavegroup/:groupId
+// Un usuario sale de un grupo (si el grupo queda vacío, se elimina)
+app.delete('/leavegroup/:groupId', async (req, res) => {
+  const groupId = req.params.groupId;
+  const username = req.headers['x-user'] ? String(req.headers['x-user']) : null;
+
+  if (!username) {
+    return res.status(400).json({ error: 'User is required' });
+  }
+
+  try {
+    const result = await GroupMember.deleteOne({ groupId, username });
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: 'Not a member of this group' });
+    }
+
+    // Verificar si el grupo quedó vacío
+    const remainingMembers = await GroupMember.countDocuments({ groupId });
+    if (remainingMembers === 0) {
+      // Eliminar el grupo si no tiene miembros
+      await Group.deleteOne({ _id: groupId });
+    }
+
+    res.status(200).json({ message: 'Left group' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ENDPOINT GET /mygroups
+// Devuelve los grupos del usuario actual
+app.get('/mygroups', async (req, res) => {
+  const username = req.headers['x-user'] ? String(req.headers['x-user']) : null;
+
+  if (!username) {
+    return res.status(400).json({ error: 'User is required' });
+  }
+
+  try {
+    const memberships = await GroupMember.find({ username })
+      .select('groupId role')
+      .lean();
+
+    const groupIds = memberships.map(m => m.groupId);
+    const groups = await Group.find({ _id: { $in: groupIds } })
+      .select('_id name description createdBy createdAt')
+      .lean();
+
+    // Enriquecer con role
+    const enriched = groups.map(g => {
+      const membership = memberships.find(m => String(m.groupId) === String(g._id));
+      return { ...g, role: membership?.role };
+    });
+
+    res.status(200).json({ groups: enriched });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

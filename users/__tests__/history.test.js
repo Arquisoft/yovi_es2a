@@ -59,7 +59,12 @@ vi.mock('../src/models/User.js', () => {
 
 // Mock de mongoose (evita conexión real a MongoDB)
 vi.mock('mongoose', async () => {
-    function Schema() {}
+    function Schema() {
+        this.index = vi.fn();
+    }
+    Schema.Types = {
+        ObjectId: function ObjectId() {}
+    };
     return {
         default: {
             Schema,

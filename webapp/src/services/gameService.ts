@@ -231,3 +231,200 @@ export async function getRanking(): Promise<RankingEntry[]> {
     const data = await response.json();
     return data.ranking;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FRIENDS & GROUPS SERVICES
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface UserPublicData {
+    username: string;
+    stats: {
+        total: number;
+        wins: number;
+        losses: number;
+        winRate: number;
+    };
+}
+
+export interface GroupData {
+    _id: string;
+    name: string;
+    description: string;
+    createdBy: string;
+    isPublic: boolean;
+    createdAt: string;
+    role?: 'admin' | 'member';
+}
+
+export interface GroupMemberData {
+    username: string;
+    role: 'admin' | 'member';
+}
+
+// Obtener datos públicos de un usuario (username, stats resumidas)
+export async function getUserPublicData(username: string): Promise<UserPublicData> {
+    const response = await fetch(`${USERS_URL}/user/${username}`);
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error ?? 'Error al obtener datos del usuario');
+    }
+    return response.json();
+}
+
+// Buscar usuarios por nombre
+export async function searchUsers(query: string): Promise<UserPublicData[]> {
+    try {
+        // En una aplicación real, esto vendría de un endpoint /search
+        // Por ahora, devolvemos array vacío y esperamos que el usuario escriba un nombre exacto
+        if (!query.trim()) return [];
+        
+        // Intentar obtener el usuario exacto
+        const user = await getUserPublicData(query.trim());
+        return [user];
+    } catch {
+        return [];
+    }
+}
+
+// Agregar un usuario como amigo
+export async function addFriend(friendUsername: string): Promise<void> {
+    const currentUser = localStorage.getItem('username');
+    if (!currentUser) throw new Error('No estás autenticado');
+
+    const response = await fetch(`${USERS_URL}/addfriend/${friendUsername}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-User': currentUser
+        }
+    });
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error ?? 'Error al agregar amigo');
+    }
+}
+
+// Remover un amigo
+export async function removeFriend(friendUsername: string): Promise<void> {
+    const currentUser = localStorage.getItem('username');
+    if (!currentUser) throw new Error('No estás autenticado');
+
+    const response = await fetch(`${USERS_URL}/removefriend/${friendUsername}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-User': currentUser
+        }
+    });
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error ?? 'Error al remover amigo');
+    }
+}
+
+// Obtener lista de amigos de un usuario
+export async function getFriends(username: string): Promise<UserPublicData[]> {
+    const response = await fetch(`${USERS_URL}/friends/${username}`);
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error ?? 'Error al obtener amigos');
+    }
+    const data = await response.json();
+    return data.friends;
+}
+
+// Obtener todos los grupos públicos
+export async function getGroups(): Promise<GroupData[]> {
+    const response = await fetch(`${USERS_URL}/groups`);
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error ?? 'Error al obtener grupos');
+    }
+    const data = await response.json();
+    return data.groups;
+}
+
+// Crear un nuevo grupo
+export async function createGroup(name: string, description: string = ''): Promise<GroupData> {
+    const currentUser = localStorage.getItem('username');
+    if (!currentUser) throw new Error('No estás autenticado');
+
+    const response = await fetch(`${USERS_URL}/creategroup`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-User': currentUser
+        },
+        body: JSON.stringify({ name, description })
+    });
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error ?? 'Error al crear grupo');
+    }
+    const data = await response.json();
+    return data.group;
+}
+
+// Obtener detalles de un grupo (incluyendo miembros)
+export async function getGroupDetails(groupId: string): Promise<{ group: GroupData; members: GroupMemberData[] }> {
+    const response = await fetch(`${USERS_URL}/group/${groupId}`);
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error ?? 'Error al obtener detalles del grupo');
+    }
+    return response.json();
+}
+
+// Unirse a un grupo
+export async function joinGroup(groupId: string): Promise<void> {
+    const currentUser = localStorage.getItem('username');
+    if (!currentUser) throw new Error('No estás autenticado');
+
+    const response = await fetch(`${USERS_URL}/joingroup/${groupId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-User': currentUser
+        }
+    });
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error ?? 'Error al unirse al grupo');
+    }
+}
+
+// Salir de un grupo
+export async function leaveGroup(groupId: string): Promise<void> {
+    const currentUser = localStorage.getItem('username');
+    if (!currentUser) throw new Error('No estás autenticado');
+
+    const response = await fetch(`${USERS_URL}/leavegroup/${groupId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-User': currentUser
+        }
+    });
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error ?? 'Error al salir del grupo');
+    }
+}
+
+// Obtener grupos del usuario actual
+export async function getMyGroups(): Promise<GroupData[]> {
+    const currentUser = localStorage.getItem('username');
+    if (!currentUser) throw new Error('No estás autenticado');
+
+    const response = await fetch(`${USERS_URL}/mygroups`, {
+        headers: {
+            'X-User': currentUser
+        }
+    });
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error ?? 'Error al obtener tus grupos');
+    }
+    const data = await response.json();
+    return data.groups;
+}
