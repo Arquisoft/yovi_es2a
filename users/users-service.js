@@ -257,9 +257,12 @@ app.get('/stats/:username', async (req, res) => {
 });
 
 // ─── PESOS DE DIFICULTAD para la fórmula de ranking ───────────────────────
-// Score(j) = Σ d(i) · W(V_i, N_i)
-// W(V,N)   = (V/N) · C(N)
-// C(N)     = 1 − exp(−N / K)    [K=10: ~30 partidas para confianza plena]
+// Score(j) = Σ d(i) · V_i · C(N_i) · (1 + V_i/N_i)
+// donde:
+//   d(i)          = peso de dificultad del rival i
+//   V_i           = victorias contra el rival i  [factor dominante]
+//   C(N)          = 1 − exp(−N / K)             [confianza estadística, K=10: ~30 partidas para confianza plena]
+//   (1 + V_i/N_i) = bonus de eficacia ∈ (1,2] [α=1.0: bonus significativo pero no principal]
 const RIVAL_WEIGHTS = {
   random_bot:        1.0,
   offensive_easy:    1.5,

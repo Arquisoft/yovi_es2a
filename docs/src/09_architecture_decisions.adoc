@@ -64,9 +64,70 @@ Por último, la integración con el microservicio de usuarios en Node.js es dire
 ** No se dispone de validación de integridad referencial a nivel de base de datos, aunque no resulta especialmente relevante dada nuestra estructura de datos.
 ** La integración con el microservicio de usuarios en Node.js es directa mediante Mongoose.
 
-=== ADR 003: Estrategia de filtrado en el historial de partidas
+=== ADR 002: Estrategia de filtrado en el historial de partidas
 
 * **Estatus:** Aceptado.
 * **Contexto:** El usuario necesita consultar miles de registros. Realizar peticiones por cada pulsación de tecla (live search) saturaría el servicio de usuarios.
 * **Decisión:** Se implementa un estado temporal en el Frontend para el input de "Rival" y una ejecución "Lazy" de la búsqueda. La petición a la API solo se dispara al pulsar el botón "Buscar".
 * **Consecuencias:** Mejora del rendimiento de red y reducción de carga en MongoDB.
+
+=== ADR-003: Fórmula de puntuación ponderada para el ranking global
+
+* **Estatus:** Aceptado.
+
+* **Contexto:** Al añadir el ranking global se necesitaba una métrica de ordenación justa. Las alternativas triviales (victorias totales, ratio de victorias) tienen sesgos bien conocidos: la primera ignora la dificultad del rival, la segunda infla a jugadores con muy pocas partidas.
+
+* **Decisión:** Se utiliza la siguiente fórmula, calculada en tiempo real en `GET /ranking` agregando la colección `GameRecords`:
+
+[source]
+----
+Score(j) = Σ d(i) · V_i · C(N_i) · (1 + V_i/N_i)
+donde:
+  d(i)          = peso de dificultad del rival i
+  V_i           = victorias contra el rival i  [factor dominante]
+  C(N)          = 1 − exp(−N / K)             [confianza estadística, K=10: ~30 partidas para confianza plena]
+  (1 + V_i/N_i) = bonus de eficacia ∈ (1,2]  [α=1.0: bonus significativo pero no principal]
+----
+
+Los pesos de dificultad asignados son:
+
+[cols="2,1", options="header"]
+|===
+| Rival | d(i)
+| random_bot | 1.0
+| offensive_easy / defensive_easy / positional_easy | 1.5
+| offensive_medium / defensive_medium / positional_medium | 2.5
+| offensive_hard / defensive_hard / positional_hard | 4.0
+| Jugador humano | 5.0
+| monte_carlo_bot | 7.0
+|===
+
+* **Desglose matemático de los factores:**
+
+** **`d(i)` — Peso de dificultad:** escala la contribución de cada rival según su complejidad algorítmica. Va de 1.0 (random_bot) a 7.0 (monte_carlo_bot). Los jugadores humanos reciben 5.0 por su imprevisibilidad.
+
+** **`V_i` — Victorias absolutas (factor dominante):** usar las victorias en bruto en lugar del ratio `V/N` hace que jugar más partidas siempre aporte puntos positivos. Premia la actividad sostenida, no solo la eficacia puntual.
+
+** **`C(N) = 1 − exp(−N/10)` — Factor de confianza estadística:** función creciente que satura hacia 1 conforme crece la muestra. Con 1 partida `C ≈ 0.10`, con 10 partidas `C ≈ 0.63`, con 30 partidas `C ≈ 0.95`. Evita que una única victoria infle artificialmente la puntuación.
+
+** **`(1 + V_i/N_i)` — Bonus de eficacia (α = 1.0):** término multiplicativo ∈ (1, 2] que añade hasta un 100 % extra cuando el jugador gana todas las partidas contra ese rival (`V/N = 1 → factor = 2`). Si no gana ninguna (`V/N = 0 → factor = 1`) no penaliza, simplemente no bonifica. Es un bonus significativo pero nunca el factor principal.
+
++
+A modo de ejemplo numérico, un jugador con 5 victorias en 10 partidas contra `monte_carlo_bot` (d = 7.0) obtiene:
++
+[source]
+----
+C(10)        = 1 − exp(−10/10)  ≈ 0.632
+bonus        = 1 + 5/10          = 1.5
+aporte       = 7.0 · 5 · 0.632 · 1.5  ≈ 33.18 puntos
+----
+
+* **Alternativas consideradas:**
+** _Victorias totales_ → Descartada. Ignora la dificultad del rival.
+** _Ratio puro V/N_ → Descartada. Una sola victoria da ratio 100 %, inflando el ranking con muestras mínimas.
+** _ELO_ → Descartada. Requiere estado persistente adicional y lógica de actualización bidireccional tras cada partida, añadiendo complejidad sin ventaja real dado el volumen de datos del sistema.
+
+* **Consecuencias:**
+** El ranking premia simultáneamente actividad (victorias absolutas), calidad (bonus de eficacia) y rigor estadístico (confianza).
+** El cálculo en tiempo real puede degradarse con un volumen muy elevado de `GameRecords`. Mitigable con un índice MongoDB sobre `username`.
+** Incorporar un nuevo bot requiere únicamente asignarle un peso en `RIVAL_WEIGHTS` del servicio `users`.

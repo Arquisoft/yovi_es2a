@@ -65,4 +65,13 @@ endif::arc42help[]
 
 | Historial Filtrado
 | Funcionalidad que permite la recuperación selectiva de registros basada en criterios de búsqueda específicos para facilitar el análisis de rendimiento del usuario.
+
+| Ranking Global
+| Tabla de clasificación pública que muestra los diez mejores jugadores ordenados por puntuación. La puntuación pondera victorias según la dificultad del rival derrotado y aplica un factor de confianza estadística que penaliza muestras pequeñas.
+ 
+| Puntuación Ponderada
+| Valor numérico calculado automáticamente por el sistema para cada usuario a partir de su historial de partidas. Tiene en cuenta la dificultad del oponente, el ratio de victorias contra ese oponente y un factor de confianza estadística basado en el número de partidas jugadas.
+ 
+| Factor de Confianza (C)
+| Componente de la fórmula de ranking definido como `C(n) = 1 − exp(−n / 10)`. Penaliza a jugadores con pocas partidas jugadas frente a un rival concreto, evitando que una única victoria contra un rival difícil infle artificialmente la puntuación.
 |===
