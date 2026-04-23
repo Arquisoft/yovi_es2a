@@ -488,7 +488,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_escenario_4_fin_de_partida_y_guardado_en_historial">6.4. Escenario 4: Fin de partida y guardado en historial</a></li>
 <li><a href="#_escenario_5_consulta_general_del_historial">6.5. Escenario 5: Consulta general del historial</a></li>
 <li><a href="#_escenario_6_consulta_de_historial_con_filtrado">6.6. Escenario 6: Consulta de historial con filtrado</a></li>
-<li><a href="#_escenario_7_cierre_de_sesión">6.7. Escenario 7: Cierre de sesión</a></li>
+<li><a href="#_escenario_7_consulta_del_ranking_global">6.7. Escenario 7: Consulta del Ranking Global</a></li>
+<li><a href="#_escenario_8_cierre_de_sesión">6.8. Escenario 8: Cierre de sesión</a></li>
 </ul>
 </li>
 <li><a href="#section-deployment-view">7. Vista de Despliegue</a>
@@ -509,7 +510,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel2">
 <li><a href="#_introducción">9.1. Introducción</a></li>
 <li><a href="#_adr_001_uso_de_mongodb_como_base_de_datos">9.2. ADR-001: Uso de MongoDB como base de datos</a></li>
-<li><a href="#_adr_003_estrategia_de_filtrado_en_el_historial_de_partidas">9.3. ADR 003: Estrategia de filtrado en el historial de partidas</a></li>
+<li><a href="#_adr_002_estrategia_de_filtrado_en_el_historial_de_partidas">9.3. ADR 002: Estrategia de filtrado en el historial de partidas</a></li>
+<li><a href="#_adr_003_fórmula_de_puntuación_ponderada_para_el_ranking_global">9.4. ADR-003: Fórmula de puntuación ponderada para el ranking global</a></li>
 </ul>
 </li>
 <li><a href="#section-quality-scenarios">10. Requisitos de Calidad</a>
@@ -668,6 +670,9 @@ Entre ellos se incluyen</p>
 </li>
 <li>
 <p><strong>Historial y Persistencia:</strong> El sistema registra de forma automática el resultado de cada partida finalizada. Los usuarios disponen de un panel de consulta donde pueden visualizar su historial de victorias y derrotas, permitiendo el filtrado de los registros por fecha, tipo de oponente y tamaño del tablero.</p>
+</li>
+<li>
+<p><strong>Ranking Global:</strong> El sistema mantiene una tabla de clasificación pública con los diez mejores jugadores. La puntuación se calcula automáticamente a partir del historial de partidas de cada usuario, ponderando las victorias según la dificultad del oponente derrotado. El usuario logueado puede ver su posición resaltada dentro del ranking.</p>
 </li>
 <li>
 <p><strong>Plataforma:</strong> La aplicación es plenamente accesible desde navegadores web modernos. El sistema se distribuye mediante contenedores Docker, lo que garantiza un despliegue ágil y consistente en cualquier entorno que lo soporte.</p>
@@ -876,7 +881,7 @@ Estas partes interesadas determinan el alcance y el nivel de detalle de su traba
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Usuarios Finales</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Jugadores de la aplicación</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Disfrutar de una buena experiencia de usuario, pudiendo jugar partidas de forma fluida, utilizar diferentes estrategias en el tablero hexagonal y consultar sus estadísticas.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Disfrutar de una buena experiencia de usuario, pudiendo jugar partidas de forma fluida, utilizar diferentes estrategias en el tablero hexagonal, consultar sus estadísticas y comparar su rendimiento con otros jugadores mediante el ranking globa</p></td>
 </tr>
 </tbody>
 </table>
@@ -1137,6 +1142,9 @@ The title of the table is the name of your system, the three columns contain the
 <li>
 <p>Historico y estadísticas</p>
 </li>
+<li>
+<p>Ranking global de jugadores</p>
+</li>
 </ul>
 </div></div></td>
 </tr>
@@ -1248,6 +1256,11 @@ together with a mapping table showing the relationships between channels and inp
 <td class="tableblock halign-left valign-top"><p class="tableblock">Resultados y estadísticas</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">HTML / JSON / HTTPS</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Consulta del ranking global</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Top 10 jugadores con puntuación</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HTML / JSON / HTTPS</p></td>
+</tr>
 </tbody>
 </table>
 <div class="ulist">
@@ -1257,10 +1270,10 @@ together with a mapping table showing the relationships between channels and inp
 <p>Protocolo y Formato: HTTPS y JSON.</p>
 </li>
 <li>
-<p>Responsabilidad: Gestiona la persistencia y consulta de datos sensibles: perfiles de usuario, autenticación y almacenamiento del historial de partidas.</p>
+<p>Responsabilidad: Gestiona la persistencia y consulta de datos sensibles: perfiles de usuario, autenticación, almacenamiento del historial de partidas y cálculo del ranking global.</p>
 </li>
 <li>
-<p>Integración: Permite a agentes externos la consulta de estadísticas y rankings mediante endpoints REST estándar.</p>
+<p>Integración: Permite a agentes externos y al frontend la consulta de estadísticas, historial y ranking mediante endpoints REST estándar (<code>GET /ranking</code>).</p>
 </li>
 </ul>
 </div>
@@ -1832,7 +1845,18 @@ Responsabilidades:
 </div>
 </div>
 <div class="sect2">
-<h3 id="_escenario_7_cierre_de_sesión">6.7. Escenario 7: Cierre de sesión</h3>
+<h3 id="_escenario_7_consulta_del_ranking_global">6.7. Escenario 7: Consulta del Ranking Global</h3>
+<div class="paragraph">
+<p>El usuario accede a la vista de ranking. El frontend solicita al servicio <code>users</code> el top 10 de jugadores. El servicio agrega los registros de partidas de MongoDB, calcula la puntuación ponderada de cada jugador y devuelve la lista ordenada. El jugador logueado aparece resaltado en la tabla.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/runtime-ranking.png" alt="runtime ranking" width="1066" height="480">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_escenario_8_cierre_de_sesión">6.8. Escenario 8: Cierre de sesión</h3>
 <div class="paragraph">
 <p>El usuario cierra su sesión desde la interfaz. El frontend elimina los datos locales (localStorage) y notifica al servicio <code>users</code>, que invalida la sesión en la base de datos.</p>
 </div>
@@ -2363,7 +2387,7 @@ Consideramos una mejor decisión el uso de una base de datos NoSQL como MongoDB 
 </div>
 </div>
 <div class="sect2">
-<h3 id="_adr_003_estrategia_de_filtrado_en_el_historial_de_partidas">9.3. ADR 003: Estrategia de filtrado en el historial de partidas</h3>
+<h3 id="_adr_002_estrategia_de_filtrado_en_el_historial_de_partidas">9.3. ADR 002: Estrategia de filtrado en el historial de partidas</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2377,6 +2401,141 @@ Consideramos una mejor decisión el uso de una base de datos NoSQL como MongoDB 
 </li>
 <li>
 <p><strong>Consecuencias:</strong> Mejora del rendimiento de red y reducción de carga en MongoDB.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_adr_003_fórmula_de_puntuación_ponderada_para_el_ranking_global">9.4. ADR-003: Fórmula de puntuación ponderada para el ranking global</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Estatus:</strong> Aceptado.</p>
+</li>
+<li>
+<p><strong>Contexto:</strong> Al añadir el ranking global se necesitaba una métrica de ordenación justa. Las alternativas triviales (victorias totales, ratio de victorias) tienen sesgos bien conocidos: la primera ignora la dificultad del rival, la segunda infla a jugadores con muy pocas partidas.</p>
+</li>
+<li>
+<p><strong>Decisión:</strong> Se utiliza la siguiente fórmula, calculada en tiempo real en <code>GET /ranking</code> agregando la colección <code>GameRecords</code>:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>Score(j) = Σ d(i) · V_i · C(N_i) · (1 + V_i/N_i)
+donde:
+  d(i)          = peso de dificultad del rival i
+  V_i           = victorias contra el rival i  [factor dominante]
+  C(N)          = 1 − exp(−N / K)             [confianza estadística, K=10: ~30 partidas para confianza plena]
+  (1 + V_i/N_i) = bonus de eficacia ∈ (1,2]  [α=1.0: bonus significativo pero no principal]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Los pesos de dificultad asignados son:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 66.6666%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Rival</th>
+<th class="tableblock halign-left valign-top">d(i)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">random_bot</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">offensive_easy / defensive_easy / positional_easy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.5</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">offensive_medium / defensive_medium / positional_medium</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.5</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">offensive_hard / defensive_hard / positional_hard</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jugador humano</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">monte_carlo_bot</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7.0</p></td>
+</tr>
+</tbody>
+</table>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Desglose matemático de los factores:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong><code>d(i)</code> — Peso de dificultad:</strong> escala la contribución de cada rival según su complejidad algorítmica. Va de 1.0 (random_bot) a 7.0 (monte_carlo_bot). Los jugadores humanos reciben 5.0 por su imprevisibilidad.</p>
+</li>
+<li>
+<p><strong><code>V_i</code> — Victorias absolutas (factor dominante):</strong> usar las victorias en bruto en lugar del ratio <code>V/N</code> hace que jugar más partidas siempre aporte puntos positivos. Premia la actividad sostenida, no solo la eficacia puntual.</p>
+</li>
+<li>
+<p><strong><code>C(N) = 1 − exp(−N/10)</code> — Factor de confianza estadística:</strong> función creciente que satura hacia 1 conforme crece la muestra. Con 1 partida <code>C ≈ 0.10</code>, con 10 partidas <code>C ≈ 0.63</code>, con 30 partidas <code>C ≈ 0.95</code>. Evita que una única victoria infle artificialmente la puntuación.</p>
+</li>
+<li>
+<p><strong><code>(1 + V_i/N_i)</code> — Bonus de eficacia (α = 1.0):</strong> término multiplicativo ∈ (1, 2] que añade hasta un 100 % extra cuando el jugador gana todas las partidas contra ese rival (<code>V/N = 1 → factor = 2</code>). Si no gana ninguna (<code>V/N = 0 → factor = 1</code>) no penaliza, simplemente no bonifica. Es un bonus significativo pero nunca el factor principal.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>A modo de ejemplo numérico, un jugador con 5 victorias en 10 partidas contra <code>monte_carlo_bot</code> (d = 7.0) obtiene:</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>C(10)        = 1 − exp(−10/10)  ≈ 0.632
+bonus        = 1 + 5/10          = 1.5
+aporte       = 7.0 · 5 · 0.632 · 1.5  ≈ 33.18 puntos</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p><strong>Alternativas consideradas:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p><em>Victorias totales</em> → Descartada. Ignora la dificultad del rival.</p>
+</li>
+<li>
+<p><em>Ratio puro V/N</em> → Descartada. Una sola victoria da ratio 100 %, inflando el ranking con muestras mínimas.</p>
+</li>
+<li>
+<p><em>ELO</em> → Descartada. Requiere estado persistente adicional y lógica de actualización bidireccional tras cada partida, añadiendo complejidad sin ventaja real dado el volumen de datos del sistema.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Consecuencias:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>El ranking premia simultáneamente actividad (victorias absolutas), calidad (bonus de eficacia) y rigor estadístico (confianza).</p>
+</li>
+<li>
+<p>El cálculo en tiempo real puede degradarse con un volumen muy elevado de <code>GameRecords</code>. Mitigable con un índice MongoDB sobre <code>username</code>.</p>
+</li>
+<li>
+<p>Incorporar un nuevo bot requiere únicamente asignarle un peso en <code>RIVAL_WEIGHTS</code> del servicio <code>users</code>.</p>
+</li>
+</ul>
+</div>
 </li>
 </ul>
 </div>
@@ -3148,6 +3307,18 @@ El hecho de que el servidor respondiera con un 422 demuestra su robustez: el bac
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>Historial Filtrado</em></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>Funcionalidad que permite la recuperación selectiva de registros basada en criterios de búsqueda específicos para facilitar el análisis de rendimiento del usuario.</em></p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Ranking Global</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Tabla de clasificación pública que muestra los diez mejores jugadores ordenados por puntuación. La puntuación pondera victorias según la dificultad del rival derrotado y aplica un factor de confianza estadística que penaliza muestras pequeñas.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Puntuación Ponderada</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Valor numérico calculado automáticamente por el sistema para cada usuario a partir de su historial de partidas. Tiene en cuenta la dificultad del oponente, el ratio de victorias contra ese oponente y un factor de confianza estadística basado en el número de partidas jugadas.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Factor de Confianza &#169;</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Componente de la fórmula de ranking definido como <code>C(n) = 1 − exp(−n / 10)</code>. Penaliza a jugadores con pocas partidas jugadas frente a un rival concreto, evitando que una única victoria contra un rival difícil infle artificialmente la puntuación.</em></p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -3156,7 +3327,7 @@ El hecho de que el servidor respondiera con un 422 demuestra su robustez: el bac
 <div id="footer">
 <div id="footer-text">
 Version 8.2 EN<br>
-Last updated 2026-04-22 18:38:04 +0200
+Last updated 2026-04-23 18:20:33 +0200
 </div>
 </div>
 </body>
