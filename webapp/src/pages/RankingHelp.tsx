@@ -20,9 +20,27 @@ const RankingHelp: React.FC = () => {
 
             {/* El Modal Flotante (solo se renderiza si isOpen es true) */}
             {isOpen && (
-                <div className="ranking-help-overlay" onClick={closeModal}>
+                <div 
+                    className="ranking-help-overlay" 
+                    onClick={closeModal}
+                    onKeyDown={(e) => {
+                        // Permite cerrar el modal con Enter, Espacio o la tecla Escape
+                        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
+                            closeModal();
+                        }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Cerrar ventana de ayuda"
+                >
                     {/* onClick={e => e.stopPropagation()} evita que al hacer clic dentro se cierre */}
-                    <div className="ranking-help-modal" onClick={e => e.stopPropagation()}>
+                    <div 
+                        className="ranking-help-modal" 
+                        onClick={e => e.stopPropagation()}
+                        onKeyDown={e => e.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                    >
                         
                         <div className="ranking-help-header">
                             <h3>¿Cómo se calcula la Puntuación?</h3>
