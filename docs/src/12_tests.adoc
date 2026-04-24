@@ -5,9 +5,135 @@ ifndef::imagesdir[:imagesdir: ../images]
 
 En esta sección se describe la estrategia de aseguramiento de la calidad (QA) seguida durante el desarrollo de Yovi, detallando los diferentes niveles de pruebas realizados para garantizar la robustez del sistema.
 
-=== Pruebas End-to-End (E2E)
+=== Pruebas Unitarias
 
-=== Pruebas Unitarias y de Integración (Test normales)
+
+=== Pruebas End-to-End (E2E)
+Las pruebas E2E tienen como objetivo validar el flujo completo del sistema, desde la interfaz de usuario hasta la base de datos, asegurando que todas las piezas integradas funcionen como se espera en un entorno similar a producción.
+
+A diferencia de los tests unitarios, las pruebas E2E no se centran en funciones aisladas, sino en **historias de usuario completas**. Esto nos permite detectar fallos en las integraciones con servicios externos y problemas de estado en la persistencia de datos.
+
+==== Casos de uso cubiertos
+En este apartado de muestran algunos de los casos cubiertos:
+
+===== Registro de un nuevo usuario
+**Descripción**: Valida que un usuario pueda crear una cuenta desde cero cuando los datos son válidos y el servidor está disponible.
+@startuml
+actor Usuario
+participant "Webapp: Register" as UI
+participant "Users" as DB
+
+Usuario -> UI: Rellena
+UI -> DB: Petición de registro (SUCCESS)
+DB --> UI: Confirmación de creación
+UI --> Usuario: Mensaje de éxito
+@enduml
+
+===== Autenticación de Usuario (Login)
+**Descripción**: Verifica el flujo de acceso al sistema y la redirección correcta al menú principal tras un login exitoso.
+@startuml
+actor Usuario
+participant "Webapp: Login" as UI
+participant "Users" as Auth
+
+Usuario -> UI: Introduce credenciales
+UI -> Auth: Validar login
+Auth --> UI: Token / OK
+UI -> UI: Redirigir a Main Menu
+UI --> Usuario: Visualiza
+@enduml
+
+===== Partida contra la CPU (Estrategia)
+**Descripción**: Comprueba que el motor de juego gestione correctamente los turnos automáticos del Bot según la dificultad y la estrategiaseleccionada una vez empezada la partida.
+@startuml
+actor Jugador
+participant "Webapp" as Board
+participant "Gamey" as Bot
+
+Jugador -> Board: Clic en celda vacía
+Board -> Board: Marcar celda (Jugador)
+Board -> Bot: Solicitar movimiento
+Bot --> Board: Realiza movimiento automático
+Board --> Jugador: Celda marcada (Bot) + Tu turno
+@enduml
+
+===== Finalización y Reinicio de Partida
+**Descripción**: Garantiza que, tras abandonar o terminar una partida, el usuario pueda volver a jugar inmediatamente sin errores de estado.
+@startuml
+actor Jugador
+participant "Webapp: Board" as Board
+participant "Gamey" as Gamey
+participant "Users" as DB
+participant "Webapp: End" as End
+
+
+Jugador -> Board: Clic en "Surrender"
+Board -> Gamey: Información de la rendición
+Gamey --> Board: Envía la respuesta con el ganador
+Board -> DB: Guarda la partida en el hisotrial
+DB --> Board: Mensaje de confimación
+Board -> End: Muestra la pantalla de fin
+Jugador -> End: Le da al botón de volver a jugar
+End -> Board: Muestra la pantalla del tablero
+Board -> Gamey: Pide una nueva partida
+Gamey --> Board: Devuelve la información
+Board -> Jugador: Se renderiza
+@enduml
+
+===== Consulta de Estadísticas e Historial
+**Descripción**: Verifica la integración con el Datahub para mostrar el histórico de partidas y la aplicación de filtros (ej. victorias).
+@startuml
+actor Jugador
+participant "Data View" as UI
+participant "Users" as DB
+
+Jugador -> UI: Navega a "My Data"
+UI -> DB: Obtener historial
+DB --> UI: Lista de partidas
+Jugador -> UI: Filtrar por "Victories"
+UI -> UI: Actualizar tabla (solo victorias)
+UI -> Jugador: Muestra los resultados 
+@enduml
+
+
+=== Grafana y Prometheus
+Para la monitorización del lado servidor se han utilizado Prometheus y Grafana. 
+Prometheus actúa como recolector y almacén de métricas del modulo users, el único del que se recolectan datos. Mientras que Grafana consume esos datos y los visualiza en dashboards interactivos.
+
+==== Dashboard: Monitorización del Servicio de Usuarios
+image::12-grafana-dashboard.png[Distribución de rangos de respuesta y peticiones, align="center"]
+Este dashboard recoge las métricas más relevantes del servicio de usuarios. A continuación explicamos cada uno de ellos un poco más en detalle:
+
+===== Rendimiento HTTP por Método y Status
+Muestra la tasa de peticiones por segundo (`req/s`) de cada método HTTP 
+junto con su código de respuesta a lo largo del tiempo. Esto permite identificar de un vistazo qué tipo de operaciones generan más tráfico y detectar anomalías en el comportamiento del servicio.
+
+A pesar de que la muestra es bastante pequeña (solo de los últimos 15 minutos), vemos una clara preponderacia de los métodos `POST-201` (recursos creados correctamente) y `OPTIONS-204` (peticiones generadas automáticamente por el navegador al comunicarse con la API), lo cual es un comportamiento esperado en una aplicación React con backend separado.
+
+===== Errores 5xx
+Este panel muestra el número de errores de servidor (códigos HTTP 5xx) por unidad de tiempo. 
+Su objetivo es detectar fallos críticos en el servicio de forma inmediata.
+
+El panel no muestra ninguno ya que el servidor ha sido capaz de manejar la carga sin problemas, lo cual es un indicador positivo de la estabilidad del sistema. Pero podría configurarse para que emitiese alertas en caso de detectar un aumento inusual de errores, lo que ayudaría a prevenir caídas del servicio.
+
+===== Latencia P95
+El percentil 95 de latencia nos indica el tiempo de respuesta máximo por debajo del cual se encuentran el 95% de las peticiones. Esto nos ayuda a ver el tiempo máximo que un usuario puede esperar para recibir una respuesta en condiciones normales de uso quitando aquellos casos excepcionales que podrían distorsionar la percepción del rendimiento.
+
+El valor registrado durante las pruebas es de **207ms**, lo cual es un resultado satisfactorio para una aplicación web con base de datos.
+
+===== Latencia Media por Operación
+Esta nos ayuda a desglosar la latencia media de cada tipo de operación (registro, login, consulta de historial...), permitiéndonos identificar cuales son las llamadas más lentas.
+
+En este caso se observa que las operaciones `POST` presentan una latencia mayor (hasta 0.3s) que las peticiones `GET`, lo cual es lógico, ya que las operaciones de escritura tienden a ser mucho más costosas que las de lectura.
+
+===== Total Peticiones/segundo
+Por último tenemos la cantidad total de peticiones por segundo recibidas por el servidor. Permite tener una visión general del volumen de tráfico en tiempo real.
+
+Durante las pruebas se registra un valor de **0.0522 req/s**, el cual está dentro de las métricas esperadas.
+
+==== Conclusiones
+Los datos obtenidos durante las pruebas muestran un servicio estable, sin errores de servidor y con tiempos de respuesta aceptables. Pero hay que recordar que se está usando una muestra muy pequeña y una carga basstante nimia. Ya que esto no es una prueba de carga, si no una muestra de la monitorización de la aplicación.
+
 
 === Pruebas de Carga
 Las pruebas de carga evalúan la capacidad de respuesta del sistema bajo condiciones de uso intensivo y estrés. Para el proyecto Yovi, se han diseñado pruebas de estrés utilizando Gatling para validar la robustez del servidor desarrollado en Rust.
