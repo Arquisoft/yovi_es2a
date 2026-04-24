@@ -19,9 +19,9 @@ El modelo de dominio gira en torno al juego de estrategia "Y".
 
 * **Visualización del Tablero:** Dado que el tablero hexagonal no es común, la interfaz debe traducir las coordenadas lógicas (x, y, z) a una posición visual en pantalla (píxeles). Se emplearán ayudas visuales para resaltar las celdas adyacentes y los movimientos válidos.
 * **Feedback Inmediato:** La interfaz bloquea visualmente acciones ilegales antes de enviarlas al servidor para mejorar la reactividad, aunque la validación final siempre reside en el backend.
-* **Diseño Adaptable:** La interfaz se adapta a diferentes tamaños de pantalla, asegurando que el tablero triangular sea jugable tanto en escritorio como en dispositivos móviles.
+* **Diseño Adaptable:** La interfaz se adapta a diferentes tamaños de tablero, asegurando que el tablero triangular sea jugable tanto en su tamaño mínimo (4) como máximo (30).
 
-==== Prototipos de pantallas
+=== Prototipos de pantallas
 Los prototipos originales de las pantallas del proyecto tal y como se diseñaron en las reuniones perativas se pueden encontrar a continuación:
 
 image::screen_prototypes.jpeg[Prototipos de pantallas]
@@ -43,19 +43,63 @@ Cabe destacar que estos prototipos se han utilizado como referencia para el desa
 * **Comunicación (JSON):** Todas las partes del sistema intercambian información utilizando el formato estándar JSON, lo que garantiza la compatibilidad entre el frontend y el backend.
 * **Gestión de Errores:** Se utilizan los códigos estándar de la web para indicar claramente si una acción ha funcionado o por qué ha fallado, facilitando la corrección de problemas.
 * **Persistencia de Datos:** La información crítica, como los usuarios registrados y el historial de partidas terminadas, se almacena de forma segura en una base de datos MongoDB.
-* **Estrategia de Pruebas:** Para asegurar la calidad y el rendimiento del sistema bajo estrés, se ha integrado la herramienta Gatling en el flujo de desarrollo. Los scripts de simulación (escritos en Scala) se encuentran  dentro del repositorio en la carpeta `PruebaCarga`. Esto permite a cualquier desarrollador del equipo levantar el entorno local de Docker y lanzar los tests de concurrencia para validar que sus cambios no han degradado el rendimiento del servidor antes de realizar un despliegue.
-* **Pruebas de Integración de API (Bots Externos):** El motor de juego en Rust expone el endpoint `/v1/play` para permitir la integración de bots externos cumpliendo con los requisitos del proyecto. A continuación se muestra un ejemplo real de consumo de la API mediante curl utilizado durante el desarrollo para validar su funcionamiento:
+* **Estrategia de Pruebas:** Para asegurar la calidad y el rendimiento del sistema bajo estrés, se ha integrado la herramienta Gatling en el flujo de desarrollo. Los scripts de simulación (escritos en Scala) se encuentran  dentro del repositorio en la carpeta PruebaCarga. Esto permite a cualquier desarrollador del equipo levantar el entorno local de Docker y lanzar los tests de concurrencia para validar que sus cambios no han degradado el rendimiento del servidor antes de realizar un despliegue.
 
+=== Diseño y Documentación de la API
+
+El sistema YOVI utiliza una arquitectura orientada a servicios que se comunican mediante APIs RESTful sobre HTTP. Se ha establecido JSON como formato estándar y universal de intercambio de datos para todos los módulos.
+
+La API se divide lógicamente en dos grandes bloques de responsabilidad, separados por puertos e instancias de despliegue:
+
+==== API de Gestión de Usuarios (Node.js - Puerto 3000)
+Este servicio centraliza la persistencia, la seguridad y el componente social del juego. Sus rutas principales incluyen:
+
+* **Autenticación y Seguridad:**
+  ** POST /createuser y POST /login: Gestión de credenciales y generación de sesiones.
+* **Historial y Estadísticas:**
+  ** POST /savegame: Registra el resultado final de una partida.
+  ** GET /history/{username}: Recupera el listado de partidas (soporta filtros por query params).
+  ** GET /stats/{username} y GET /ranking: Agregación de datos y cálculo de la puntuación ponderada.
+* **Componente Social:**
+  ** GET /user/{username}, POST /addfriend/{username}, DELETE /removefriend/{username}.
+  ** Gestión completa de grupos (/creategroup, /joingroup, /mygroups, etc.).
+
+==== API del Motor de Juego (Rust/Axum - Puerto 4000)
+Este servicio, altamente optimizado, expone la lógica pura del juego "Y", la validación de movimientos y los motores de Inteligencia Artificial (Bots).
+
+* **Gestión Interna de Partidas (Usado por el Frontend):**
+  ** POST /game/new: Inicializa un tablero en memoria, asigna un UUID y devuelve el estado inicial.
+  ** GET /game/{game_id}: Recupera el estado de ocupación y el turno actual del tablero.
+  ** POST /game/{game_id}/move: Procesa un movimiento (place, resign, timeout). Si la partida es contra la IA, el frontend puede adjuntar el identificador del bot en la petición para que el motor encadene el movimiento humano y la respuesta de la máquina en una sola transacción.
+
+==== API Pública para Torneos y Bots Externos
+Para cumplir con el requisito de interoperabilidad y permitir que bots desarrollados por terceros compitan contra nuestro motor, se expone un endpoint público que actúa sin necesidad de estado previo (Stateless):
+
+* **GET /play**
+  ** **Propósito:** Permite a un bot externo solicitar cuál sería el siguiente mejor movimiento dado un estado de tablero concreto.
+  ** **Parámetros:**  position: Un string que contiene un JSON serializado con el formato de notación YEN (tamaño, turno, jugadores y layout).
+      bot_id (opcional): El nombre de la estrategia de la IA a consultar (ej. monte_carlo_bot, random_bot).
+  ** **Respuesta:** El servidor reconstruye el tablero en memoria, evalúa la jugada y devuelve las coordenadas espaciales {"coords": {"x": 0, "y": 1, "z": 2}} o, en caso de estar bloqueado, la acción {"action": "resign"}.
+
+**Ejemplo de llamada:**
 [source,bash]
 ----
-# Petición de un bot externo (random_bot)
-curl -X POST http://localhost:4000/v1/play \
-  -H "Content-Type: application/json" \
-  -d "{\"position\": \"./../...\", \"bot\": \"random_bot\", \"player\": 0}"
-
-# Respuesta del servidor (JSON) indicando el movimiento del bot
-{"position":"./../.B.","cell_index":4,"status":"ongoing","winner":null}
+curl -G "http://localhost:4000/play" \
+     --data-urlencode "position={\"size\":3,\"turn\":0,\"players\":[\"B\",\"R\"],\"layout\":\"./../...\"}"
 ----
+
+**Respuesta del servidor:**
+[source,json]
+----
+{
+  "coords": {
+    "x": 0,
+    "y": 0,
+    "z": 2
+  }
+}
+----
+
 
 ifdef::arc42help[]
 [role="arc42help"]
