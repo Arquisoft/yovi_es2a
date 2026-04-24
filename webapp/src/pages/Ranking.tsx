@@ -4,6 +4,7 @@ import { useAuthComprobation } from '../components/AuthComprobation';
 import Navbar from '../components/Navbar';
 import { getRanking, type RankingEntry } from '../services/gameService';
 import '../styles/Ranking.css';
+import RankingHelp from './RankingHelp';
 
 const MEDAL: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
 
@@ -58,7 +59,7 @@ const Ranking: React.FC = () => {
                             <tr>
                                 <th className="col-pos">#</th>
                                 <th className="col-user">Jugador</th>
-                                <th className="col-score">Puntuación</th>
+                                <th className="col-score">Puntuación <RankingHelp /></th>
                                 <th className="col-games">Partidas</th>
                                 <th className="col-wins">Victorias</th>
                             </tr>
