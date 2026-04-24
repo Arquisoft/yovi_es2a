@@ -1,12 +1,11 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom'; // <--- SOLUCIÓN ERROR 1: Permite usar toBeInTheDocument
 
 // Ajustamos las rutas asumiendo que el test está en src/__tests__ 
 // y el componente en src/ o src/components/
 import FriendsList from '../components/FriendsList'; 
-import { getFriends, removeFriend } from '../services/gameService'; 
+import { getFriends } from '../services/gameService'; 
 
 // ─── 1. MOCKS DE DEPENDENCIAS ──────────────────────────────────────────────
 
