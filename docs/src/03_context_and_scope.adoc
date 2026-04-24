@@ -68,6 +68,7 @@ a|
     * Estado actualizado de la partida
     * Resultado de la partida
     * Historico y estadísticas
+    * Ranking global de jugadores
 
 | *Bot externo*
 a| 
@@ -111,12 +112,13 @@ endif::arc42help[]
 | Selección de estrategia y nivel de dificultad | Confirmación de configuración | HTML / JSON / HTTPS
 | Movimientos de la partida | Estado de la partida en curso | HTML / JSON / HTTPS
 | Consulta de resultados / estadísticas | Resultados y estadísticas | HTML / JSON / HTTPS
+| Consulta del ranking global | Top 10 jugadores con puntuación | HTML / JSON / HTTPS
 |===
 
 .**API de Gestión (Servicio `users` - Puerto 3000)**
 * Protocolo y Formato: HTTPS y JSON.
-* Responsabilidad: Gestiona la persistencia y consulta de datos sensibles: perfiles de usuario, autenticación y almacenamiento del historial de partidas.
-* Integración: Permite a agentes externos la consulta de estadísticas y rankings mediante endpoints REST estándar.
+* Responsabilidad: Gestiona la persistencia y consulta de datos sensibles: perfiles de usuario, autenticación, almacenamiento del historial de partidas y cálculo del ranking global.
+* Integración: Permite a agentes externos y al frontend la consulta de estadísticas, historial y ranking mediante endpoints REST estándar (`GET /ranking`).
 
 .**API de Motor de Juego (Servicio `gamey` - Puerto 4000)**
 * Protocolo y Formato: HTTPS, JSON y notación YEN.

@@ -1,4 +1,3 @@
-/* Contenedor del shader */
 .color-bends-container {
   position: fixed;
   top: 0;
@@ -10,7 +9,6 @@
   pointer-events: none;
 }
 
-/* Canvas ocupa todo */
 .color-bends-container canvas {
   width: 100%;
   height: 100%;

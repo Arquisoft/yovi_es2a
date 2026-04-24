@@ -14,6 +14,11 @@ const Navbar: React.FC = () => {
         navigate('/');
     };
 
+    const handleNetworkClick = () => {
+        navigate('/red');
+        setShowDropdown(false);
+    };
+
     return (
         <nav className="navbar">
             <div className="navbar-left">
@@ -26,6 +31,7 @@ const Navbar: React.FC = () => {
                 </button>
                 {showDropdown && (
                     <div className="dropdown-menu">
+                        <button onClick={handleNetworkClick}>👥 Mi red de usuarios</button>
                         <button onClick={handleLogout}>Cerrar sesión</button>
                     </div>
                 )}

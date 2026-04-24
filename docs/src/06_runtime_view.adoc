@@ -147,7 +147,40 @@ deactivate web
 @enduml
 ....
 
-=== Escenario 7: Cierre de sesión
+=== Escenario 7: Consulta del Ranking Global
+ 
+El usuario accede a la vista de ranking. El frontend solicita al servicio `users` el top 10 de jugadores. El servicio agrega los registros de partidas de MongoDB, calcula la puntuación ponderada de cada jugador y devuelve la lista ordenada. El jugador logueado aparece resaltado en la tabla.
+ 
+[plantuml, runtime-ranking, png]
+....
+@startuml
+!theme plain
+autonumber
+skinparam monochrome true
+ 
+actor Usuario
+participant "webapp (Frontend)" as web
+participant "users-service (API)" as users
+database "MongoDB" as mongo
+ 
+Usuario -> web: Accede a vista 'Ranking'
+activate web
+web -> users: GET /ranking
+activate users
+users -> mongo: find(GameRecord) todos los usuarios
+activate mongo
+mongo --> users: Colección completa de partidas
+deactivate mongo
+users -> users: Agrupa por usuario\nCalcula Score ponderado\nOrdena y selecciona top 10
+users --> web: 200 OK [ {username, score, totalGames, wins, position} ]
+deactivate users
+web -> web: Resalta fila del usuario logueado
+web --> Usuario: Renderiza tabla de ranking (top 10)
+deactivate web
+@enduml
+....
+
+=== Escenario 8: Cierre de sesión
 
 El usuario cierra su sesión desde la interfaz. El frontend elimina los datos locales (localStorage) y notifica al servicio `users`, que invalida la sesión en la base de datos.
 

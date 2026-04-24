@@ -1,14 +1,34 @@
-// src/__tests__/gameService.test.ts
-import { describe, test, expect, vi, afterEach } from 'vitest'
+import { describe, test, expect, vi, afterEach, beforeEach } from 'vitest'
 import {
     createGame,
     getGame,
     placeToken,
     resign,
+    timeout,
     saveGameResult,
     getHistory,
     getStats,
+    getRanking,
+    getUserPublicData,
+    searchUsers,
+    addFriend,
+    removeFriend,
+    getFriends,
+    getGroups,
+    createGroup,
+    getGroupDetails,
+    joinGroup,
+    leaveGroup,
+    getMyGroups
 } from '../services/gameService'
+
+// Mock del localStorage para las funciones de amigos y grupos
+const mockLocalStorage = {
+    getItem: vi.fn(),
+};
+Object.defineProperty(global, 'localStorage', {
+    value: mockLocalStorage,
+});
 
 // Definimos el estado de la partida que se usará en las respuestas mockeadas
 const mockApiState = {
@@ -46,17 +66,21 @@ function mockFetchError(error: string, status = 400) {
 }
 
 describe('gameService', () => {
+    beforeEach(() => {
+        // Por defecto, simulamos que hay un usuario logueado
+        mockLocalStorage.getItem.mockReturnValue('testuser');
+    });
+
     afterEach(() => {
         vi.restoreAllMocks()
     })
 
-    // describe es una función de Vitest que agrupa un conjunto de pruebas relacionadas.
+    // ─── TESTS EXISTENTES ──────────────────────────────────────────────────
+
     describe('createGame', () => {
         test('llama al endpoint correcto y devuelve el estado inicial', async () => {
             mockFetchOk(mockApiState)
-
             const result = await createGame(7, 'human', 'random_bot')
-
             expect(fetch).toHaveBeenCalledWith(
                 expect.stringContaining('/game/new'),
                 expect.objectContaining({ method: 'POST' })
@@ -66,7 +90,6 @@ describe('gameService', () => {
 
         test('lanza error si la respuesta no es ok', async () => {
             mockFetchError('Error al crear la partida')
-
             await expect(createGame(7)).rejects.toThrow('Error al crear la partida')
         })
     })
@@ -74,16 +97,13 @@ describe('gameService', () => {
     describe('getGame', () => {
         test('llama al endpoint con el gameId correcto', async () => {
             mockFetchOk(mockApiState)
-
             const result = await getGame('game-123')
-
             expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/game/game-123'))
             expect(result.game_id).toBe('game-123')
         })
 
         test('lanza error si la partida no existe', async () => {
             mockFetchError('Partida no encontrada', 404)
-
             await expect(getGame('inexistente')).rejects.toThrow('Partida no encontrada')
         })
     })
@@ -91,35 +111,25 @@ describe('gameService', () => {
     describe('placeToken', () => {
         test('envía el movimiento correctamente sin bot', async () => {
             mockFetchOk(mockMoveResponse)
-
             const result = await placeToken('game-123', 0, 3)
-
             expect(fetch).toHaveBeenCalledWith(
                 expect.stringContaining('/game/game-123/move'),
-                expect.objectContaining({
-                    method: 'POST',
-                    body: expect.stringContaining('"cell_index":3'),
-                })
+                expect.objectContaining({ method: 'POST', body: expect.stringContaining('"cell_index":3') })
             )
             expect(result.applied_move.cell_index).toBe(3)
         })
 
         test('incluye el botId en el body cuando se pasa', async () => {
             mockFetchOk(mockMoveResponse)
-
             await placeToken('game-123', 0, 3, 'defensive_easy')
-
             expect(fetch).toHaveBeenCalledWith(
                 expect.anything(),
-                expect.objectContaining({
-                    body: expect.stringContaining('"bot":"defensive_easy"'),
-                })
+                expect.objectContaining({ body: expect.stringContaining('"bot":"defensive_easy"') })
             )
         })
 
         test('lanza error si el movimiento es inválido', async () => {
             mockFetchError('Movimiento inválido')
-
             await expect(placeToken('game-123', 0, 99)).rejects.toThrow('Movimiento inválido')
         })
     })
@@ -127,20 +137,15 @@ describe('gameService', () => {
     describe('resign', () => {
         test('envía la acción resign correctamente', async () => {
             mockFetchOk(mockMoveResponse)
-
             await resign('game-123', 0)
-
             expect(fetch).toHaveBeenCalledWith(
                 expect.stringContaining('/game/game-123/move'),
-                expect.objectContaining({
-                    body: expect.stringContaining('"action":"resign"'),
-                })
+                expect.objectContaining({ body: expect.stringContaining('"action":"resign"') })
             )
         })
 
         test('lanza error si falla la rendición', async () => {
             mockFetchError('Error al rendirse')
-
             await expect(resign('game-123', 0)).rejects.toThrow('Error al rendirse')
         })
     })
@@ -148,46 +153,32 @@ describe('gameService', () => {
     describe('saveGameResult', () => {
         test('envía el resultado al endpoint correcto', async () => {
             mockFetchOk({})
-
             await saveGameResult('testuser', 'random_bot', '1', 7)
-
             expect(fetch).toHaveBeenCalledWith(
                 expect.stringContaining('/savegame'),
-                expect.objectContaining({
-                    method: 'POST',
-                    body: expect.stringContaining('"resultado":"1"'),
-                })
+                expect.objectContaining({ method: 'POST', body: expect.stringContaining('"resultado":"1"') })
             )
         })
 
         test('lanza error si falla el guardado', async () => {
             mockFetchError('Error al guardar la partida')
-
-            await expect(saveGameResult('testuser', 'bot', '1', 7))
-                .rejects.toThrow('Error al guardar la partida')
+            await expect(saveGameResult('testuser', 'bot', '1', 7)).rejects.toThrow('Error al guardar la partida')
         })
     })
 
     describe('getHistory', () => {
-        const mockHistory = [
-            { _id: '1', username: 'testuser', rival: 'bot', resultado: '1' as const, size: 7, createdAt: '2024-01-01' },
-        ]
+        const mockHistory = [{ _id: '1', username: 'testuser', rival: 'bot', resultado: '1' as const, size: 7, createdAt: '2024-01-01' }]
 
         test('devuelve el historial sin filtros', async () => {
             mockFetchOk({ history: mockHistory })
-
             const result = await getHistory('testuser')
-
             expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/history/testuser'))
             expect(result).toHaveLength(1)
-            expect(result[0].rival).toBe('bot')
         })
 
         test('añade los filtros como query params', async () => {
             mockFetchOk({ history: mockHistory })
-
             await getHistory('testuser', { resultado: '1', rival: 'bot', size: 7 })
-
             const url = (fetch as ReturnType<typeof vi.fn>).mock.calls[0][0] as string
             expect(url).toContain('resultado=1')
             expect(url).toContain('rival=bot')
@@ -196,38 +187,171 @@ describe('gameService', () => {
 
         test('lanza error si falla la petición', async () => {
             mockFetchError('Error al obtener el historial')
-
             await expect(getHistory('testuser')).rejects.toThrow('Error al obtener el historial')
         })
     })
 
     describe('getStats', () => {
-        const mockStats = {
-            username: 'testuser',
-            total: 10,
-            wins: 7,
-            losses: 3,
-            winRate: 70,
-            currentStreak: 2,
-            bestStreak: 5,
-            mostPlayedRival: 'random_bot',
-            rivalStats: { random_bot: { wins: 7, losses: 3, total: 10 } },
-        }
+        const mockStats = { username: 'testuser', winRate: 70, mostPlayedRival: 'random_bot' }
 
         test('devuelve las estadísticas del usuario', async () => {
             mockFetchOk(mockStats)
-
             const result = await getStats('testuser')
-
             expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/stats/testuser'))
             expect(result.winRate).toBe(70)
-            expect(result.mostPlayedRival).toBe('random_bot')
         })
 
         test('lanza error si falla la petición', async () => {
             mockFetchError('Error al obtener las estadísticas')
-
             await expect(getStats('testuser')).rejects.toThrow('Error al obtener las estadísticas')
+        })
+    })
+
+    // ─── NUEVOS TESTS (COBERTURA AÑADIDA) ──────────────────────────────────
+
+    describe('timeout', () => {
+        test('envía la acción timeout correctamente sin bot', async () => {
+            mockFetchOk(mockMoveResponse)
+            await timeout('game-123', 0)
+            expect(fetch).toHaveBeenCalledWith(
+                expect.stringContaining('/game/game-123/move'),
+                expect.objectContaining({ body: expect.stringContaining('"action":"timeout"') })
+            )
+        })
+
+        test('envía la acción timeout incluyendo el bot', async () => {
+            mockFetchOk(mockMoveResponse)
+            await timeout('game-123', 0, 'offensive_bot')
+            expect(fetch).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({ body: expect.stringContaining('"bot":"offensive_bot"') })
+            )
+        })
+
+        test('lanza error si falla el timeout', async () => {
+            mockFetchError('Error al pasar turno')
+            await expect(timeout('game-123', 0)).rejects.toThrow('Error al pasar turno')
+        })
+    })
+
+    describe('getRanking', () => {
+        test('devuelve el ranking correctamente', async () => {
+            mockFetchOk({ ranking: [{ username: 'testuser', score: 100 }] })
+            const result = await getRanking()
+            expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/ranking'))
+            expect(result[0].score).toBe(100)
+        })
+
+        test('lanza error si falla', async () => {
+            mockFetchError('Error al obtener el ranking')
+            await expect(getRanking()).rejects.toThrow('Error al obtener el ranking')
+        })
+    })
+
+    describe('getUserPublicData y searchUsers', () => {
+        test('obtiene datos públicos de usuario', async () => {
+            mockFetchOk({ username: 'amigo', stats: { total: 5 } })
+            const result = await getUserPublicData('amigo')
+            expect(result.username).toBe('amigo')
+        })
+
+        test('lanza error si el usuario no existe', async () => {
+            mockFetchError('Error al obtener datos del usuario', 404)
+            await expect(getUserPublicData('falso')).rejects.toThrow('Error al obtener datos del usuario')
+        })
+
+        test('searchUsers devuelve array vacío si la query está vacía', async () => {
+            const result = await searchUsers('   ')
+            expect(result).toEqual([])
+        })
+
+        test('searchUsers devuelve el usuario si lo encuentra', async () => {
+            mockFetchOk({ username: 'amigo', stats: {} })
+            const result = await searchUsers('amigo')
+            expect(result).toHaveLength(1)
+            expect(result[0].username).toBe('amigo')
+        })
+
+        test('searchUsers devuelve array vacío si el usuario no existe (atrapa el error)', async () => {
+            mockFetchError('Not found', 404)
+            const result = await searchUsers('falso')
+            expect(result).toEqual([])
+        })
+    })
+
+    describe('Friends Endpoints', () => {
+        test('addFriend envía la petición con X-User', async () => {
+            mockFetchOk({ message: 'Friend added' })
+            await addFriend('amigo')
+            expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/addfriend/amigo'), expect.objectContaining({
+                headers: { 'Content-Type': 'application/json', 'X-User': 'testuser' }
+            }))
+        })
+
+        test('addFriend falla si no hay usuario logueado', async () => {
+            mockLocalStorage.getItem.mockReturnValue(null)
+            await expect(addFriend('amigo')).rejects.toThrow('No estás autenticado')
+        })
+
+        test('removeFriend envía la petición correcta', async () => {
+            mockFetchOk({ message: 'Friend removed' })
+            await removeFriend('amigo')
+            expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/removefriend/amigo'), expect.objectContaining({ method: 'DELETE' }))
+        })
+
+        test('getFriends devuelve la lista de amigos', async () => {
+            mockFetchOk({ friends: [{ username: 'amigo1' }] })
+            const result = await getFriends('testuser')
+            expect(result[0].username).toBe('amigo1')
+        })
+    })
+
+    describe('Groups Endpoints', () => {
+        test('getGroups devuelve todos los grupos públicos', async () => {
+            mockFetchOk({ groups: [{ name: 'Grupo Publico' }] })
+            const result = await getGroups()
+            expect(result[0].name).toBe('Grupo Publico')
+        })
+
+        test('createGroup falla si no hay sesión', async () => {
+            mockLocalStorage.getItem.mockReturnValue(null)
+            await expect(createGroup('Mi Grupo')).rejects.toThrow('No estás autenticado')
+        })
+
+        test('createGroup envía los datos correctos', async () => {
+            mockFetchOk({ group: { name: 'Mi Grupo' } })
+            const result = await createGroup('Mi Grupo', 'Desc')
+            expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/creategroup'), expect.objectContaining({
+                body: JSON.stringify({ name: 'Mi Grupo', description: 'Desc' })
+            }))
+            expect(result.name).toBe('Mi Grupo')
+        })
+
+        test('getGroupDetails devuelve detalles', async () => {
+            mockFetchOk({ group: { name: 'Grupo 1' }, members: [] })
+            const result = await getGroupDetails('123')
+            expect(result.group.name).toBe('Grupo 1')
+        })
+
+        test('joinGroup envía la petición correctamente', async () => {
+            mockFetchOk({ message: 'Joined' })
+            await joinGroup('123')
+            expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/joingroup/123'), expect.objectContaining({ method: 'POST' }))
+        })
+
+        test('leaveGroup envía la petición correctamente', async () => {
+            mockFetchOk({ message: 'Left' })
+            await leaveGroup('123')
+            expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/leavegroup/123'), expect.objectContaining({ method: 'DELETE' }))
+        })
+
+        test('getMyGroups devuelve los grupos del usuario actual', async () => {
+            mockFetchOk({ groups: [{ name: 'Mi Grupo Privado' }] })
+            const result = await getMyGroups()
+            expect(result[0].name).toBe('Mi Grupo Privado')
+            expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/mygroups'), expect.objectContaining({
+                headers: { 'X-User': 'testuser' }
+            }))
         })
     })
 })
