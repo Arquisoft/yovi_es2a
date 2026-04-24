@@ -501,9 +501,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel2">
 <li><a href="#_conceptos_de_dominio">8.1. Conceptos de Dominio</a></li>
 <li><a href="#_experiencia_de_usuario_ux">8.2. Experiencia de Usuario (UX)</a></li>
-<li><a href="#_seguridad">8.3. Seguridad</a></li>
-<li><a href="#_arquitectura">8.4. Arquitectura</a></li>
-<li><a href="#_desarrollo_y_operaciones">8.5. Desarrollo y Operaciones</a></li>
+<li><a href="#_prototipos_de_pantallas">8.3. Prototipos de pantallas</a></li>
+<li><a href="#_seguridad">8.4. Seguridad</a></li>
+<li><a href="#_arquitectura">8.5. Arquitectura</a></li>
+<li><a href="#_desarrollo_y_operaciones">8.6. Desarrollo y Operaciones</a></li>
+<li><a href="#_diseño_y_documentación_de_la_api">8.7. Diseño y Documentación de la API</a></li>
 </ul>
 </li>
 <li><a href="#section-design-decisions">9. Decisiones de Arquitectura</a>
@@ -2105,12 +2107,13 @@ when your infrastructure is more complex.</p>
 <p><strong>Feedback Inmediato:</strong> La interfaz bloquea visualmente acciones ilegales antes de enviarlas al servidor para mejorar la reactividad, aunque la validación final siempre reside en el backend.</p>
 </li>
 <li>
-<p><strong>Diseño Adaptable:</strong> La interfaz se adapta a diferentes tamaños de pantalla, asegurando que el tablero triangular sea jugable tanto en escritorio como en dispositivos móviles.</p>
+<p><strong>Diseño Adaptable:</strong> La interfaz se adapta a diferentes tamaños de tablero, asegurando que el tablero triangular sea jugable tanto en su tamaño mínimo (4) como máximo (30).</p>
 </li>
 </ul>
 </div>
-<div class="sect3">
-<h4 id="_prototipos_de_pantallas">8.2.1. Prototipos de pantallas</h4>
+</div>
+<div class="sect2">
+<h3 id="_prototipos_de_pantallas">8.3. Prototipos de pantallas</h3>
 <div class="paragraph">
 <p>Los prototipos originales de las pantallas del proyecto tal y como se diseñaron en las reuniones perativas se pueden encontrar a continuación:</p>
 </div>
@@ -2123,9 +2126,8 @@ when your infrastructure is more complex.</p>
 <p>Cabe destacar que estos prototipos se han utilizado como referencia para el desarrollo de la interfaz de usuario, aunque se han realizado ajustes durante el proceso de implementación para mejorar la usabilidad y adaptarse a las limitaciones técnicas.</p>
 </div>
 </div>
-</div>
 <div class="sect2">
-<h3 id="_seguridad">8.3. Seguridad</h3>
+<h3 id="_seguridad">8.4. Seguridad</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2138,7 +2140,7 @@ when your infrastructure is more complex.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_arquitectura">8.4. Arquitectura</h3>
+<h3 id="_arquitectura">8.5. Arquitectura</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2151,7 +2153,7 @@ when your infrastructure is more complex.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_desarrollo_y_operaciones">8.5. Desarrollo y Operaciones</h3>
+<h3 id="_desarrollo_y_operaciones">8.6. Desarrollo y Operaciones</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2164,22 +2166,141 @@ when your infrastructure is more complex.</p>
 <p><strong>Persistencia de Datos:</strong> La información crítica, como los usuarios registrados y el historial de partidas terminadas, se almacena de forma segura en una base de datos MongoDB.</p>
 </li>
 <li>
-<p><strong>Estrategia de Pruebas:</strong> Para asegurar la calidad y el rendimiento del sistema bajo estrés, se ha integrado la herramienta Gatling en el flujo de desarrollo. Los scripts de simulación (escritos en Scala) se encuentran  dentro del repositorio en la carpeta <code>PruebaCarga</code>. Esto permite a cualquier desarrollador del equipo levantar el entorno local de Docker y lanzar los tests de concurrencia para validar que sus cambios no han degradado el rendimiento del servidor antes de realizar un despliegue.</p>
-</li>
-<li>
-<p><strong>Pruebas de Integración de API (Bots Externos):</strong> El motor de juego en Rust expone el endpoint <code>/v1/play</code> para permitir la integración de bots externos cumpliendo con los requisitos del proyecto. A continuación se muestra un ejemplo real de consumo de la API mediante curl utilizado durante el desarrollo para validar su funcionamiento:</p>
+<p><strong>Estrategia de Pruebas:</strong> Para asegurar la calidad y el rendimiento del sistema bajo estrés, se ha integrado la herramienta Gatling en el flujo de desarrollo. Los scripts de simulación (escritos en Scala) se encuentran  dentro del repositorio en la carpeta PruebaCarga. Esto permite a cualquier desarrollador del equipo levantar el entorno local de Docker y lanzar los tests de concurrencia para validar que sus cambios no han degradado el rendimiento del servidor antes de realizar un despliegue.</p>
 </li>
 </ul>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_diseño_y_documentación_de_la_api">8.7. Diseño y Documentación de la API</h3>
+<div class="paragraph">
+<p>El sistema YOVI utiliza una arquitectura orientada a servicios que se comunican mediante APIs RESTful sobre HTTP. Se ha establecido JSON como formato estándar y universal de intercambio de datos para todos los módulos.</p>
+</div>
+<div class="paragraph">
+<p>La API se divide lógicamente en dos grandes bloques de responsabilidad, separados por puertos e instancias de despliegue:</p>
+</div>
+<div class="sect3">
+<h4 id="_api_de_gestión_de_usuarios_node_js_puerto_3000">8.7.1. API de Gestión de Usuarios (Node.js - Puerto 3000)</h4>
+<div class="paragraph">
+<p>Este servicio centraliza la persistencia, la seguridad y el componente social del juego. Sus rutas principales incluyen:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Autenticación y Seguridad:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>POST /createuser y POST /login: Gestión de credenciales y generación de sesiones.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Historial y Estadísticas:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>POST /savegame: Registra el resultado final de una partida.</p>
+</li>
+<li>
+<p>GET /history/{username}: Recupera el listado de partidas (soporta filtros por query params).</p>
+</li>
+<li>
+<p>GET /stats/{username} y GET /ranking: Agregación de datos y cálculo de la puntuación ponderada.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Componente Social:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>GET /user/{username}, POST /addfriend/{username}, DELETE /removefriend/{username}.</p>
+</li>
+<li>
+<p>Gestión completa de grupos (/creategroup, /joingroup, /mygroups, etc.).</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_api_del_motor_de_juego_rustaxum_puerto_4000">8.7.2. API del Motor de Juego (Rust/Axum - Puerto 4000)</h4>
+<div class="paragraph">
+<p>Este servicio, altamente optimizado, expone la lógica pura del juego "Y", la validación de movimientos y los motores de Inteligencia Artificial (Bots).</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gestión Interna de Partidas (Usado por el Frontend):</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>POST /game/new: Inicializa un tablero en memoria, asigna un UUID y devuelve el estado inicial.</p>
+</li>
+<li>
+<p>GET /game/{game_id}: Recupera el estado de ocupación y el turno actual del tablero.</p>
+</li>
+<li>
+<p>POST /game/{game_id}/move: Procesa un movimiento (place, resign, timeout). Si la partida es contra la IA, el frontend puede adjuntar el identificador del bot en la petición para que el motor encadene el movimiento humano y la respuesta de la máquina en una sola transacción.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_api_pública_para_torneos_y_bots_externos">8.7.3. API Pública para Torneos y Bots Externos</h4>
+<div class="paragraph">
+<p>Para cumplir con el requisito de interoperabilidad y permitir que bots desarrollados por terceros compitan contra nuestro motor, se expone un endpoint público que actúa sin necesidad de estado previo (Stateless):</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>GET /play</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Propósito:</strong> Permite a un bot externo solicitar cuál sería el siguiente mejor movimiento dado un estado de tablero concreto.</p>
+</li>
+<li>
+<p><strong>Parámetros:</strong>  position: Un string que contiene un JSON serializado con el formato de notación YEN (tamaño, turno, jugadores y layout).
+bot_id (opcional): El nombre de la estrategia de la IA a consultar (ej. monte_carlo_bot, random_bot).</p>
+</li>
+<li>
+<p><strong>Respuesta:</strong> El servidor reconstruye el tablero en memoria, evalúa la jugada y devuelve las coordenadas espaciales {"coords": {"x": 0, "y": 1, "z": 2}} o, en caso de estar bloqueado, la acción {"action": "resign"}.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Ejemplo de llamada:</strong></p>
+</div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash"># Petición de un bot externo (random_bot)
-curl -X POST http://localhost:4000/v1/play \
-  -H "Content-Type: application/json" \
-  -d "{\"position\": \"./../...\", \"bot\": \"random_bot\", \"player\": 0}"
-
-# Respuesta del servidor (JSON) indicando el movimiento del bot
-{"position":"./../.B.","cell_index":4,"status":"ongoing","winner":null}</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">curl -G "http://localhost:4000/play" \
+     --data-urlencode "position={\"size\":3,\"turn\":0,\"players\":[\"B\",\"R\"],\"layout\":\"./../...\"}"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Respuesta del servidor:</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">{
+  "coords": {
+    "x": 0,
+    "y": 0,
+    "z": 2
+  }
+}</code></pre>
 </div>
 </div>
 <div class="sidebarblock arc42help">
@@ -2282,6 +2403,7 @@ de esta lista.</p>
 </div>
 </div>
 <div style="page-break-after: always;"></div>
+</div>
 </div>
 </div>
 </div>
@@ -3327,7 +3449,7 @@ El hecho de que el servidor respondiera con un 422 demuestra su robustez: el bac
 <div id="footer">
 <div id="footer-text">
 Version 8.2 EN<br>
-Last updated 2026-04-23 18:20:33 +0200
+Last updated 2026-04-23 22:32:31 +0200
 </div>
 </div>
 </body>
