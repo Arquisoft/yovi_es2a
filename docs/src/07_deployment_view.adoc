@@ -50,25 +50,33 @@ El sistema YOVI está desplegado en **Microsoft Azure** mediante contenedores Do
 
 [plantuml, deployment-diagram, png]
 
+[plantuml, deployment-diagram, png]
 ....
 @startuml
 node "Microsoft Azure" {
-    node "Docker Host" {
-        component "webapp\n(Frontend + API)" as webapp
-        component "gamey\n(Motor de juego Rust)" as gamey
-        component "users\n(Gestión de usuarios)" as users
-        database "MongoDB" as mongo
+    node "Docker Host (Docker Compose)" {
+        component "webapp\n(React :80)" as webapp
+        component "users\n(Node.js :3000)" as users
+        component "gamey\n(Rust :4000)" as gamey
+        database "MongoDB\n(:27017)" as mongo
     }
 }
 
 actor "Usuario" as user
 actor "Bot externo" as bot
 
-user --> webapp : HTTPS
-bot --> webapp : HTTPS (API REST)
-webapp --> gamey : HTTP (API REST)
-webapp --> users : HTTP (API REST)
-users --> mongo : MongoDB protocol
+' El usuario se descarga la web
+user --> webapp : HTTPS (Descarga SPA)
+
+' El navegador del usuario ataca a las APIs
+user --> users : HTTP/REST (Auth/Estadísticas)
+user --> gamey : HTTP/REST (Lógica de juego)
+
+' El bot ataca directamente al motor
+bot --> gamey : GET /play (Notación YEN)
+
+' Conexión interna de BD
+users --> mongo : Protocolo MongoDB (Mongoose)
 @enduml
 ....
 
@@ -79,20 +87,20 @@ users --> mongo : MongoDB protocol
 |Componente |Tecnología |Responsabilidad
 
 |*webapp*
-|TypeScript
-|Sirve el frontend web y expone la API pública para usuarios y bots externos.
+|React / TypeScript
+|Servidor web estático (ej. Nginx o Node estático) que sirve la interfaz de usuario (Single Page Application) al navegador del jugador.
 
 |*gamey*
-|Rust
-|Motor de juego. Valida movimientos, detecta victorias y sugiere jugadas mediante las estrategias implementadas.
+|Rust / Axum
+|Microservicio del Motor de Juego. Valida movimientos, detecta victorias y expone el endpoint público de la IA para los bots externos.
 
 |*users*
-|Node.js / TypeScript
-|Gestiona el registro, autenticación y el historial de partidas de los usuarios.
+|Node.js / Express
+|Microservicio backend que gestiona el registro, la autenticación, el cálculo de rankings y el historial de partidas.
 
 |*MongoDB*
 |MongoDB
-|Base de datos documental que persiste usuarios, credenciales y estadísticas de partidas.
+|Base de datos documental persistente e interna. Solo accesible por el servicio de `users`. Almacena credenciales y estadísticas.
 |===
 
 .Motivación
