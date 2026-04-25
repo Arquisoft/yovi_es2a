@@ -16,7 +16,8 @@ const Ranking: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError]     = useState<string | null>(null);
 
-    const currentUser = localStorage.getItem('username');
+    const raw = localStorage.getItem('username');
+    const currentUser = raw ? decodeURIComponent(raw) : null;
 
     useEffect(() => {
         getRanking()

@@ -288,7 +288,8 @@ export async function searchUsers(query: string): Promise<UserPublicData[]> {
 
 // Agregar un usuario como amigo
 export async function addFriend(friendUsername: string): Promise<void> {
-    const currentUser = localStorage.getItem('username');
+    const raw = localStorage.getItem('username');
+    const currentUser = raw ? decodeURIComponent(raw) : null;
     if (!currentUser) throw new Error('No estás autenticado');
 
     const response = await fetch(`${USERS_URL}/addfriend/${friendUsername}`, {
@@ -306,7 +307,8 @@ export async function addFriend(friendUsername: string): Promise<void> {
 
 // Remover un amigo
 export async function removeFriend(friendUsername: string): Promise<void> {
-    const currentUser = localStorage.getItem('username');
+    const raw = localStorage.getItem('username');
+    const currentUser = raw ? decodeURIComponent(raw) : null;
     if (!currentUser) throw new Error('No estás autenticado');
 
     const response = await fetch(`${USERS_URL}/removefriend/${friendUsername}`, {
@@ -346,7 +348,8 @@ export async function getGroups(): Promise<GroupData[]> {
 
 // Crear un nuevo grupo
 export async function createGroup(name: string, description: string = ''): Promise<GroupData> {
-    const currentUser = localStorage.getItem('username');
+    const raw = localStorage.getItem('username');
+    const currentUser = raw ? decodeURIComponent(raw) : null;
     if (!currentUser) throw new Error('No estás autenticado');
 
     const response = await fetch(`${USERS_URL}/creategroup`, {
@@ -377,7 +380,8 @@ export async function getGroupDetails(groupId: string): Promise<{ group: GroupDa
 
 // Unirse a un grupo
 export async function joinGroup(groupId: string): Promise<void> {
-    const currentUser = localStorage.getItem('username');
+    const raw = localStorage.getItem('username');
+    const currentUser = raw ? decodeURIComponent(raw) : null;
     if (!currentUser) throw new Error('No estás autenticado');
 
     const response = await fetch(`${USERS_URL}/joingroup/${groupId}`, {
@@ -395,7 +399,8 @@ export async function joinGroup(groupId: string): Promise<void> {
 
 // Salir de un grupo
 export async function leaveGroup(groupId: string): Promise<void> {
-    const currentUser = localStorage.getItem('username');
+    const raw = localStorage.getItem('username');
+    const currentUser = raw ? decodeURIComponent(raw) : null;
     if (!currentUser) throw new Error('No estás autenticado');
 
     const response = await fetch(`${USERS_URL}/leavegroup/${groupId}`, {
@@ -413,7 +418,8 @@ export async function leaveGroup(groupId: string): Promise<void> {
 
 // Obtener grupos del usuario actual
 export async function getMyGroups(): Promise<GroupData[]> {
-    const currentUser = localStorage.getItem('username');
+    const raw = localStorage.getItem('username');
+    const currentUser = raw ? decodeURIComponent(raw) : null;
     if (!currentUser) throw new Error('No estás autenticado');
 
     const response = await fetch(`${USERS_URL}/mygroups`, {

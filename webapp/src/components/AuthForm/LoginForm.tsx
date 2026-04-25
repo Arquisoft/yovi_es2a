@@ -44,7 +44,7 @@ const AuthForm: React.FC = () => {
 
       if (res.ok) {
         const sanitizedUsername = sanitizeUsername(username);
-        localStorage.setItem("username", sanitizedUsername); // NOSONAR: username sanitized via sanitizeUsername before storage
+        localStorage.setItem("username", encodeURIComponent(sanitizedUsername));
         navigate('/menu');
       } else {
         setError(data.error || 'Something went wrong');

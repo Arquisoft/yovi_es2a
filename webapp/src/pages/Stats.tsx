@@ -7,7 +7,8 @@ const Stats: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const username = localStorage.getItem('username');
+    const raw = localStorage.getItem('username');
+    const username = raw ? decodeURIComponent(raw) : null;
 
     useEffect(() => {
         if (!username) { setLoading(false); return; }

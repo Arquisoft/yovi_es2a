@@ -43,7 +43,8 @@ function getBotId(type: BotType, difficulty: Difficulty): string {
 }
 
 export default function Lobby(): JSX.Element {
-    const username = localStorage.getItem("username") ?? undefined;
+    const raw = localStorage.getItem("username");
+    const username = raw ? decodeURIComponent(raw) : undefined;
     const navigate = useNavigate();
     useAuthComprobation();
     const [mode, setMode] = useState<GameMode>(null);
