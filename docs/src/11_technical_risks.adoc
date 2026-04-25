@@ -62,7 +62,6 @@ Para valorar la importancia de cada riesgo se utiliza una escala de impacto en t
 
 === Deuda Técnica
 
-**Diseño web inicial poco optimizado visualmente**  
-Durante las primeras fases del desarrollo se priorizará la funcionalidad sobre el diseño visual 
-de la aplicación. Como resultado, la interfaz puede presentar un diseño básico con escasa 
-optimización estética o de experiencia de usuario, que deberá mejorarse en iteraciones posteriores.
+**1. Optimización de CSS y Diseño Responsivo Extremo** Aunque el frontend es completamente funcional y el tablero se renderiza de forma correcta, la estructura CSS requiere una refactorización profunda. Actualmente existen limitaciones en la adaptabilidad a pantallas de móviles muy pequeñas, quedando como deuda técnica la migración a un framework de utilidades CSS más robusto o la reescritura de los media queries.
+
+**2. Soporte Multijugador en Red (Ausencia de WebSockets)** El motor actual procesa los turnos en un modelo de petición/respuesta síncrono (REST). Si en el futuro se desea escalar el proyecto para permitir partidas entre humanos en distintos ordenadores (multijugador real-time remoto), será necesario refactorizar la capa de red del servicio `gamey` para integrar WebSockets.

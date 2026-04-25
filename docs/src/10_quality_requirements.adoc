@@ -168,7 +168,7 @@ endif::arc42help[]
 |Bajo acoplamiento
 |===
 
-====
+==== Fiabilidad
 
 [options="header", cols="1,2,2,3,2"]
 |===
