@@ -74,6 +74,13 @@ export function Game({ size: _size }: GameProps): JSX.Element {
 
     if (status === "loading") return <div>Cargando partida...</div>;
 
+    function getTurnLabel(): string {
+        if (winner) return "TERMINADO";
+        if (currentPlayer === "PLAYER_ONE") return `Turno: ${username ?? "Jugador 1"}`;
+        if (mode === "computer") return "Turno: Bot";
+        return "Turno: Invitado";
+    }
+
     return (
         <>
             <Navbar />
@@ -91,7 +98,7 @@ export function Game({ size: _size }: GameProps): JSX.Element {
                 {/* --- NUEVO: La Cabecera Arriba (Turno, Reloj y Botón) --- */}
                 <div className="game-header">
                     <div className="game-turn">
-                        {winner ? "TERMINADO" : `Turno: ${currentPlayer}`}
+                        {getTurnLabel()}
                     </div>
 
                     {timeLeft !== null && status === "ongoing" && (
