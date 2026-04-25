@@ -39,8 +39,14 @@ endif::arc42help[]
 | Backend API
 | Servicio que centraliza la lógica de negocio, autenticación, gestión de partidas y comunicación con el motor de juego.
 
-| Notación YEN
-| Formato estructurado utilizado para representar posiciones y movimientos del juego Y en la comunicación entre sistemas.
+| Notación YEN (Y-game Exchange Notation)
+| Formato estándar de comunicación del motor de juego que representa el estado completo de una partida del Juego Y en un instante de tiempo. Se expresa como un objeto JSON con cuatro campos: 
+`size` (tamaño del tablero), `turn` (jugador que debe mover), `players` (identificadores de los jugadores) y `layout` (sityación del tablero fila a fila separada por `/`, donde `.` es celda vacía, `B` ficha del jugador B y `R` ficha del jugador R).
+
+| Bot Externo
+| Programa desarrollado por terceros que compite contra el motor de juego del sistema 
+mediante la API REST, enviando y recibiendo movimientos en notación YEN a través del 
+endpoint `GET /play`.
 
 | JSON (JavaScript Object Notation)
 | Formato ligero de intercambio de datos utilizado para la comunicación entre frontend, backend y bots a través de la API REST.

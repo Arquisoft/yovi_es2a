@@ -53,7 +53,6 @@ endif::arc42help[]
 
 .Juego Y
 [options="header"]
-[options="]
 |===
 | Actor | Input | Output
 
@@ -62,7 +61,7 @@ a|
     * Versión de juego deseada
     * Tamaño del tablero
     * Estrategia de juego
-    * Datos basicos (usuario y email) para su registro
+    * Datos basicos (usuario y contraseña) para su registro
     * Movimientos en notación YEN
 a| 
     * Estado actualizado de la partida
@@ -80,6 +79,27 @@ a|
 |===
 
 === Contexto Técnico
+[plantuml, tecnical-context, png]
+....
+@startuml
+actor "Jugador humano" as player
+actor "Bot externo" as bot
+
+rectangle "Sistema Yovi" {
+    component "Webapp\n(React :80)" as webapp
+    component "Users Service\n(Node.js :3000)" as users
+    component "Motor de Juego\n(Rust :4000)" as gamey
+}
+
+database "MongoDB" as db
+
+player --> webapp : HTTPS / navegador web
+webapp --> users : REST / JSON\n(auth, stats, historial)
+webapp --> gamey : REST / JSON\n(lógica de juego)
+bot --> gamey : GET /play\n(notación YEN)
+users --> db : Mongoose / MongoDB
+@enduml
+....
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -97,38 +117,55 @@ together with a mapping table showing the relationships between channels and inp
 ****
 endif::arc42help[]
 
-.API REST (Bots, HTTPS)
+.API REST (Bots, HTTP)
+[options="header"]
 |===
 | Input al sistema | Output del sistema | Formato / Canal
-| Registro / actualización de usuario | Confirmación de operación | JSON / HTTPS
-| POST /v1/play (Parámetros: position, bot, player) | Siguiente movimiento calculado y estado | JSON / HTTPS 
-| Consulta de usuarios | Información de usuarios | JSON / HTTPS
+| Registro / actualización de usuario | Confirmación de operación | JSON / HTTP
+| POST /v1/play (Parámetros: position, bot, player) | Siguiente movimiento calculado y estado | JSON / HTTP 
+| Consulta de usuarios | Información de usuarios | JSON / HTTP
 |===
 
-.Interfaz Web (Jugadores, HTTPS)
+[NOTE]
+La **notación YEN** es el formato estándar utilizado registrar el estado del tablero en la comunicación del motor de juego. Más información al respecto en el glosario.
+
+
+.Interfaz Web (Jugadores, HTTP)
+[options="header"]
 |===
 | Input al sistema | Output del sistema | Formato / Canal
-| Registro de usuario | Confirmación de registro | HTML / JSON / HTTPS
-| Selección de estrategia y nivel de dificultad | Confirmación de configuración | HTML / JSON / HTTPS
-| Movimientos de la partida | Estado de la partida en curso | HTML / JSON / HTTPS
-| Consulta de resultados / estadísticas | Resultados y estadísticas | HTML / JSON / HTTPS
-| Consulta del ranking global | Top 10 jugadores con puntuación | HTML / JSON / HTTPS
+| Registro de usuario | Confirmación de registro | HTML / JSON / HTTP
+| Selección de estrategia y nivel de dificultad | Confirmación de configuración | HTML / JSON / HTTP
+| Movimientos de la partida | Estado de la partida en curso | HTML / JSON / HTTP
+| Consulta de resultados / estadísticas | Resultados y estadísticas | HTML / JSON / HTTP
+| Consulta del ranking global | Top 10 jugadores con puntuación | HTML / JSON / HTTP
 |===
 
 .**API de Gestión (Servicio `users` - Puerto 3000)**
-* Protocolo y Formato: HTTPS y JSON.
+* Protocolo y Formato: HTTP y JSON.
 * Responsabilidad: Gestiona la persistencia y consulta de datos sensibles: perfiles de usuario, autenticación, almacenamiento del historial de partidas y cálculo del ranking global.
 * Integración: Permite a agentes externos y al frontend la consulta de estadísticas, historial y ranking mediante endpoints REST estándar (`GET /ranking`).
 
 .**API de Motor de Juego (Servicio `gamey` - Puerto 4000)**
-* Protocolo y Formato: HTTPS, JSON y notación YEN.
+* Protocolo y Formato: HTTP, JSON y notación YEN.
 * Responsabilidad: Procesa la lógica algorítmica del Juego Y, validación de reglas en tiempo real y ejecución de estrategias de IA.
 * Interoperabilidad: Expone el método `POST /v1/play` que permite el intercambio de jugadas serializadas en notación YEN, facilitando la competición de bots externos contra el motor desarrollado en Rust.
 
+
 .**Interfaz Web (Jugadores)**
 
-* Protocolo: HTTPS, HTML y JSON.
+* Protocolo: HTTP, HTML y JSON.
 * Soporta la interacción directa de los usuarios con el frontend web.
 * Funciones principales: registro, selección de estrategia, ejecución de movimientos y consulta de estadísticas.
 * Formato HTML para visualización y JSON para llamadas internas o APIs de frontend-backend.
+
+.**Base de Datos (MongoDB)**
+[options="header"]
+|===
+| Input al sistema | Output del sistema | Formato / Canal
+| Datos de usuario, partidas, grupos y amistades | Consulta y persistencia de registros | BSON / Driver Mongoose (interno)
+|===
+
+* Protocolo: Conexión interna mediante el driver de mongodb desde el servicio `users`.
+* Almacena: perfiles de usuario, historial de partidas, ranking, relaciones de amistad y grupos.
 

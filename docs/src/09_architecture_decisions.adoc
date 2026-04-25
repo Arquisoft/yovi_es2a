@@ -131,3 +131,30 @@ aporte       = 7.0 · 5 · 0.632 · 1.5  ≈ 33.18 puntos
 ** El ranking premia simultáneamente actividad (victorias absolutas), calidad (bonus de eficacia) y rigor estadístico (confianza).
 ** El cálculo en tiempo real puede degradarse con un volumen muy elevado de `GameRecords`. Mitigable con un índice MongoDB sobre `username`.
 ** Incorporar un nuevo bot requiere únicamente asignarle un peso en `RIVAL_WEIGHTS` del servicio `users`.
+
+=== ADR-004: Ausencia de Gateway — Acceso directo a microservicios
+
+* **Estatus:** Aceptado.
+
+* **Contexto:** En una arquitectura de microservicios, como vimos más tarde en clase, es habitual centralizar el tráfico entrante a través de un gateway que actúe como punto único de entrada. Para el momento de tomar esta decisión teníamos que definir el cómo hacer la API públca para los bots externos.
+
+* **Decisión:** Se descarta el uso de un gateway centralizado. En su lugar:
+** La **webapp** (React) accede directamente a `users` para operaciones hacer las operaciones relacionadas con la gestión de usuarios y directamente a `gamey` para la lógica del juego.
+** Los **bots externos** acceden directamente al motor de juego mediante 
+`GET /play` en notación YEN, sin intermediario.
+
+* **Justificación:** 
+Consideramos que añadir una gateway sería complicar la arquitectura de forma innecesaria en vista de la poca cantidad de endpoints disponibles y la simplicidad de estos. Además, en vista de que nuestra aplicación no está diseñada para manejar un amplio tráfico de bots externos o usuarios, por lo que resolvimos tomar la opción más sencilla de implementar.
+
+* **Alternativas consideradas:**
+** _nginx como reverse proxy_ → Descartado. Añade configuración adicional sin 
+aportar valor real dado que no hay colisión de puertos ni necesidad de balanceo 
+de carga con el volumen actual.
+** _Gateway Node.js propio_ → Descartado. Requeriría desarrollo y mantenimiento 
+de una capa extra que duplicaría lógica ya presente en la webapp.
+
+* **Consecuencias:**
+** La arquitectura es más simple y fácil de desplegar y depurar.
+** La webapp asume la responsabilidad de seleccionar el servicio correcto en cada 
+operación, acoplando ligeramente el frontend a la topología de servicios.
+** Si en el futuro se añaden más microservicios o se requiere autenticación centralizada, la introducción de un gateway sería la evolución natural del sistema que resultaría sencilla de implementar.
