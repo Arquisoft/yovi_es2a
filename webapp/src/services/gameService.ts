@@ -1,19 +1,5 @@
 // Esta clase contiene todas las conexiones entre la API de rust y la lógica del juego en React.
 
-// Sobre el flujo desde React:
-//1. React arranca → POST /game/new
-//                   El servidor crea un GameY, le asigna un ID único (uuid)
-//                   y lo guarda en el HashMap de AppState.
-//                   Devuelve el estado inicial del tablero.
-//
-//2. El jugador mueve → POST /game/{id}/move
-//                      El servidor busca la partida por ID en el HashMap,
-//                      aplica el movimiento, y si hay bot, lo hace jugar.
-//                      Devuelve el tablero actualizado.
-//
-//3. React consulta → GET /game/{id}
-//                    El servidor busca la partida y devuelve su estado actual.
-
 // Importamos los tipos de la API
 import type { ApiGameState, ApiMakeMoveResponse } from "../types/gameApi";
 
@@ -34,7 +20,6 @@ export async function createGame(
     const response = await fetch(`${BACKEND_URL}/game/new`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // Añade al JSON tamaño, moodo y bot usando stringify para convertirlo a texto
         body: JSON.stringify({ size, mode, bot, timer }),
     });
     if (!response.ok) {
@@ -47,8 +32,7 @@ export async function createGame(
 // Obtiene el estado de la partida por su ID
 export async function getGame(gameId: string): Promise<ApiGameState> {
     // Llamamos a la API de rust y le pedimos que nos devuelva el estado de la partida con ese ID
-    const safeId = encodeURIComponent(gameId);
-    const response = await fetch(`${BACKEND_URL}/game/${safeId}`);
+    const response = await fetch(`${BACKEND_URL}/game/${encodeURIComponent(gameId)}`);
     // Si sale mal obtenemos el error y lo mostramos
     if (!response.ok) {
         const error = await response.json();
@@ -74,8 +58,7 @@ export async function placeToken(
 
     if (botId) body.bot = botId;
 
-    const url = new URL(`/game/${encodeURIComponent(gameId)}/move`, BACKEND_URL);
-    const response = await fetch(url.toString(), {
+    const response = await fetch(`${BACKEND_URL}/game/${encodeURIComponent(gameId)}/move`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -92,13 +75,8 @@ export async function resign(
     gameId: string,
     player: number
 ): Promise<ApiMakeMoveResponse> {
-    // Validamos estrictamente el formato del ID antes de usarlo
-    if (!/^[a-zA-Z0-9-]+$/.test(gameId)) {
-        throw new Error("Formato de ID de partida inválido por seguridad");
-    }
-    const response = await fetch(`${BACKEND_URL}/game/${gameId}/move`, {
+    const response = await fetch(`${BACKEND_URL}/game/${encodeURIComponent(gameId)}/move`, {
         method: 'POST',
-        // ... resto del código igual
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ player, action: "resign" }),
     });
@@ -123,8 +101,7 @@ export async function timeout(
     // Si hay un bot jugando, le decimos a Rust que el bot juegue su turno automáticamente después
     if (botId) body.bot = botId;
 
-    const cleanId = gameId.replace(/[./\\]/g, ''); 
-    const response = await fetch(`${BACKEND_URL}/game/${cleanId}/move`, {
+    const response = await fetch(`${BACKEND_URL}/game/${encodeURIComponent(gameId)}/move`, {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -212,10 +189,7 @@ export interface UserStats {
 }
 
 export async function getStats(username: string): Promise<UserStats> {
-  if (/[^a-zA-Z0-9_-]/.test(username)) {
-    throw new Error("Nombre de usuario inválido");
-}
-  const response = await fetch(`${USERS_URL}/stats/${username}`);
+  const response = await fetch(`${USERS_URL}/stats/${encodeURIComponent(username)}`);
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.error ?? 'Error al obtener las estadísticas');
@@ -282,7 +256,7 @@ export interface GroupMemberData {
 
 // Obtener datos públicos de un usuario (username, stats resumidas)
 export async function getUserPublicData(username: string): Promise<UserPublicData> {
-    const response = await fetch(`${USERS_URL}/user/${username}`);
+    const response = await fetch(`${USERS_URL}/user/${encodeURIComponent(username)}`);
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error ?? 'Error al obtener datos del usuario');
@@ -310,7 +284,7 @@ export async function addFriend(friendUsername: string): Promise<void> {
     const currentUser = localStorage.getItem('username');
     if (!currentUser) throw new Error('No estás autenticado');
 
-    const response = await fetch(`${USERS_URL}/addfriend/${friendUsername}`, {
+    const response = await fetch(`${USERS_URL}/addfriend/${encodeURIComponent(friendUsername)}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -328,7 +302,7 @@ export async function removeFriend(friendUsername: string): Promise<void> {
     const currentUser = localStorage.getItem('username');
     if (!currentUser) throw new Error('No estás autenticado');
 
-    const response = await fetch(`${USERS_URL}/removefriend/${friendUsername}`, {
+    const response = await fetch(`${USERS_URL}/removefriend/${encodeURIComponent(friendUsername)}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
@@ -343,7 +317,7 @@ export async function removeFriend(friendUsername: string): Promise<void> {
 
 // Obtener lista de amigos de un usuario
 export async function getFriends(username: string): Promise<UserPublicData[]> {
-    const response = await fetch(`${USERS_URL}/friends/${username}`);
+    const response = await fetch(`${USERS_URL}/friends/${encodeURIComponent(username)}`);
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error ?? 'Error al obtener amigos');
@@ -386,7 +360,7 @@ export async function createGroup(name: string, description: string = ''): Promi
 
 // Obtener detalles de un grupo (incluyendo miembros)
 export async function getGroupDetails(groupId: string): Promise<{ group: GroupData; members: GroupMemberData[] }> {
-    const response = await fetch(`${USERS_URL}/group/${groupId}`);
+    const response = await fetch(`${USERS_URL}/group/${encodeURIComponent(groupId)}`);
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error ?? 'Error al obtener detalles del grupo');
@@ -399,7 +373,7 @@ export async function joinGroup(groupId: string): Promise<void> {
     const currentUser = localStorage.getItem('username');
     if (!currentUser) throw new Error('No estás autenticado');
 
-    const response = await fetch(`${USERS_URL}/joingroup/${groupId}`, {
+    const response = await fetch(`${USERS_URL}/joingroup/${encodeURIComponent(groupId)}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -417,7 +391,7 @@ export async function leaveGroup(groupId: string): Promise<void> {
     const currentUser = localStorage.getItem('username');
     if (!currentUser) throw new Error('No estás autenticado');
 
-    const response = await fetch(`${USERS_URL}/leavegroup/${groupId}`, {
+    const response = await fetch(`${USERS_URL}/leavegroup/${encodeURIComponent(groupId)}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
