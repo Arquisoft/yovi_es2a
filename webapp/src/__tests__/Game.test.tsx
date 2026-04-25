@@ -205,28 +205,22 @@ describe('Game Component', () => {
     });
 
     test('debe mostrar el temporizador y reducir el tiempo cada segundo', () => {
-      // Necesitamos importar 'act' de '@testing-library/react' arriba en tu archivo
-      
       render(
         <MemoryRouter>
           <Game />
         </MemoryRouter>
       );
 
-      // Comprobamos que empieza en 30s
       expect(screen.getByText('⏳ 30s')).toBeInTheDocument();
 
-      // Avanzamos el tiempo 1 segundo exacto
       act(() => {
         vi.advanceTimersByTime(1000);
       });
 
-      // Comprobamos que ha bajado a 29s
       expect(screen.getByText('⏳ 29s')).toBeInTheDocument();
     });
 
     test('debe llamar a handleTimeout EXACTAMENTE una vez cuando el tiempo llega a 0', () => {
-    
       const mockHandleTimeout = vi.fn();
       mockUseGame.mockReturnValue({ ...defaultGameState, handleTimeout: mockHandleTimeout });
 
