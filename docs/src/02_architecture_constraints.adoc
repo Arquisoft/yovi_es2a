@@ -36,6 +36,9 @@ endif::arc42help[]
 | **Modos de Juego** | La aplicación debe soportar partidas de dos jugadores (local) y un modo de un jugador contra la IA.
 | **Interfaz Gráfica** | El tablero debe representarse de forma clara y permitir la interacción táctil o mediante ratón para colocar las fichas.
 | **Despliegue con Docker** | El sistema se despliega mediante contenedores Docker para garantizar portabilidad y reproducibilidad del entorno de ejecución.
+| **Arquitectura de Microservicios** | El sistema está dividido en servicios independientes (users, webapp y gamey), cada uno con una responsabilidad bien definida y desplegable de forma autónoma.
+| **API REST** | La comunicación entre servicios y con bots externos se realiza mediante API REST. El motor del juego expone una interfaz compatible con la notación YEN para permitir la interoperabilidad con agentes externos.
+| **Navegador Web** | La aplicación debe funcionar correctamente en navegadores modernos sin requerir instalación adicional por parte del usuario.
 |===
 
 === Restricciones Organizativas
@@ -53,6 +56,7 @@ endif::arc42help[]
 | Restricción | Descripción
 | **Curva de aprendizaje** | El desarrollo del sistema se basa en tecnologías como Rust y Docker, lo que condiciona las decisiones de implementación y arquitectura.
 | **Coordinación Inicial** | Al no haber trabajado juntos antes, se enfatizará la comunicación constante para evitar conflictos.
+| **Tiempo Limitado** | Al tratarse de un proyecto académico con fechas de entrega fijas, el alcance de ciertas decisiones arquitectónicas está condicionado por los plazos disponibles. Dividiendo la entrega en 4 pequeños entregables diferentes.
 |===
 
 === Restricciones Políticas y Convenciones
