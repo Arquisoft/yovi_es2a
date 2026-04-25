@@ -167,5 +167,5 @@ a| * Jose Emilio Labra Gayo - labra@uniovi.es
 
 | **Usuarios Finales**
 | Jugadores de la aplicación
-| Disfrutar de una buena experiencia de usuario, pudiendo jugar partidas de forma fluida, utilizar diferentes estrategias en el tablero hexagonal, consultar sus estadísticas y comparar su rendimiento con otros jugadores mediante el ranking globa
+| Disfrutar de una buena experiencia de usuario, pudiendo jugar partidas de forma fluida, utilizar diferentes estrategias en el tablero triangular, consultar sus estadísticas y comparar su rendimiento con otros jugadores mediante el ranking global
 |===

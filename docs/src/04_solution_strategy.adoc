@@ -54,10 +54,13 @@ Basándonos en los requisitos del proyecto, se han seleccionado las siguientes t
 ** _Rust:_ Elegido específicamente por su seguridad de memoria y su capacidad de ofrecer un alto rendimiento en los cálculos del juego.
 
 * **Persistencia y Datos:**
-** _MongoDB:_ Base de datos no relacional elegida para garantizar la integridad de los datos de usuarios y mantener un registro fiable de los historiales de partidas.
+** _MongoDB:_ Base de datos no relacional elegida por la flexibilidad de su esquema y su integración con Node.js, ideal para hacer historiales de partidas y perfiles persistentes sin una estructura fija.
+
+* **Pruebas de Rendimiento:**
+** _Gatling (Scala):_ Seleccionado como herramienta principal para las pruebas de carga y estrés. Se eligió por su capacidad para simular un alto volumen de usuarios concurrentes consumiendo mínimos recursos de máquina, y por la generación automática de reportes de rendimiento detallados.
 
 * **Pruebas y Aseguramiento de Calidad:**
-** _Gatling (Scala):_ Seleccionado como herramienta principal para las pruebas de carga y estrés. Se eligió por su capacidad para simular un alto volumen de usuarios concurrentes consumiendo mínimos recursos de máquina, y por la generación automática de reportes de rendimiento detallados.
+** _Vitest, cargo test y Pruebas Manuales E2E:_ Ecosistema de pruebas unitarias y End-to-End (E2E) empleado para garantizar la fiabilidad matemática del motor de juego, el renderizado de la interfaz y la correcta integración entre los microservicios.
 
 === Decisiones de Organización
 

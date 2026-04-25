@@ -228,6 +228,43 @@ EP --> Test : 400 ✓
 
 ==== Tests del Backend (Gamey)
 
+En el motor de juego (Gamey), las pruebas se desarrollan utilizando el framework de testing integrado de forma nativa en Rust (`cargo test`). Al separar la lógica pura de la capa de red, los tests se estructuran en tres focos principales para garantizar la seguridad, el rendimiento y la fiabilidad algorítmica.
+
+===== Rutas y Gestión de Estado Concurrente (`game_routes.rs`)
+
+Estos tests validan los endpoints HTTP gestionados por Axum y la inyección del estado concurrente (`AppState`). Se simulan peticiones HTTP directamente en memoria (sin abrir puertos de red reales) para agilizar la ejecución. Se verifica que el servidor responde con los códigos adecuados (ej. `201 Created` al instanciar partidas, o `200 OK` al mover).
+Un aspecto fundamental comprobado aquí es la seguridad: el servidor debe rechazar peticiones malformadas o movimientos ilegales para evitar trampas, cosa que en la prueba de Carga se confirma.
+
+[plantuml, game_routes, png]
+....
+@startuml
+actor Test
+participant "Axum Router" as Router
+participant "GameY (Engine)" as Engine
+
+Test -> Router : POST /game/{id}/move\n{ player: 1, cell_index: 0 }
+Router -> Engine : add_move(player=1, coords=(0,0,x))
+Engine -> Engine : validate_placement()
+Engine --> Router : Err(OccupiedCell)
+Router --> Test : HTTP 422 Unprocessable Entity
+@enduml
+....
+
+===== Motor del Juego "Y" (`game.rs`)
+
+En este módulo se somete a prueba el núcleo lógico del sistema de forma totalmente aislada. Los tests unitarios validan las estructuras de datos que representan el tablero hexagonal y el estado de la partida:
+
+* **Geometría del tablero:** Se verifica que el cálculo de coordenadas sea exacto (ej. comprobando mediante `test_interior_cell_has_six_neighbors` que una celda central tiene 6 vecinos, mientras que una esquina solo 2).
+* **Condición de Victoria:** Se simulan secuencias completas de jugadas para asegurar que el algoritmo de grafos (_Union-Find_) detecta correctamente en qué momento exacto un jugador logra conectar los tres lados del triángulo (`test_winning_condition`).
+* **Serialización:** Se comprueba el _round-trip_ de conversión bidireccional entre el estado en memoria de Rust y el estándar de notación YEN.
+
+===== Estrategias e Inteligencia Artificial (`monte_carlo_bot.rs`)
+
+Las pruebas de los módulos de IA garantizan que los bots devuelven jugadas legales, sin colgar el servidor ante casos límite.
+Para testear algoritmos probabilísticos como Monte Carlo, se evalúan escenarios cerrados donde la lógica debe ser determinista. Entre otros casos, se verifica:
+
+* Que el bot devuelve una respuesta nula (`None`) si se le envía un tablero ya lleno (`test_monte_carlo_returns_none_on_full_board`).
+* Que el algoritmo reconoce prioridades críticas: se le suministra un tablero preconfigurado a un solo movimiento de ganar, comprobando que el bot ignora el resto de celdas y elige obligatoriamente la coordenada de victoria inmediata (`test_monte_carlo_takes_immediate_win`).
 
 === Pruebas End-to-End (E2E)
 Las pruebas E2E tienen como objetivo validar el flujo completo del sistema, desde la interfaz de usuario hasta la base de datos, asegurando que todas las piezas integradas funcionen como se espera en un entorno similar a producción.
@@ -235,7 +272,7 @@ Las pruebas E2E tienen como objetivo validar el flujo completo del sistema, desd
 A diferencia de los tests unitarios, las pruebas E2E no se centran en funciones aisladas, sino en **historias de usuario completas**. Esto nos permite detectar fallos en las integraciones con servicios externos y problemas de estado en la persistencia de datos.
 
 ==== Casos de uso cubiertos
-En este apartado de muestran algunos de los casos cubiertos:
+En este apartado se muestran algunos de los casos cubiertos:
 
 ===== Registro de un nuevo usuario
 **Descripción**: Valida que un usuario pueda crear una cuenta desde cero cuando los datos son válidos y el servidor está disponible.
@@ -272,7 +309,7 @@ UI --> Usuario: Visualiza
 @enduml
 ....
 ===== Partida contra la CPU (Estrategia)
-**Descripción**: Comprueba que el motor de juego gestione correctamente los turnos automáticos del Bot según la dificultad y la estrategiaseleccionada una vez empezada la partida.
+**Descripción**: Comprueba que el motor de juego gestione correctamente los turnos automáticos del Bot según la dificultad y la estrategia seleccionada una vez empezada la partida.
 
 [plantuml, game-strategy, png]
 ....
@@ -305,7 +342,7 @@ participant "Webapp: End" as End
 Jugador -> Board: Clic en "Surrender"
 Board -> Gamey: Información de la rendición
 Gamey --> Board: Envía la respuesta con el ganador
-Board -> DB: Guarda la partida en el hisotrial
+Board -> DB: Guarda la partida en el historial
 DB --> Board: Mensaje de confimación
 Board -> End: Muestra la pantalla de fin
 Jugador -> End: Le da al botón de volver a jugar
@@ -372,7 +409,7 @@ Por último tenemos la cantidad total de peticiones por segundo recibidas por el
 Durante las pruebas se registra un valor de **0.0522 req/s**, el cual está dentro de las métricas esperadas.
 
 ==== Conclusiones
-Los datos obtenidos durante las pruebas muestran un servicio estable, sin errores de servidor y con tiempos de respuesta aceptables. Pero hay que recordar que se está usando una muestra muy pequeña y una carga basstante nimia. Ya que esto no es una prueba de carga, si no una muestra de la monitorización de la aplicación.
+Los datos obtenidos durante las pruebas muestran un servicio estable, sin errores de servidor y con tiempos de respuesta aceptables. Pero hay que recordar que se está usando una muestra muy pequeña y una carga bastante nimia. Ya que esto no es una prueba de carga, si no una muestra de la monitorización de la aplicación.
 
 
 === Pruebas de Carga

@@ -13,7 +13,18 @@ El modelo de dominio gira en torno al juego de estrategia "Y".
 * **Coordenadas:** Debido a la naturaleza hexagonal del tablero, se utiliza un sistema de coordenadas específico para identificar cada celda y calcular adyacencias de forma eficiente.
 * **Jugador:** Puede ser un usuario humano autenticado o un Bot.
 
+=== Sistema de Puntuación y Ranking
 
+Para que el ranking global sea justo y evitar que los jugadores suban al top jugando exclusivamente contra bots de nivel fácil, el sistema YOVI no utiliza un simple conteo de victorias, sino un algoritmo de **puntuación ponderada**.
+
+En lugar de que cada victoria valga 1 punto, el backend calcula la puntuación de cada jugador basándose en estas cuatro reglas:
+
+* **1. Dificultad del rival:** No todas las victorias valen lo mismo. Ganar al bot aleatorio otorga un multiplicador bajo (x1), ganar a otros jugadores humanos da más puntos (x5), y derrotar a la IA más avanzada (Monte Carlo) otorga el multiplicador máximo (x7).
+* **2. Número de victorias:** Es el factor principal; cuantas más veces derrotes a un rival concreto, más puntos acumulas.
+* **3. Filtro anti-suerte (Confianza estadística):** Si un jugador juega una sola partida contra la IA difícil y la gana por suerte, tendría un "100% de victorias". Para evitar que esto rompa el ranking, el sistema exige un mínimo de volumen. Si juegas pocas partidas, recibes solo una fracción de los puntos. Necesitas jugar unas 30 partidas contra un mismo rival para que el sistema confíe en tu nivel y te dé el 100% de tus puntos.
+* **4. Bonus de eficacia:** Si ganas muchas partidas y pierdes muy pocas contra un mismo oponente, el sistema te premia con un pequeño porcentaje extra de puntos.
+
+Desde la perspectiva de la experiencia de usuario, dado que este sistema genera situaciones donde un jugador con menos victorias totales puede superar en el ranking a otro (por haber jugado partidas más difíciles), la interfaz web incluye una ventana explicativa con mucho detalle en la cabecera del ranking para explicar el sistema de puntuación a los jugadores.
 
 === Experiencia de Usuario (UX)
 
@@ -35,8 +46,8 @@ Cabe destacar que estos prototipos se han utilizado como referencia para el desa
 
 === Arquitectura
 
-* **Microservicios:** El sistema no es un único bloque, sino que está dividido en servicios independientes. Esto permite que si una parte falla o necesita cambios, no afecte a todo el sistema.
-* **API Gateway:** Para facilitar la comunicación, el cliente web (frontend) solo se conecta a una única dirección (puerta de enlace). Esta se encarga de redirigir internamente los datos al microservicio correcto, simplificando la red.
+* **Microservicios Desacoplados:** El sistema no es un único bloque, sino que está dividido en servicios independientes (Node.js y Rust). Esto permite aislar la carga de procesamiento matemático del juego de la gestión de sesiones de usuario.
+* **Comunicación Directa (Cliente-Servidor):** El frontend (React) actúa como orquestador de las peticiones, comunicándose directamente mediante HTTP/REST con el servicio correspondiente (Puerto 3000 para usuarios, Puerto 4000 para juego) sin intermediarios, optimizando la latencia de red.
 
 === Desarrollo y Operaciones
 

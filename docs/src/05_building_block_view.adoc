@@ -23,7 +23,7 @@ actor "Bot Externo" as Bot
 component "Sistema Yovi" as System
 database "MongoDB" as DB
 
-User --> System : HTTPS (Navegador)
+User --> System : HTTP (Navegador)
 Bot --> System : API REST
 System --> DB : Protocolo NoSQL
 @enduml
@@ -32,9 +32,8 @@ System --> DB : Protocolo NoSQL
 ==== Motivación
 El sistema Yovi está diseñado para permitir la gestión y ejecución de partidas del juego "Y" en un entorno web. La arquitectura debe soportar concurrencia y dos tipos de actores principales:
 
-Usuarios Humanos: Que requieren una interfaz gráfica interactiva.
-
-Bots: Que requieren una API para automatizar el juego.
+* **Usuarios Humanos:** Que requieren una interfaz gráfica interactiva.
+* **Bots:** Que requieren una API para automatizar el juego.
 
 ==== Bloques de construcción contenidos
 
@@ -50,9 +49,8 @@ Bots: Que requieren una API para automatizar el juego.
 
 ==== Interfaces Importantes
 
-Interfaz Web (HTTPS): Acceso para usuarios humanos.
-
-API Pública (REST/JSON): Acceso programático para los bots y comunicación interna.
+* **Interfaz Web (HTTP):** Acceso para usuarios humanos.
+* **API Pública (REST/JSON):** Acceso programático para los bots y comunicación interna.
 
 === Nivel 2
 
@@ -65,118 +63,100 @@ endif::arc42help[]
 
 ==== Caja Blanca: Sistema Yovi
 
-Esta vista explota el sistema en sus contenedores principales, separando la presentación de la lógica de negocio y los datos.
+Esta vista explota el sistema en sus contenedores principales, demostrando nuestra arquitectura orientada a microservicios donde la gestión de usuarios y la lógica matemática del juego viven en servidores distintos.
 
 [plantuml, target=diagrama-contenedores, format=svg]
 ....
 @startuml
-component "Frontend Web" as Front
-component "Backend API" as Back
-component "Motor de Juego (Game Engine)" as Engine
+component "Frontend Web\n(React)" as Front
+component "Users Service\n(Node.js)" as Users
+component "Gamey Service\n(Rust)" as Engine
 
-Front --> Back : API REST / WebSockets
-Back --> Engine : Llamadas a funciones
+Front --> Users : HTTP/REST\n(Auth, Historial, Ranking)
+Front --> Engine : HTTP/REST\n(Movimientos, Reglas)
 @enduml
 ....
 
-Motivación:
-Se ha optado por una arquitectura cliente-servidor desacoplada para permitir que la interfaz web evolucione independientemente de la lógica y para facilitar la integración de los bots directamente contra el Backend.
+**Motivación:**
+Se ha optado por una arquitectura cliente-servidor desacoplada y dividida en microservicios. Esto permite que el motor de juego (Rust) escale o se modifique sin afectar a la gestión de sesiones de usuario (Node.js).
 
-Bloques de construcción contenidos:
+**Bloques de construcción contenidos:**
 
 [cols="1,2" options="header"]
 |===
 | Nombre | Responsabilidad
-| Frontend Web | Aplicación de Página Única (SPA). Renderiza el tablero de juego y gestiona la interacción del usuario.
-| Backend API | Servidor de aplicaciones. Gestiona la autenticación, matchmaking, persistencia y orquesta el flujo de la partida.
-| Motor de Juego (Game Engine) | Librería o módulo puro. Contiene estrictamente las reglas del juego "Y", validación de movimientos y detección de victoria.
+| Frontend Web | Aplicación de Página Única (SPA). Renderiza el tablero hexagonal y gestiona la interacción del usuario.
+| Users Service | Microservicio backend (Puerto 3000). Gestiona la autenticación, perfiles, estadísticas y persistencia en base de datos.
+| Gamey Service | Microservicio del Motor (Puerto 4000). Contiene estrictamente las reglas del juego "Y", la Inteligencia Artificial y la validación de movimientos.
 |===
 
 ==== Frontend Web
+* **Propósito:** Proveer una interfaz visual rápida y amigable para los jugadores humanos.
+* **Interfaces:** Consume las APIs REST de los microservicios backend.
+* **Tecnología:** React con TypeScript.
 
-Propósito: Proveer una interfaz visual amigable para los jugadores humanos.
+==== Users Service (Node.js)
+* **Propósito:** Centralizar la lógica de usuarios y seguridad. Actúa como intermediario exclusivo con la base de datos.
+* **Interfaces:** Expone endpoints REST para autenticación y métricas.
+* **Tecnología:** Node.js / Express.
 
-Interfaces: Consume la API REST del Backend y utiliza WebSockets para actualizaciones en tiempo real.
-
-Tecnología: HTML5/JS (React/Angular/Vue).
-
-==== Backend API
-
-Propósito: Centralizar la lógica de negocio y seguridad. Actúa como intermediario entre los actores, la base de datos y el motor de reglas.
-
-Interfaces: Expone endpoints REST y WebSockets para el gameplay.
-
-Tecnología: Node.js / Express.
-
-==== Motor de Juego (Game Engine)
-
-Propósito: Encapsular la complejidad algorítmica del juego "Y". Asegura que las reglas se cumplan rigurosamente.
-
-Características: Módulo independiente, testeable unitariamente y sin estado.
+==== Gamey Service (Rust)
+* **Propósito:** Encapsular la complejidad algorítmica del juego "Y". Asegura que las reglas se cumplan rigurosamente, manteniendo el estado de las partidas vivas en memoria.
+* **Características:** Módulo independiente, concurrente, testeable unitariamente y que expone la IA.
 
 === Nivel 3
 
 ifdef::arc42help[]
 [role="arc42help"]
 
-Aquí especificamos la estructura interna del Backend API, detallando sus componentes internos.
+Aquí especificamos la estructura interna de los Microservicios Backend, detallando sus componentes internos.
 
 endif::arc42help[]
 
-==== Caja Blanca: Backend API
+==== Caja Blanca: Microservicios Backend
 
-El Backend se organiza siguiendo un patrón de capas (Controller - Service - Repository) para mantener el código limpio y mantenible.
+El Backend se divide físicamente en dos servicios independientes, cada uno con su propia estructura interna adaptada a su tecnología.
 
 [plantuml, target=diagrama-componentes, format=svg]
 ....
 @startuml
-package "Backend API" {
-[Game Controller] --> [Matchmaking Service]
-[Game Controller] --> [Game Service]
-[User Controller] --> [User Service]
-
-[Game Service] ..> [Motor de Juego] : usa
-[Matchmaking Service] --> [Game Service] : inicia
-
-[Game Service] --> [Persistence Layer]
-[User Service] --> [Persistence Layer]
+package "Users Service (Node.js)" {
+  [Auth Controller] --> [Mongoose Models]
+  [Stats/History Controller] --> [Mongoose Models]
 }
-@enduml
+
+package "Gamey Service (Rust)" {
+  [Axum Router\n(game_routes.rs)] --> [Game Engine\n(game.rs)]
+  [Axum Router\n(game_routes.rs)] --> [Bot Strategies\n(monte_carlo, random)]
+}
+
+[Mongoose Models] --> [MongoDB] : Persistencia
 ....
 
-Bloques de construcción contenidos:
+**Bloques de construcción contenidos:**
 
 [cols="1,2" options="header"]
 |===
 | Nombre | Responsabilidad
-| Game Controller | Gestiona las peticiones de red (HTTP/Sockets) relacionadas con el juego.
-| User Controller | Gestiona el registro, login y perfil de usuario.
-| Matchmaking Service | Lógica para emparejar jugadores en espera o asignar un Bot si es necesario.
-| Game Service | Orquestador de la partida. Mantiene el estado en memoria y valida movimientos con el Motor de Juego.
-| Persistence Layer | Capa de abstracción (DAO/Repository) para comunicar con MongoDB.
+| Auth & Stats Controllers (Node) | Rutas de Express que gestionan el registro, login y la agregación matemática para el cálculo del ranking.
+| Mongoose Models | Capa de abstracción de datos (ORM) para comunicar Node.js con MongoDB de forma segura.
+| Axum Router (Rust) | Gestiona las peticiones de red (HTTP REST) relacionadas con el juego, inyectando el estado concurrente.
+| Game Engine (Rust) | Cerebro de la ejecución. Recibe intentos de movimiento, actualiza el estado del tablero y detecta la condición de victoria (algoritmo Union-Find).
+| Bot Strategies (Rust) | Módulos de Inteligencia Artificial que evalúan el tablero y devuelven la mejor coordenada posible según su dificultad.
 |===
 
-==== User Controller
+==== Auth & Stats Controllers (Node.js)
+* **Propósito:** Mantener una navegación segura gestionando sesiones y cálculos estadísticos.
+* **Responsabilidades:** Registro, Login, consulta del historial de MongoDB y cálculo algorítmico del ranking ponderado.
 
-Propósito: mantener una navegación segura permitiendo únicamente jugar y acceder a seccioens específicas a usuarios registrados en el sistema.
-Responsabilidades:
-- Registro de usuarios
-- Login
-- Logout
+==== Axum Router & Game Engine (Rust)
+* **Propósito:** Cerebro de la ejecución de la partida. Inyecta el estado concurrente (`Mutex`), recibe intentos de movimiento, consulta la validez de la geometría del tablero, actualiza el estado y dictamina el ganador.
 
-==== Servicio de Juego
+==== Bot Strategies (Rust)
+* **Propósito:** Implementaciones algorítmicas de la Inteligencia Artificial (Monte Carlo, Random, etc.) que evalúan el tablero de forma aislada para devolver la jugada óptima.
 
-Propósito: Cerebro de la ejecución. Recibe intentos de movimiento, consulta validez al motor, actualiza el estado y notifica a los jugadores.
-
-Colaboradores: Motor de Juego, Persistence Layer.
-
-==== Servicio de Emparejamiento (Matchmaking)
-
-Propósito: Gestionar la cola de jugadores. Instancia nuevos juegos a través del Game Service cuando se cumplen las condiciones de emparejamiento.
-
-==== Capa de Persistencia
-
-Propósito: Aislar las consultas y el mapeo de datos de MongoDB del resto de la lógica de negocio.
+==== Mongoose Models (Capa de Persistencia)
+* **Propósito:** Aislar las consultas y el mapeo de datos de MongoDB del resto de la lógica de negocio del servicio de usuarios.
 
 ==== Esquema de Base de Datos (Modelo Relacional en MongoDB)
 
@@ -215,6 +195,6 @@ entity "GameRecord" as game {
   createdAt : Date
 }
 ' Relación: Un usuario puede tener muchas partidas en su historial
-user ||--o{ game : "eJugador 1"}
+user ||--o{ game : "Jugador 1"
 @enduml
 ....

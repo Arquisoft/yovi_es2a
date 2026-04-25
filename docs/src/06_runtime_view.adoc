@@ -11,6 +11,10 @@ El usuario accede a la aplicación e introduce sus credenciales. El servicio `us
 [plantuml, runtime-login, png]
 ....
 @startuml
+!theme plain
+autonumber
+skinparam monochrome true
+
 actor Usuario
 participant "webapp" as web
 participant "users" as users
@@ -30,7 +34,10 @@ El usuario configura una nueva partida eligiendo tamaño del tablero, tipo de op
 
 [plantuml, runtime-newgame, png]
 ....
-@startuml
+!theme plain
+autonumber
+skinparam monochrome true
+
 actor Usuario
 participant "webapp" as web
 participant "gamey" as gamey
@@ -47,7 +54,10 @@ El usuario hace clic en una celda. El frontend envía el movimiento al motor de 
 
 [plantuml, runtime-move, png]
 ....
-@startuml
+!theme plain
+autonumber
+skinparam monochrome true
+
 actor Usuario
 participant "webapp" as web
 participant "gamey" as game
@@ -74,8 +84,13 @@ participant "gamey (Game Engine)" as gamey
 participant "users-service (API)" as users
 database "MongoDB" as mongo
 
-gamey -> web: Evento: Victoria/Derrota detectada
+Usuario -> web: Realiza el movimiento final
 activate web
+web -> gamey: POST /game/{id}/move
+activate gamey
+gamey --> web: 200 OK (Estado: Finished, Winner)
+deactivate gamey
+
 web -> users: POST /savegame (resultado de la partida)
 activate users
 users -> mongo: insertOne(GameRecord)
@@ -84,6 +99,7 @@ mongo --> users: Confirmación (_id)
 deactivate mongo
 users --> web: 201 Created
 deactivate users
+
 web --> Usuario: Renderiza pantalla de resultado final
 deactivate web
 @enduml
@@ -198,12 +214,15 @@ database "MongoDB" as mongo
 
 Usuario -> web: Pulsa "Cerrar sesión"
 activate web
-
-web -> web: Elimina username de localStorage
-
-web -> users: logout
+web -> web: Elimina datos de localStorage
+web -> users: POST /logout
 activate users
-
+users -> mongo: Invalida token/sesión
+activate mongo
+mongo --> users: Confirmación
+deactivate mongo
+users --> web: 200 OK
+deactivate users
 web --> Usuario: Redirige a pantalla de login
 deactivate web
 @enduml
