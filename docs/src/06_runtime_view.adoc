@@ -71,7 +71,7 @@ web --> Usuario: Muestra el nuevo estado del tablero
 
 === Escenario 4: Fin de partida y guardado en historial
 
-plantuml, runtime-endgame, png]
+[plantuml, runtime-endgame, png]
 ....
 @startuml
 !theme plain
