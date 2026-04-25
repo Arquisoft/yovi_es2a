@@ -57,18 +57,21 @@ describe('Game Component', () => {
 
   const defaultGameState = {
     cells: generateMockCells(7),
-    currentPlayer: 1,
+    currentPlayer: 'PLAYER_ONE' as const,
     winner: null,
     status: 'ongoing',
     error: null,
+    moveCount: 0,
     handleCellClick: vi.fn(),
     handleResign: vi.fn(),
+    handleTimeout: vi.fn(),
     resetGame: vi.fn(),
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+    localStorage.setItem('username', 'testuser'); // necesario para getTurnLabel()
+
     mockUseAuthComprobation.mockReturnValue(undefined);
     mockGetLoggedUser.mockReturnValue('testuser');
     mockUseLocation.mockReturnValue({
@@ -79,6 +82,10 @@ describe('Game Component', () => {
       },
     });
     mockUseGame.mockReturnValue(defaultGameState);
+  });
+
+  afterEach(() => {
+    localStorage.clear();
   });
 
   test('debe mostrar el estado de carga', () => {
@@ -93,15 +100,54 @@ describe('Game Component', () => {
     expect(screen.getByText('Cargando partida...')).toBeInTheDocument();
   });
 
-  test('debe mostrar el estado de una partida en curso', () => {
+  test('debe mostrar el turno del usuario cuando es PLAYER_ONE', () => {
     render(
       <MemoryRouter>
         <Game />
       </MemoryRouter>
     );
 
-    expect(screen.getByText('Turno: 1')).toBeInTheDocument();
+    expect(screen.getByText('Turno: testuser')).toBeInTheDocument();
     expect(screen.getByText('Rendirse')).toBeInTheDocument();
+  });
+
+  test('debe mostrar "Turno: Bot" cuando es el turno del bot en modo computer', () => {
+    mockUseGame.mockReturnValue({ ...defaultGameState, currentPlayer: 'PLAYER_TWO' as const });
+
+    render(
+      <MemoryRouter>
+        <Game />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Turno: Bot')).toBeInTheDocument();
+  });
+
+  test('debe mostrar "Turno: Invitado" cuando es el turno del segundo jugador en modo human', () => {
+    mockUseLocation.mockReturnValue({
+      state: { mode: 'human', boardSize: 7 },
+    });
+    mockUseGame.mockReturnValue({ ...defaultGameState, currentPlayer: 'PLAYER_TWO' as const });
+
+    render(
+      <MemoryRouter>
+        <Game />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Turno: Invitado')).toBeInTheDocument();
+  });
+
+  test('debe mostrar TERMINADO cuando hay ganador', () => {
+    mockUseGame.mockReturnValue({ ...defaultGameState, winner: 'PLAYER_ONE' as const });
+
+    render(
+      <MemoryRouter>
+        <Game />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('TERMINADO')).toBeInTheDocument();
   });
 
   test('debe llamar a handleResign cuando se hace clic en el botón de rendirse', () => {
