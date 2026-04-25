@@ -514,6 +514,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_adr_001_uso_de_mongodb_como_base_de_datos">9.2. ADR-001: Uso de MongoDB como base de datos</a></li>
 <li><a href="#_adr_002_estrategia_de_filtrado_en_el_historial_de_partidas">9.3. ADR 002: Estrategia de filtrado en el historial de partidas</a></li>
 <li><a href="#_adr_003_fórmula_de_puntuación_ponderada_para_el_ranking_global">9.4. ADR-003: Fórmula de puntuación ponderada para el ranking global</a></li>
+<li><a href="#_adr_004_ausencia_de_gateway_acceso_directo_a_microservicios">9.5. ADR-004: Ausencia de Gateway — Acceso directo a microservicios</a></li>
 </ul>
 </li>
 <li><a href="#section-quality-scenarios">10. Requisitos de Calidad</a>
@@ -533,9 +534,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#section-tests">12. Estrategia de Pruebas</a>
 <ul class="sectlevel2">
-<li><a href="#_pruebas_end_to_end_e2e">12.1. Pruebas End-to-End (E2E)</a></li>
-<li><a href="#_pruebas_unitarias_y_de_integración_test_normales">12.2. Pruebas Unitarias y de Integración (Test normales)</a></li>
-<li><a href="#_pruebas_de_carga">12.3. Pruebas de Carga</a></li>
+<li><a href="#_pruebas_unitarias">12.1. Pruebas Unitarias</a></li>
+<li><a href="#_pruebas_end_to_end_e2e">12.2. Pruebas End-to-End (E2E)</a></li>
+<li><a href="#_grafana_y_prometheus">12.3. Grafana y Prometheus</a></li>
+<li><a href="#_pruebas_de_carga">12.4. Pruebas de Carga</a></li>
 </ul>
 </li>
 <li><a href="#section-glossary">13. Glosario</a></li>
@@ -948,6 +950,18 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Despliegue con Docker</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">El sistema se despliega mediante contenedores Docker para garantizar portabilidad y reproducibilidad del entorno de ejecución.</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Arquitectura de Microservicios</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">El sistema está dividido en servicios independientes (users, webapp y gamey), cada uno con una responsabilidad bien definida y desplegable de forma autónoma.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>API REST</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">La comunicación entre servicios y con bots externos se realiza mediante API REST. El motor del juego expone una interfaz compatible con la notación YEN para permitir la interoperabilidad con agentes externos.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Navegador Web</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">La aplicación debe funcionar correctamente en navegadores modernos sin requerir instalación adicional por parte del usuario.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1001,6 +1015,10 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Coordinación Inicial</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Al no haber trabajado juntos antes, se enfatizará la comunicación constante para evitar conflictos.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Tiempo Limitado</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Al tratarse de un proyecto académico con fechas de entrega fijas, el alcance de ciertas decisiones arquitectónicas está condicionado por los plazos disponibles. Dividiendo la entrega en 4 pequeños entregables diferentes.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1126,7 +1144,7 @@ The title of the table is the name of your system, the three columns contain the
 <p>Estrategia de juego</p>
 </li>
 <li>
-<p>Datos basicos (usuario y email) para su registro</p>
+<p>Datos basicos (usuario y contraseña) para su registro</p>
 </li>
 <li>
 <p>Movimientos en notación YEN</p>
@@ -1178,6 +1196,11 @@ The title of the table is the name of your system, the three columns contain the
 </div>
 <div class="sect2">
 <h3 id="_contexto_técnico">3.2. Contexto Técnico</h3>
+<div class="imageblock">
+<div class="content">
+<img src="./images/tecnical-context.png" alt="tecnical context" width="441" height="491">
+</div>
+</div>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
@@ -1196,72 +1219,88 @@ together with a mapping table showing the relationships between channels and inp
 </div>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 2. API REST (Bots, HTTPS)</caption>
+<caption class="title">Table 2. API REST (Bots, HTTP)</caption>
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
 <col style="width: 33.3334%;">
 </colgroup>
-<tbody>
+<thead>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Input al sistema</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Output del sistema</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Formato / Canal</p></td>
+<th class="tableblock halign-left valign-top">Input al sistema</th>
+<th class="tableblock halign-left valign-top">Output del sistema</th>
+<th class="tableblock halign-left valign-top">Formato / Canal</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Registro / actualización de usuario</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Confirmación de operación</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">JSON / HTTPS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JSON / HTTP</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">POST /v1/play (Parámetros: position, bot, player)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Siguiente movimiento calculado y estado</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">JSON / HTTPS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JSON / HTTP</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Consulta de usuarios</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Información de usuarios</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">JSON / HTTPS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JSON / HTTP</p></td>
 </tr>
 </tbody>
 </table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+La <strong>notación YEN</strong> es el formato estándar utilizado registrar el estado del tablero en la comunicación del motor de juego. Más información al respecto en el glosario.
+</td>
+</tr>
+</table>
+</div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 3. Interfaz Web (Jugadores, HTTPS)</caption>
+<caption class="title">Table 3. Interfaz Web (Jugadores, HTTP)</caption>
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
 <col style="width: 33.3334%;">
 </colgroup>
-<tbody>
+<thead>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Input al sistema</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Output del sistema</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Formato / Canal</p></td>
+<th class="tableblock halign-left valign-top">Input al sistema</th>
+<th class="tableblock halign-left valign-top">Output del sistema</th>
+<th class="tableblock halign-left valign-top">Formato / Canal</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Registro de usuario</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Confirmación de registro</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">HTML / JSON / HTTPS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HTML / JSON / HTTP</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Selección de estrategia y nivel de dificultad</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Confirmación de configuración</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">HTML / JSON / HTTPS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HTML / JSON / HTTP</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Movimientos de la partida</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Estado de la partida en curso</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">HTML / JSON / HTTPS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HTML / JSON / HTTP</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Consulta de resultados / estadísticas</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Resultados y estadísticas</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">HTML / JSON / HTTPS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HTML / JSON / HTTP</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Consulta del ranking global</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Top 10 jugadores con puntuación</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">HTML / JSON / HTTPS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HTML / JSON / HTTP</p></td>
 </tr>
 </tbody>
 </table>
@@ -1269,7 +1308,7 @@ together with a mapping table showing the relationships between channels and inp
 <div class="title"><strong>API de Gestión (Servicio <code>users</code> - Puerto 3000)</strong></div>
 <ul>
 <li>
-<p>Protocolo y Formato: HTTPS y JSON.</p>
+<p>Protocolo y Formato: HTTP y JSON.</p>
 </li>
 <li>
 <p>Responsabilidad: Gestiona la persistencia y consulta de datos sensibles: perfiles de usuario, autenticación, almacenamiento del historial de partidas y cálculo del ranking global.</p>
@@ -1283,7 +1322,7 @@ together with a mapping table showing the relationships between channels and inp
 <div class="title"><strong>API de Motor de Juego (Servicio <code>gamey</code> - Puerto 4000)</strong></div>
 <ul>
 <li>
-<p>Protocolo y Formato: HTTPS, JSON y notación YEN.</p>
+<p>Protocolo y Formato: HTTP, JSON y notación YEN.</p>
 </li>
 <li>
 <p>Responsabilidad: Procesa la lógica algorítmica del Juego Y, validación de reglas en tiempo real y ejecución de estrategias de IA.</p>
@@ -1297,7 +1336,7 @@ together with a mapping table showing the relationships between channels and inp
 <div class="title"><strong>Interfaz Web (Jugadores)</strong></div>
 <ul>
 <li>
-<p>Protocolo: HTTPS, HTML y JSON.</p>
+<p>Protocolo: HTTP, HTML y JSON.</p>
 </li>
 <li>
 <p>Soporta la interacción directa de los usuarios con el frontend web.</p>
@@ -1307,6 +1346,38 @@ together with a mapping table showing the relationships between channels and inp
 </li>
 <li>
 <p>Formato HTML para visualización y JSON para llamadas internas o APIs de frontend-backend.</p>
+</li>
+</ul>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 4. <strong>Base de Datos (MongoDB)</strong></caption>
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Input al sistema</th>
+<th class="tableblock halign-left valign-top">Output del sistema</th>
+<th class="tableblock halign-left valign-top">Formato / Canal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Datos de usuario, partidas, grupos y amistades</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Consulta y persistencia de registros</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BSON / Driver Mongoose (interno)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="ulist">
+<ul>
+<li>
+<p>Protocolo: Conexión interna mediante el driver de mongodb desde el servicio <code>users</code>.</p>
+</li>
+<li>
+<p>Almacena: perfiles de usuario, historial de partidas, ranking, relaciones de amistad y grupos.</p>
 </li>
 </ul>
 </div>
@@ -2001,7 +2072,7 @@ when your infrastructure is more complex.</p>
 </div>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 4. Descripción de los nodos</caption>
+<caption class="title">Table 5. Descripción de los nodos</caption>
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 40%;">
@@ -2661,6 +2732,70 @@ aporte       = 7.0 · 5 · 0.632 · 1.5  ≈ 33.18 puntos</code></pre>
 </li>
 </ul>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_adr_004_ausencia_de_gateway_acceso_directo_a_microservicios">9.5. ADR-004: Ausencia de Gateway — Acceso directo a microservicios</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Estatus:</strong> Aceptado.</p>
+</li>
+<li>
+<p><strong>Contexto:</strong> En una arquitectura de microservicios, como vimos más tarde en clase, es habitual centralizar el tráfico entrante a través de un gateway que actúe como punto único de entrada. Para el momento de tomar esta decisión teníamos que definir el cómo hacer la API públca para los bots externos.</p>
+</li>
+<li>
+<p><strong>Decisión:</strong> Se descarta el uso de un gateway centralizado. En su lugar:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>La <strong>webapp</strong> (React) accede directamente a <code>users</code> para operaciones hacer las operaciones relacionadas con la gestión de usuarios y directamente a <code>gamey</code> para la lógica del juego.</p>
+</li>
+<li>
+<p>Los <strong>bots externos</strong> acceden directamente al motor de juego mediante
+<code>GET /play</code> en notación YEN, sin intermediario.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Justificación:</strong>
+Consideramos que añadir una gateway sería complicar la arquitectura de forma innecesaria en vista de la poca cantidad de endpoints disponibles y la simplicidad de estos. Además, en vista de que nuestra aplicación no está diseñada para manejar un amplio tráfico de bots externos o usuarios, por lo que resolvimos tomar la opción más sencilla de implementar.</p>
+</li>
+<li>
+<p><strong>Alternativas consideradas:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p><em>nginx como reverse proxy</em> → Descartado. Añade configuración adicional sin
+aportar valor real dado que no hay colisión de puertos ni necesidad de balanceo
+de carga con el volumen actual.</p>
+</li>
+<li>
+<p><em>Gateway Node.js propio</em> → Descartado. Requeriría desarrollo y mantenimiento
+de una capa extra que duplicaría lógica ya presente en la webapp.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Consecuencias:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>La arquitectura es más simple y fácil de desplegar y depurar.</p>
+</li>
+<li>
+<p>La webapp asume la responsabilidad de seleccionar el servicio correcto en cada
+operación, acoplando ligeramente el frontend a la topología de servicios.</p>
+</li>
+<li>
+<p>Si en el futuro se añaden más microservicios o se requiere autenticación centralizada, la introducción de un gateway sería la evolución natural del sistema que resultaría sencilla de implementar.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
@@ -3192,20 +3327,281 @@ optimización estética o de experiencia de usuario, que deberá mejorarse en it
 <p>En esta sección se describe la estrategia de aseguramiento de la calidad (QA) seguida durante el desarrollo de Yovi, detallando los diferentes niveles de pruebas realizados para garantizar la robustez del sistema.</p>
 </div>
 <div class="sect2">
-<h3 id="_pruebas_end_to_end_e2e">12.1. Pruebas End-to-End (E2E)</h3>
+<h3 id="_pruebas_unitarias">12.1. Pruebas Unitarias</h3>
+<div class="paragraph">
+<p>Los tests unitarios son pruebas automatizadas que verifican el comportamiento del codigo ejecutable. Su objetivo es garantizar que cada pieza funciona correctamente por sí sola y detectar problemas de comportamiento.</p>
+</div>
+<div class="paragraph">
+<p>En estas pruebas utilizamos <strong>mocks</strong> para sustituir módulos externos y servicios, ya que lo que nos interesa es validar la lógica de cada fragmento y no el comportamiento del sistema completo.</p>
+</div>
+<div class="sect3">
+<h4 id="_tests_del_frontend_webapp">12.1.1. Tests del Frontend (Webapp)</h4>
+<div class="paragraph">
+<p>En webapp se utiliza <strong>Vitest</strong> como framework de testing junto con <strong>React Testing Library</strong> para el renderizado y simulación de interacciones de componentes.</p>
+</div>
+<div class="paragraph">
+<p>A continuación se describen los tests unitarios más relevantes de la webapp:</p>
+</div>
+<div class="sect4">
+<h5 id="_hook_usegame_lógica_principal_del_juego">Hook useGame — Lógica principal del juego</h5>
+<div class="paragraph">
+<p>El hook <code>useGame</code> centraliza toda la lógica del juego: creación de partidas, gestión de
+turnos, movimientos, rendición y timeout.</p>
+</div>
+<div class="paragraph">
+<p>Los tests verifican entre otras cosas que el hook arranca en estado <code>loading</code> y transiciona
+a <code>ongoing</code> tras crear la partida, que los movimientos actualizan correctamente el estado
+del tablero y el turno, que la rendición termina la partida con el ganador correcto, y que
+los errores de red se capturan y exponen al componente.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/useGame.png" alt="useGame" width="507" height="580">
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_gameservice_capa_de_comunicación_con_la_api">GameService — Capa de comunicación con la API</h5>
+<div class="paragraph">
+<p>El módulo <code>gameService</code> encapsula todas las llamadas HTTP al backend: creación de partidas,
+movimientos, historial, estadísticas, ranking, amigos y grupos. Sus tests verifican que
+cada función llama al endpoint correcto.</p>
+</div>
+<div class="paragraph">
+<p>Aquí un ejemplo de caso probado:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/gameService.png" alt="gameService" width="585" height="426">
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_historic_historial_de_partidas_con_filtros">Historic — Historial de partidas con filtros</h5>
+<div class="paragraph">
+<p>El componente <code>Historic</code> muestra el historial de partidas del usuario y permite filtrarlo. Sus tests cubren la carga inicial de datos, los estados de error y vacío, y la interacción con los filtros.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/historic.png" alt="historic" width="615" height="547">
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_registerform_autenticación_de_usuarios">RegisterForm — Autenticación de usuarios</h5>
+<div class="paragraph">
+<p>El componente <code>AuthForm</code> gestiona tanto el login como el registro de usuarios. Sus tests
+verifican el flujo completo de autenticación: validación de campos, manejo de errores del
+servidor, almacenamiento del usuario en <code>localStorage</code> tras un login exitoso, y la
+navegación al menú principal.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/authForm.png" alt="authForm" width="709" height="428">
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_tests_de_datos_users">12.1.2. Tests de Datos (Users)</h4>
+<div class="paragraph">
+<p>El servicio de usuarios es el microservicio central que gestiona la autenticación,
+el historial de partidas, las estadísticas, el ranking y las relaciones sociales
+entre jugadores. Sus tests utilizan <strong>Vitest</strong> junto con <strong>Supertest</strong> para realizar
+peticiones HTTP reales contra la aplicación sin necesidad de un servidor externo.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_hashing_seguridad_de_contraseñas">12.1.3. Hashing — Seguridad de contraseñas</h4>
+<div class="paragraph">
+<p>El módulo <code>Hashing</code> encapsula el cifrado y verificación de contraseñas usando el algoritmo <strong>Argon2id</strong>. Sus tests verifican que las contraseñas se almacenan siempre cifradas, que la verificación funciona correctamente tanto para contraseñas válidas como incorrectas, y que los
+errores internos del algoritmo se capturan sin romper la aplicación.</p>
+</div>
+<div class="paragraph">
+<p>Algunos ejemplos de los tests:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/hashing.png" alt="hashing" width="577" height="564">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_history_historial_de_partidas">12.1.4. History — Historial de partidas</h4>
+<div class="paragraph">
+<p>El endpoint <code>/history/:username</code> permite consultar el historial de partidas de un
+usuario con múltiples filtros opcionales: resultado, rival&#8230;&#8203; Sus tests cubren el caso base de carga de partidas, la validación de cada parámetro de filtrado, entre otros.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/history.png" alt="history" width="565" height="487">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_users_service_endpoints_principales">12.1.5. Users Service — Endpoints principales</h4>
+<div class="paragraph">
+<p>El archivo <code>users-service.test.js</code> cubre de forma integral todos los endpoints del microservicio: registro y login de usuarios, guardado de partidas&#8230;&#8203;</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/users-service.png" alt="users service" width="550" height="608">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_tests_del_backend_gamey">12.1.6. Tests del Backend (Gamey)</h4>
 
 </div>
-<div class="sect2">
-<h3 id="_pruebas_unitarias_y_de_integración_test_normales">12.2. Pruebas Unitarias y de Integración (Test normales)</h3>
-
 </div>
 <div class="sect2">
-<h3 id="_pruebas_de_carga">12.3. Pruebas de Carga</h3>
+<h3 id="_pruebas_end_to_end_e2e">12.2. Pruebas End-to-End (E2E)</h3>
+<div class="paragraph">
+<p>Las pruebas E2E tienen como objetivo validar el flujo completo del sistema, desde la interfaz de usuario hasta la base de datos, asegurando que todas las piezas integradas funcionen como se espera en un entorno similar a producción.</p>
+</div>
+<div class="paragraph">
+<p>A diferencia de los tests unitarios, las pruebas E2E no se centran en funciones aisladas, sino en <strong>historias de usuario completas</strong>. Esto nos permite detectar fallos en las integraciones con servicios externos y problemas de estado en la persistencia de datos.</p>
+</div>
+<div class="sect3">
+<h4 id="_casos_de_uso_cubiertos">12.2.1. Casos de uso cubiertos</h4>
+<div class="paragraph">
+<p>En este apartado de muestran algunos de los casos cubiertos:</p>
+</div>
+<div class="sect4">
+<h5 id="_registro_de_un_nuevo_usuario">Registro de un nuevo usuario</h5>
+<div class="paragraph">
+<p><strong>Descripción</strong>: Valida que un usuario pueda crear una cuenta desde cero cuando los datos son válidos y el servidor está disponible.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/user-register.png" alt="user register" width="395" height="305">
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_autenticación_de_usuario_login">Autenticación de Usuario (Login)</h5>
+<div class="paragraph">
+<p><strong>Descripción</strong>: Verifica el flujo de acceso al sistema y la redirección correcta al menú principal tras un login exitoso.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/user-login.png" alt="user login" width="358" height="348">
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_partida_contra_la_cpu_estrategia">Partida contra la CPU (Estrategia)</h5>
+<div class="paragraph">
+<p><strong>Descripción</strong>: Comprueba que el motor de juego gestione correctamente los turnos automáticos del Bot según la dificultad y la estrategiaseleccionada una vez empezada la partida.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/game-strategy.png" alt="game strategy" width="479" height="348">
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_finalización_y_reinicio_de_partida">Finalización y Reinicio de Partida</h5>
+<div class="paragraph">
+<p><strong>Descripción</strong>: Garantiza que, tras abandonar o terminar una partida, el usuario pueda volver a jugar inmediatamente sin errores de estado.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/game-surrender-and-restart.png" alt="game surrender and restart" width="592" height="517">
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_consulta_de_estadísticas_e_historial">Consulta de Estadísticas e Historial</h5>
+<div class="paragraph">
+<p><strong>Descripción</strong>: Verifica la integración con el Datahub para mostrar el histórico de partidas y la aplicación de filtros (ej. victorias).</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/user-stats.png" alt="user stats" width="408" height="378">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_grafana_y_prometheus">12.3. Grafana y Prometheus</h3>
+<div class="paragraph">
+<p>Para la monitorización del lado servidor se han utilizado Prometheus y Grafana.
+Prometheus actúa como recolector y almacén de métricas del modulo users, el único del que se recolectan datos. Mientras que Grafana consume esos datos y los visualiza en dashboards interactivos.</p>
+</div>
+<div class="sect3">
+<h4 id="_dashboard_monitorización_del_servicio_de_usuarios">12.3.1. Dashboard: Monitorización del Servicio de Usuarios</h4>
+<div class="imageblock text-center">
+<div class="content">
+<img src="./images/12-grafana-dashboard.png" alt="Distribución de rangos de respuesta y peticiones">
+</div>
+</div>
+<div class="paragraph">
+<p>Este dashboard recoge las métricas más relevantes del servicio de usuarios. A continuación explicamos cada uno de ellos un poco más en detalle:</p>
+</div>
+<div class="sect4">
+<h5 id="_rendimiento_http_por_método_y_status">Rendimiento HTTP por Método y Status</h5>
+<div class="paragraph">
+<p>Muestra la tasa de peticiones por segundo (<code>req/s</code>) de cada método HTTP
+junto con su código de respuesta a lo largo del tiempo. Esto permite identificar de un vistazo qué tipo de operaciones generan más tráfico y detectar anomalías en el comportamiento del servicio.</p>
+</div>
+<div class="paragraph">
+<p>A pesar de que la muestra es bastante pequeña (solo de los últimos 15 minutos), vemos una clara preponderacia de los métodos <code>POST-201</code> (recursos creados correctamente) y <code>OPTIONS-204</code> (peticiones generadas automáticamente por el navegador al comunicarse con la API), lo cual es un comportamiento esperado en una aplicación React con backend separado.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_errores_5xx">Errores 5xx</h5>
+<div class="paragraph">
+<p>Este panel muestra el número de errores de servidor (códigos HTTP 5xx) por unidad de tiempo.
+Su objetivo es detectar fallos críticos en el servicio de forma inmediata.</p>
+</div>
+<div class="paragraph">
+<p>El panel no muestra ninguno ya que el servidor ha sido capaz de manejar la carga sin problemas, lo cual es un indicador positivo de la estabilidad del sistema. Pero podría configurarse para que emitiese alertas en caso de detectar un aumento inusual de errores, lo que ayudaría a prevenir caídas del servicio.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_latencia_p95">Latencia P95</h5>
+<div class="paragraph">
+<p>El percentil 95 de latencia nos indica el tiempo de respuesta máximo por debajo del cual se encuentran el 95% de las peticiones. Esto nos ayuda a ver el tiempo máximo que un usuario puede esperar para recibir una respuesta en condiciones normales de uso quitando aquellos casos excepcionales que podrían distorsionar la percepción del rendimiento.</p>
+</div>
+<div class="paragraph">
+<p>El valor registrado durante las pruebas es de <strong>207ms</strong>, lo cual es un resultado satisfactorio para una aplicación web con base de datos.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_latencia_media_por_operación">Latencia Media por Operación</h5>
+<div class="paragraph">
+<p>Esta nos ayuda a desglosar la latencia media de cada tipo de operación (registro, login, consulta de historial&#8230;&#8203;), permitiéndonos identificar cuales son las llamadas más lentas.</p>
+</div>
+<div class="paragraph">
+<p>En este caso se observa que las operaciones <code>POST</code> presentan una latencia mayor (hasta 0.3s) que las peticiones <code>GET</code>, lo cual es lógico, ya que las operaciones de escritura tienden a ser mucho más costosas que las de lectura.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_total_peticionessegundo">Total Peticiones/segundo</h5>
+<div class="paragraph">
+<p>Por último tenemos la cantidad total de peticiones por segundo recibidas por el servidor. Permite tener una visión general del volumen de tráfico en tiempo real.</p>
+</div>
+<div class="paragraph">
+<p>Durante las pruebas se registra un valor de <strong>0.0522 req/s</strong>, el cual está dentro de las métricas esperadas.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_conclusiones">12.3.2. Conclusiones</h4>
+<div class="paragraph">
+<p>Los datos obtenidos durante las pruebas muestran un servicio estable, sin errores de servidor y con tiempos de respuesta aceptables. Pero hay que recordar que se está usando una muestra muy pequeña y una carga basstante nimia. Ya que esto no es una prueba de carga, si no una muestra de la monitorización de la aplicación.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_pruebas_de_carga">12.4. Pruebas de Carga</h3>
 <div class="paragraph">
 <p>Las pruebas de carga evalúan la capacidad de respuesta del sistema bajo condiciones de uso intensivo y estrés. Para el proyecto Yovi, se han diseñado pruebas de estrés utilizando Gatling para validar la robustez del servidor desarrollado en Rust.</p>
 </div>
 <div class="sect3">
-<h4 id="_escenario_de_prueba">12.3.1. Escenario de Prueba</h4>
+<h4 id="_escenario_de_prueba">12.4.1. Escenario de Prueba</h4>
 <div class="paragraph">
 <p>Se generó el script TestCargaLoginJugar.scala para simular un flujo de usuario completo y realista. El escenario incluye:</p>
 </div>
@@ -3230,7 +3626,7 @@ optimización estética o de experiencia de usuario, que deberá mejorarse en it
 </div>
 </div>
 <div class="sect3">
-<h4 id="_configuración_de_carga_e_inyección">12.3.2. Configuración de Carga e Inyección:</h4>
+<h4 id="_configuración_de_carga_e_inyección">12.4.2. Configuración de Carga e Inyección:</h4>
 <div class="paragraph">
 <p>Se estableció una estrategia de Ramp-up para observar la degradación progresiva del servicio:</p>
 </div>
@@ -3249,7 +3645,7 @@ optimización estética o de experiencia de usuario, que deberá mejorarse en it
 </div>
 </div>
 <div class="sect3">
-<h4 id="_analisis_de_resultados_y_gráficas">12.3.3. Analisis de Resultados y Gráficas</h4>
+<h4 id="_analisis_de_resultados_y_gráficas">12.4.3. Analisis de Resultados y Gráficas</h4>
 <div class="paragraph">
 <p>Para evaluar el comportamiento del sistema, se han extraído las siguientes gráficas del informe generado por Gatling:</p>
 </div>
@@ -3318,7 +3714,7 @@ optimización estética o de experiencia de usuario, que deberá mejorarse en it
 </div>
 </div>
 <div class="sect3">
-<h4 id="_conclusiones_de_rendimiento">12.3.4. Conclusiones de Rendimiento</h4>
+<h4 id="_conclusiones_de_rendimiento">12.4.4. Conclusiones de Rendimiento</h4>
 <div class="paragraph">
 <p>Tras la ejecución y análisis de la prueba de carga, el equipo extrae las siguientes conclusiones sobre la arquitectura:</p>
 </div>
@@ -3394,8 +3790,15 @@ El hecho de que el servidor respondiera con un 422 demuestra su robustez: el bac
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>Servicio que centraliza la lógica de negocio, autenticación, gestión de partidas y comunicación con el motor de juego.</em></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Notación YEN</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Formato estructurado utilizado para representar posiciones y movimientos del juego Y en la comunicación entre sistemas.</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Notación YEN (Y-game Exchange Notation)</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Formato estándar de comunicación del motor de juego que representa el estado completo de una partida del Juego Y en un instante de tiempo. Se expresa como un objeto JSON con cuatro campos:
+<code>size</code> (tamaño del tablero), <code>turn</code> (jugador que debe mover), <code>players</code> (identificadores de los jugadores) y <code>layout</code> (sityación del tablero fila a fila separada por <code>/</code>, donde <code>.</code> es celda vacía, <code>B</code> ficha del jugador B y <code>R</code> ficha del jugador R).</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Bot Externo</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Programa desarrollado por terceros que compite contra el motor de juego del sistema
+mediante la API REST, enviando y recibiendo movimientos en notación YEN a través del
+endpoint <code>GET /play</code>.</em></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>JSON (JavaScript Object Notation)</em></p></td>
