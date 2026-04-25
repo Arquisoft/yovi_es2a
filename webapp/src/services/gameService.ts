@@ -1,17 +1,25 @@
 // Esta clase contiene todas las conexiones entre la API de rust y la lógica del juego en React.
 
-// Importamos los tipos de la API
 import type { ApiGameState, ApiMakeMoveResponse } from "../types/gameApi";
 
-// Si está vacío usamos localHost, en otro caso funciona con la ip. Debería funcionar en el despliegue
 const BACKEND_URL = import.meta.env.VITE_GAMEY_URL ?? "http://localhost:4000";
-
 const USERS_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
+// ============================================================================
+// ESCUDO DE SEGURIDAD (SONARCLOUD)
+// Validación estricta mediante Expresión Regular (Allowlist)
+// Evita ataques de SSRF / Path Traversal asegurando que el parámetro 
+// solo contiene caracteres alfanuméricos, guiones o guiones bajos.
+// ============================================================================
+function sanitizeParam(param: string): string {
+    if (!/^[a-zA-Z0-9_-]+$/.test(param)) {
+        throw new Error("Parámetro inválido por seguridad. Formato incorrecto.");
+    }
+    return encodeURIComponent(param);
+}
 
 // Llamada que crea el juego
 export async function createGame(
-    // De momento los datos pasados son default, pero se podrían personalizar desde la UI
     size: number,
     mode: "human" | "computer" = "human",
     bot: string = "random_bot",
@@ -31,14 +39,12 @@ export async function createGame(
 
 // Obtiene el estado de la partida por su ID
 export async function getGame(gameId: string): Promise<ApiGameState> {
-    // Llamamos a la API de rust y le pedimos que nos devuelva el estado de la partida con ese ID
-    const response = await fetch(`${BACKEND_URL}/game/${encodeURIComponent(gameId)}`);
-    // Si sale mal obtenemos el error y lo mostramos
+    const safeId = sanitizeParam(gameId);
+    const response = await fetch(`${BACKEND_URL}/game/${safeId}`);
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error ?? "Partida no encontrada");
     }
-    // En cualquier otro caso obtenemos el Json (YEN)
     return response.json();
 }
 
@@ -49,7 +55,6 @@ export async function placeToken(
     cellIndex: number,
     botId?: string
 ): Promise<ApiMakeMoveResponse> {
-
     const body: Record<string, unknown> = {
         player,
         action: "place",
@@ -58,7 +63,8 @@ export async function placeToken(
 
     if (botId) body.bot = botId;
 
-    const response = await fetch(`${BACKEND_URL}/game/${encodeURIComponent(gameId)}/move`, {
+    const safeId = sanitizeParam(gameId);
+    const response = await fetch(`${BACKEND_URL}/game/${safeId}/move`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -70,12 +76,13 @@ export async function placeToken(
     return response.json();
 }
 
-// Método para que un jugador se rinda en una partida
+// Método para que un jugador se rinda
 export async function resign(
     gameId: string,
     player: number
 ): Promise<ApiMakeMoveResponse> {
-    const response = await fetch(`${BACKEND_URL}/game/${encodeURIComponent(gameId)}/move`, {
+    const safeId = sanitizeParam(gameId);
+    const response = await fetch(`${BACKEND_URL}/game/${safeId}/move`, {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ player, action: "resign" }),
@@ -98,10 +105,10 @@ export async function timeout(
         cell_index: null,
     };
 
-    // Si hay un bot jugando, le decimos a Rust que el bot juegue su turno automáticamente después
     if (botId) body.bot = botId;
 
-    const response = await fetch(`${BACKEND_URL}/game/${encodeURIComponent(gameId)}/move`, {
+    const safeId = sanitizeParam(gameId);
+    const response = await fetch(`${BACKEND_URL}/game/${safeId}/move`, {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -114,8 +121,6 @@ export async function timeout(
     return response.json();
 }
 
-// Guarda el resultado de una partida finalizada en el historial del usuario.
-// resultado: '1' = gana el usuario logueado, '2' = pierde
 export async function saveGameResult(
     username: string,
     rival: string,
@@ -133,7 +138,6 @@ export async function saveGameResult(
     }
 }
 
-// Devuelve el historial de partidas de un usuario con filtros opcionales
 export async function getHistory(
     username: string,
     filters: HistoryFilters = {}
@@ -145,13 +149,12 @@ export async function getHistory(
     if (filters.fechaHasta)         params.set("fechaHasta", filters.fechaHasta);
     if (filters.size)               params.set("size", String(filters.size));
  
-    const query = params.toString() ? `?${params.toString()}` : "";
-    const safeUsername = encodeURIComponent(username);
+    const safeUsername = sanitizeParam(username);
     const url = new URL(`/history/${safeUsername}`, USERS_URL);
 
-    // Si 'query' trae el '?', lo quitamos para que el objeto URL lo gestione seguro
+    const query = params.toString();
     if (query) {
-        url.search = query.startsWith('?') ? query.substring(1) : query;
+        url.search = query;
     }
 
     const response = await fetch(url.toString());
@@ -189,7 +192,8 @@ export interface UserStats {
 }
 
 export async function getStats(username: string): Promise<UserStats> {
-  const response = await fetch(`${USERS_URL}/stats/${encodeURIComponent(username)}`);
+  const safeUsername = sanitizeParam(username);
+  const response = await fetch(`${USERS_URL}/stats/${safeUsername}`);
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.error ?? 'Error al obtener las estadísticas');
@@ -197,7 +201,6 @@ export async function getStats(username: string): Promise<UserStats> {
   return response.json();
 }
 
-// Filtros opcionales para getHistory
 export interface HistoryFilters {
     resultado?: "1" | "2";
     rival?: string;
@@ -214,7 +217,6 @@ export interface RankingEntry {
     wins: number;
 }
 
-// Devuelve el top 10 de jugadores ordenados por puntuación de ranking
 export async function getRanking(): Promise<RankingEntry[]> {
     const response = await fetch(`${USERS_URL}/ranking`);
     if (!response.ok) {
@@ -254,9 +256,9 @@ export interface GroupMemberData {
     role: 'admin' | 'member';
 }
 
-// Obtener datos públicos de un usuario (username, stats resumidas)
 export async function getUserPublicData(username: string): Promise<UserPublicData> {
-    const response = await fetch(`${USERS_URL}/user/${encodeURIComponent(username)}`);
+    const safeUsername = sanitizeParam(username);
+    const response = await fetch(`${USERS_URL}/user/${safeUsername}`);
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error ?? 'Error al obtener datos del usuario');
@@ -264,14 +266,9 @@ export async function getUserPublicData(username: string): Promise<UserPublicDat
     return response.json();
 }
 
-// Buscar usuarios por nombre
 export async function searchUsers(query: string): Promise<UserPublicData[]> {
     try {
-        // En una aplicación real, esto vendría de un endpoint /search
-        // Por ahora, devolvemos array vacío y esperamos que el usuario escriba un nombre exacto
         if (!query.trim()) return [];
-        
-        // Intentar obtener el usuario exacto
         const user = await getUserPublicData(query.trim());
         return [user];
     } catch {
@@ -279,12 +276,12 @@ export async function searchUsers(query: string): Promise<UserPublicData[]> {
     }
 }
 
-// Agregar un usuario como amigo
 export async function addFriend(friendUsername: string): Promise<void> {
     const currentUser = localStorage.getItem('username');
     if (!currentUser) throw new Error('No estás autenticado');
 
-    const response = await fetch(`${USERS_URL}/addfriend/${encodeURIComponent(friendUsername)}`, {
+    const safeFriend = sanitizeParam(friendUsername);
+    const response = await fetch(`${USERS_URL}/addfriend/${safeFriend}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -297,12 +294,12 @@ export async function addFriend(friendUsername: string): Promise<void> {
     }
 }
 
-// Remover un amigo
 export async function removeFriend(friendUsername: string): Promise<void> {
     const currentUser = localStorage.getItem('username');
     if (!currentUser) throw new Error('No estás autenticado');
 
-    const response = await fetch(`${USERS_URL}/removefriend/${encodeURIComponent(friendUsername)}`, {
+    const safeFriend = sanitizeParam(friendUsername);
+    const response = await fetch(`${USERS_URL}/removefriend/${safeFriend}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
@@ -315,9 +312,9 @@ export async function removeFriend(friendUsername: string): Promise<void> {
     }
 }
 
-// Obtener lista de amigos de un usuario
 export async function getFriends(username: string): Promise<UserPublicData[]> {
-    const response = await fetch(`${USERS_URL}/friends/${encodeURIComponent(username)}`);
+    const safeUsername = sanitizeParam(username);
+    const response = await fetch(`${USERS_URL}/friends/${safeUsername}`);
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error ?? 'Error al obtener amigos');
@@ -326,7 +323,6 @@ export async function getFriends(username: string): Promise<UserPublicData[]> {
     return data.friends;
 }
 
-// Obtener todos los grupos públicos
 export async function getGroups(): Promise<GroupData[]> {
     const response = await fetch(`${USERS_URL}/groups`);
     if (!response.ok) {
@@ -337,7 +333,6 @@ export async function getGroups(): Promise<GroupData[]> {
     return data.groups;
 }
 
-// Crear un nuevo grupo
 export async function createGroup(name: string, description: string = ''): Promise<GroupData> {
     const currentUser = localStorage.getItem('username');
     if (!currentUser) throw new Error('No estás autenticado');
@@ -358,9 +353,9 @@ export async function createGroup(name: string, description: string = ''): Promi
     return data.group;
 }
 
-// Obtener detalles de un grupo (incluyendo miembros)
 export async function getGroupDetails(groupId: string): Promise<{ group: GroupData; members: GroupMemberData[] }> {
-    const response = await fetch(`${USERS_URL}/group/${encodeURIComponent(groupId)}`);
+    const safeId = sanitizeParam(groupId);
+    const response = await fetch(`${USERS_URL}/group/${safeId}`);
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error ?? 'Error al obtener detalles del grupo');
@@ -368,12 +363,12 @@ export async function getGroupDetails(groupId: string): Promise<{ group: GroupDa
     return response.json();
 }
 
-// Unirse a un grupo
 export async function joinGroup(groupId: string): Promise<void> {
     const currentUser = localStorage.getItem('username');
     if (!currentUser) throw new Error('No estás autenticado');
 
-    const response = await fetch(`${USERS_URL}/joingroup/${encodeURIComponent(groupId)}`, {
+    const safeId = sanitizeParam(groupId);
+    const response = await fetch(`${USERS_URL}/joingroup/${safeId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -386,12 +381,12 @@ export async function joinGroup(groupId: string): Promise<void> {
     }
 }
 
-// Salir de un grupo
 export async function leaveGroup(groupId: string): Promise<void> {
     const currentUser = localStorage.getItem('username');
     if (!currentUser) throw new Error('No estás autenticado');
 
-    const response = await fetch(`${USERS_URL}/leavegroup/${encodeURIComponent(groupId)}`, {
+    const safeId = sanitizeParam(groupId);
+    const response = await fetch(`${USERS_URL}/leavegroup/${safeId}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
@@ -404,7 +399,6 @@ export async function leaveGroup(groupId: string): Promise<void> {
     }
 }
 
-// Obtener grupos del usuario actual
 export async function getMyGroups(): Promise<GroupData[]> {
     const currentUser = localStorage.getItem('username');
     if (!currentUser) throw new Error('No estás autenticado');
