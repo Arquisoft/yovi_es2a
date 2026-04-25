@@ -47,7 +47,8 @@ export async function createGame(
 // Obtiene el estado de la partida por su ID
 export async function getGame(gameId: string): Promise<ApiGameState> {
     // Llamamos a la API de rust y le pedimos que nos devuelva el estado de la partida con ese ID
-    const response = await fetch(`${BACKEND_URL}/game/${gameId}`); // NOSONAR: gameId comes from server
+    const safeId = encodeURIComponent(gameId);
+    const response = await fetch(`${BACKEND_URL}/game/${safeId}`);
     // Si sale mal obtenemos el error y lo mostramos
     if (!response.ok) {
         const error = await response.json();
@@ -73,7 +74,8 @@ export async function placeToken(
 
     if (botId) body.bot = botId;
 
-    const response = await fetch(`${BACKEND_URL}/game/${gameId}/move`, { // NOSONAR: gameId comes from server
+    const url = new URL(`/game/${encodeURIComponent(gameId)}/move`, BACKEND_URL);
+    const response = await fetch(url.toString(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -90,8 +92,13 @@ export async function resign(
     gameId: string,
     player: number
 ): Promise<ApiMakeMoveResponse> {
-    const response = await fetch(`${BACKEND_URL}/game/${gameId}/move`, { // NOSONAR: gameId comes from server
-        method: "POST",
+    // Validamos estrictamente el formato del ID antes de usarlo
+    if (!/^[a-zA-Z0-9-]+$/.test(gameId)) {
+        throw new Error("Formato de ID de partida inválido por seguridad");
+    }
+    const response = await fetch(`${BACKEND_URL}/game/${gameId}/move`, {
+        method: 'POST',
+        // ... resto del código igual
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ player, action: "resign" }),
     });
@@ -116,8 +123,9 @@ export async function timeout(
     // Si hay un bot jugando, le decimos a Rust que el bot juegue su turno automáticamente después
     if (botId) body.bot = botId;
 
-    const response = await fetch(`${BACKEND_URL}/game/${gameId}/move`, { // NOSONAR: gameId comes from server
-        method: "POST",
+    const cleanId = gameId.replace(/[./\\]/g, ''); 
+    const response = await fetch(`${BACKEND_URL}/game/${cleanId}/move`, {
+        method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
     });
@@ -161,7 +169,15 @@ export async function getHistory(
     if (filters.size)               params.set("size", String(filters.size));
  
     const query = params.toString() ? `?${params.toString()}` : "";
-    const response = await fetch(`${USERS_URL}/history/${username}${query}`); // NOSONAR: username sanitized at login
+    const safeUsername = encodeURIComponent(username);
+    const url = new URL(`/history/${safeUsername}`, USERS_URL);
+
+    // Si 'query' trae el '?', lo quitamos para que el objeto URL lo gestione seguro
+    if (query) {
+        url.search = query.startsWith('?') ? query.substring(1) : query;
+    }
+
+    const response = await fetch(url.toString());
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error ?? "Error al obtener el historial");
@@ -196,7 +212,10 @@ export interface UserStats {
 }
 
 export async function getStats(username: string): Promise<UserStats> {
-  const response = await fetch(`${USERS_URL}/stats/${username}`); // NOSONAR: username sanitized at login
+  if (/[^a-zA-Z0-9_-]/.test(username)) {
+    throw new Error("Nombre de usuario inválido");
+}
+  const response = await fetch(`${USERS_URL}/stats/${username}`);
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.error ?? 'Error al obtener las estadísticas');
