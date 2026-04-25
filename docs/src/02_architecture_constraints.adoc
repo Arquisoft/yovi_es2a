@@ -64,6 +64,6 @@ endif::arc42help[]
 |===
 | Restricción | Descripción
 | **Estándar arc42** | Seguimiento estricto de la estructura arc42 para documentar la arquitectura del juego.
-| **Interoperabilidad** | El motor del juego debe estar separado de la interfaz para permitir posibles cambios de UI en el futuro.
-| **Idioma** | Documentación técnica en español y código fuente/comentarios en español.
+| **Interoperabilidad** | Utilización de un formato estándar (notación YEN y JSON) en la API, garantizando que el motor de juego sea totalmente independiente a la interfaz gráfica.
+| **Idioma** | Documentación técnica en español y código comentarios en español. El código fuente se desarrolla principalmente en inglés siguiendo los estándares de la industria.
 |===

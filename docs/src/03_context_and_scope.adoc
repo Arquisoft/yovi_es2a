@@ -62,7 +62,7 @@ a|
     * Tamaño del tablero
     * Estrategia de juego
     * Datos basicos (usuario y contraseña) para su registro
-    * Movimientos en notación YEN
+    * Hace click en las casillas
 a| 
     * Estado actualizado de la partida
     * Resultado de la partida
@@ -71,11 +71,9 @@ a|
 
 | *Bot externo*
 a| 
-    * Solicitud de movimiento (play en YEN).
-    * Peticiones sde datos de usuario/partidas (vía API). 
+    * Estado actual del tablero
 a| 
-    * Respuesta de movimiento (YEN).
-    * Listado de usuarios y registros de partidas en formato JSON.
+    * Siguiente movimiento calculado
 |===
 
 === Contexto Técnico
@@ -122,7 +120,7 @@ endif::arc42help[]
 |===
 | Input al sistema | Output del sistema | Formato / Canal
 | Registro / actualización de usuario | Confirmación de operación | JSON / HTTP
-| POST /v1/play (Parámetros: position, bot, player) | Siguiente movimiento calculado y estado | JSON / HTTP 
+| GET /play (Parámetros: position, bot_id) | Siguiente movimiento calculado y estado | JSON / HTTP 
 | Consulta de usuarios | Información de usuarios | JSON / HTTP
 |===
 
@@ -149,7 +147,7 @@ La **notación YEN** es el formato estándar utilizado registrar el estado del t
 .**API de Motor de Juego (Servicio `gamey` - Puerto 4000)**
 * Protocolo y Formato: HTTP, JSON y notación YEN.
 * Responsabilidad: Procesa la lógica algorítmica del Juego Y, validación de reglas en tiempo real y ejecución de estrategias de IA.
-* Interoperabilidad: Expone el método `POST /v1/play` que permite el intercambio de jugadas serializadas en notación YEN, facilitando la competición de bots externos contra el motor desarrollado en Rust.
+* Interoperabilidad: Expone el método `GET /play` que permite el intercambio de jugadas serializadas en notación YEN, facilitando la competición de bots externos contra el motor desarrollado en Rust.
 
 
 .**Interfaz Web (Jugadores)**
