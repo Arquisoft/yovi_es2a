@@ -142,12 +142,24 @@ describe('Stats', () => {
 
     // ── Tabla por rival ────────────────────────────────────────────────────
 
-    it('renderiza la tabla de rivales con sus filas', async () => {
+    it('renderiza las tarjetas de rivales con nombres amigables', async () => {
+        render(<Stats />)
+
+        await waitFor(() => {
+            // Los nombres amigables deben aparecer, no los identificadores internos
+            expect(screen.getByText('Bot Defensivo (Fácil)')).toBeInTheDocument()
+            expect(screen.getAllByText('Bot Aleatorio').length).toBeGreaterThanOrEqual(1)
+        })
+    })
+
+    it('no muestra los identificadores internos con guiones bajos', async () => {
         render(<Stats />)
 
         await waitFor(() =>
-            expect(screen.getByText('defensive_easy')).toBeInTheDocument()
+            expect(screen.getByText(/estadísticas de alice/i)).toBeInTheDocument()
         )
+        expect(screen.queryByText('defensive_easy')).not.toBeInTheDocument()
+        expect(screen.queryByText('random_bot')).not.toBeInTheDocument()
     })
 
     it('muestra el win rate correcto en la tabla por rival', async () => {
