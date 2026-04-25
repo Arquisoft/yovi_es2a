@@ -3451,7 +3451,57 @@ usuario con múltiples filtros opcionales: resultado, rival&#8230;&#8203; Sus te
 </div>
 <div class="sect3">
 <h4 id="_tests_del_backend_gamey">12.1.6. Tests del Backend (Gamey)</h4>
-
+<div class="paragraph">
+<p>En el motor de juego (Gamey), las pruebas se desarrollan utilizando el framework de testing integrado de forma nativa en <strong>Rust</strong> (<code>cargo test</code>). Al separar la lógica pura de la capa de red, los tests se estructuran en tres focos principales para garantizar la seguridad, el rendimiento y la fiabilidad algorítmica.</p>
+</div>
+<div class="sect4">
+<h5 id="_rutas_y_gestión_de_estado_concurrente_game_routes_rs">Rutas y Gestión de Estado Concurrente (<code>game_routes.rs</code>)</h5>
+<div class="paragraph">
+<p>Estos tests validan los endpoints HTTP gestionados por <strong>Axum</strong> y la inyección del estado concurrente (<code>AppState</code>). Se simulan peticiones HTTP directamente en memoria (sin abrir puertos de red reales) para agilizar la ejecución. Se verifica que el servidor responde con los códigos adecuados (ej. <code>201 Created</code> al instanciar partidas, o <code>200 OK</code> al mover).
+Un aspecto fundamental auditado aquí es la seguridad: el servidor debe rechazar de forma controlada peticiones malformadas o movimientos ilegales para evitar trampas.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/game_routes.png" alt="game routes" width="599" height="364">
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_motor_del_juego_y_game_rs">Motor del Juego "Y" (<code>game.rs</code>)</h5>
+<div class="paragraph">
+<p>En este módulo se somete a prueba el núcleo matemático del sistema de forma totalmente aislada. Los tests unitarios validan las estructuras de datos que representan el tablero hexagonal y el estado de la partida:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Geometría del tablero:</strong> Se verifica que el cálculo de coordenadas sea exacto (ej. comprobando mediante <code>test_interior_cell_has_six_neighbors</code> que una celda central tiene 6 vecinos, mientras que una esquina solo 2).</p>
+</li>
+<li>
+<p><strong>Condición de Victoria:</strong> Se simulan secuencias completas de jugadas para asegurar que el algoritmo de grafos (<em>Union-Find</em>) detecta correctamente en qué momento exacto un jugador logra conectar los tres lados del triángulo (<code>test_winning_condition</code>).</p>
+</li>
+<li>
+<p><strong>Serialización:</strong> Se comprueba el <em>round-trip</em> de conversión bidireccional entre el estado en memoria de Rust y el estándar de notación YEN.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_estrategias_e_inteligencia_artificial_monte_carlo_bot_rs">Estrategias e Inteligencia Artificial (<code>monte_carlo_bot.rs</code>)</h5>
+<div class="paragraph">
+<p>Las pruebas de los módulos de IA garantizan que los bots devuelven jugadas legales, sin colgar el servidor ante casos límite.
+Para testear algoritmos probabilísticos como Monte Carlo, se evalúan escenarios cerrados donde la lógica debe ser determinista. Entre otros casos, se verifica:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Que el bot devuelve una respuesta nula (<code>None</code>) si se le envía un tablero ya lleno (<code>test_monte_carlo_returns_none_on_full_board</code>).</p>
+</li>
+<li>
+<p>Que el algoritmo reconoce prioridades críticas: se le suministra un tablero preconfigurado a un solo movimiento de ganar, comprobando que el bot ignora el resto de celdas y elige obligatoriamente la coordenada de victoria inmediata (<code>test_monte_carlo_takes_immediate_win</code>).</p>
+</li>
+</ul>
+</div>
+</div>
 </div>
 </div>
 <div class="sect2">
