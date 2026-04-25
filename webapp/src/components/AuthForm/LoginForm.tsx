@@ -1,15 +1,19 @@
 import './AuthForm.css'
-import React, { useState} from 'react';
+import React, { useState } from 'react';
 import { useAuthComprobation } from '../AuthComprobation';
-import { useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 /**
- * Sanitiza el username eliminando caracteres de inyección HTML/script
- * antes de escribirlo en localStorage.
- * Sonar CWE-20 / CWE-79: tainted data must be sanitized before storage.
+ * ESCUDO DE SEGURIDAD (SONARCLOUD)
+ * En lugar de intentar "limpiar" caracteres malos (Blocklist),
+ * validamos estrictamente que solo haya caracteres buenos (Allowlist).
+ * Esto asegura que nunca se guarde código malicioso en localStorage (DOM XSS).
  */
-function sanitizeUsername(raw: string): string {
-  return raw.replace(/[<>"'&]/g, "");
+function validateUsernameForStorage(raw: string): string {
+  if (!/^[a-zA-Z0-9_-]+$/.test(raw)) {
+    throw new Error("El nombre de usuario tiene un formato inválido por seguridad.");
+  }
+  return raw;
 }
 
 const AuthForm: React.FC = () => {
@@ -43,8 +47,9 @@ const AuthForm: React.FC = () => {
       const data = await res.json();
 
       if (res.ok) {
-        const sanitizedUsername = sanitizeUsername(username);
-        localStorage.setItem("username", sanitizedUsername); // NOSONAR: username sanitized via sanitizeUsername before storage
+        // Validamos el dato antes de guardarlo para satisfacer a SonarCloud
+        const safeUsername = validateUsernameForStorage(username);
+        localStorage.setItem("username", safeUsername); 
         navigate('/menu');
       } else {
         setError(data.error || 'Something went wrong');
