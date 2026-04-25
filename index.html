@@ -500,12 +500,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#section-concepts">8. Conceptos transversales</a>
 <ul class="sectlevel2">
 <li><a href="#_conceptos_de_dominio">8.1. Conceptos de Dominio</a></li>
-<li><a href="#_experiencia_de_usuario_ux">8.2. Experiencia de Usuario (UX)</a></li>
-<li><a href="#_prototipos_de_pantallas">8.3. Prototipos de pantallas</a></li>
-<li><a href="#_seguridad">8.4. Seguridad</a></li>
-<li><a href="#_arquitectura">8.5. Arquitectura</a></li>
-<li><a href="#_desarrollo_y_operaciones">8.6. Desarrollo y Operaciones</a></li>
-<li><a href="#_diseño_y_documentación_de_la_api">8.7. Diseño y Documentación de la API</a></li>
+<li><a href="#_sistema_de_puntuación_y_ranking">8.2. Sistema de Puntuación y Ranking</a></li>
+<li><a href="#_experiencia_de_usuario_ux">8.3. Experiencia de Usuario (UX)</a></li>
+<li><a href="#_prototipos_de_pantallas">8.4. Prototipos de pantallas</a></li>
+<li><a href="#_seguridad">8.5. Seguridad</a></li>
+<li><a href="#_arquitectura">8.6. Arquitectura</a></li>
+<li><a href="#_desarrollo_y_operaciones">8.7. Desarrollo y Operaciones</a></li>
+<li><a href="#_diseño_y_documentación_de_la_api">8.8. Diseño y Documentación de la API</a></li>
 </ul>
 </li>
 <li><a href="#section-design-decisions">9. Decisiones de Arquitectura</a>
@@ -522,8 +523,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_introducción_2">10.1. Introducción</a></li>
 <li><a href="#_arbol_de_calidad">10.2. Arbol de calidad</a></li>
 <li><a href="#_escenarios_de_calidad">10.3. Escenarios de Calidad</a></li>
-<li><a href="#_fiabilidad">10.4. Fiabilidad</a></li>
-<li><a href="#_validacion_de_rendimiento_pruebas_de_carga">10.5. Validacion de Rendimiento (Pruebas de Carga)</a></li>
+<li><a href="#_validacion_de_rendimiento_pruebas_de_carga">10.4. Validacion de Rendimiento (Pruebas de Carga)</a></li>
 </ul>
 </li>
 <li><a href="#section-technical-risks">11. Riesgos y Deudas Técnicas</a>
@@ -885,7 +885,7 @@ Estas partes interesadas determinan el alcance y el nivel de detalle de su traba
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Usuarios Finales</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Jugadores de la aplicación</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Disfrutar de una buena experiencia de usuario, pudiendo jugar partidas de forma fluida, utilizar diferentes estrategias en el tablero hexagonal, consultar sus estadísticas y comparar su rendimiento con otros jugadores mediante el ranking globa</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Disfrutar de una buena experiencia de usuario, pudiendo jugar partidas de forma fluida, utilizar diferentes estrategias en el tablero triangular, consultar sus estadísticas y comparar su rendimiento con otros jugadores mediante el ranking global</p></td>
 </tr>
 </tbody>
 </table>
@@ -1043,11 +1043,11 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Interoperabilidad</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">El motor del juego debe estar separado de la interfaz para permitir posibles cambios de UI en el futuro.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Utilización de un formato estándar (notación YEN y JSON) en la API, garantizando que el motor de juego sea totalmente independiente a la interfaz gráfica.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Idioma</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Documentación técnica en español y código fuente/comentarios en español.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Documentación técnica en español y código comentarios en español. El código fuente se desarrolla principalmente en inglés siguiendo los estándares de la industria.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1147,7 +1147,7 @@ The title of the table is the name of your system, the three columns contain the
 <p>Datos basicos (usuario y contraseña) para su registro</p>
 </li>
 <li>
-<p>Movimientos en notación YEN</p>
+<p>Hace click en las casillas</p>
 </li>
 </ul>
 </div></div></td>
@@ -1173,20 +1173,14 @@ The title of the table is the name of your system, the three columns contain the
 <td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
 <ul>
 <li>
-<p>Solicitud de movimiento (play en YEN).</p>
-</li>
-<li>
-<p>Peticiones sde datos de usuario/partidas (vía API).</p>
+<p>Estado actual del tablero</p>
 </li>
 </ul>
 </div></div></td>
 <td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
 <ul>
 <li>
-<p>Respuesta de movimiento (YEN).</p>
-</li>
-<li>
-<p>Listado de usuarios y registros de partidas en formato JSON.</p>
+<p>Siguiente movimiento calculado</p>
 </li>
 </ul>
 </div></div></td>
@@ -1239,7 +1233,7 @@ together with a mapping table showing the relationships between channels and inp
 <td class="tableblock halign-left valign-top"><p class="tableblock">JSON / HTTP</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">POST /v1/play (Parámetros: position, bot, player)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GET /play (Parámetros: position, bot_id)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Siguiente movimiento calculado y estado</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">JSON / HTTP</p></td>
 </tr>
@@ -1328,7 +1322,7 @@ La <strong>notación YEN</strong> es el formato estándar utilizado registrar el
 <p>Responsabilidad: Procesa la lógica algorítmica del Juego Y, validación de reglas en tiempo real y ejecución de estrategias de IA.</p>
 </li>
 <li>
-<p>Interoperabilidad: Expone el método <code>POST /v1/play</code> que permite el intercambio de jugadas serializadas en notación YEN, facilitando la competición de bots externos contra el motor desarrollado en Rust.</p>
+<p>Interoperabilidad: Expone el método <code>GET /play</code> que permite el intercambio de jugadas serializadas en notación YEN, facilitando la competición de bots externos contra el motor desarrollado en Rust.</p>
 </li>
 </ul>
 </div>
@@ -1483,7 +1477,17 @@ Refer to details in the following sections.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><em>MongoDB:</em> Base de datos no relacional elegida para garantizar la integridad de los datos de usuarios y mantener un registro fiable de los historiales de partidas.</p>
+<p><em>MongoDB:</em> Base de datos no relacional elegida por la flexibilidad de su esquema y su integración con Node.js, ideal para hacer historiales de partidas y perfiles persistentes sin una estructura fija.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Pruebas de Rendimiento:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p><em>Gatling (Scala):</em> Seleccionado como herramienta principal para las pruebas de carga y estrés. Se eligió por su capacidad para simular un alto volumen de usuarios concurrentes consumiendo mínimos recursos de máquina, y por la generación automática de reportes de rendimiento detallados.</p>
 </li>
 </ul>
 </div>
@@ -1493,7 +1497,7 @@ Refer to details in the following sections.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><em>Gatling (Scala):</em> Seleccionado como herramienta principal para las pruebas de carga y estrés. Se eligió por su capacidad para simular un alto volumen de usuarios concurrentes consumiendo mínimos recursos de máquina, y por la generación automática de reportes de rendimiento detallados.</p>
+<p><em>Vitest, cargo test y Pruebas Manuales E2E:</em> Ecosistema de pruebas unitarias y End-to-End (E2E) empleado para garantizar la fiabilidad matemática del motor de juego, el renderizado de la interfaz y la correcta integración entre los microservicios.</p>
 </li>
 </ul>
 </div>
@@ -1554,7 +1558,7 @@ Refer to details in the following sections.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/diagrama-contexto.svg" alt="diagrama contexto" width="261" height="313">
+<img src="./images/diagrama-contexto.svg" alt="diagrama contexto" width="252" height="313">
 </div>
 </div>
 <div class="sect3">
@@ -1562,11 +1566,15 @@ Refer to details in the following sections.</p>
 <div class="paragraph">
 <p>El sistema Yovi está diseñado para permitir la gestión y ejecución de partidas del juego "Y" en un entorno web. La arquitectura debe soportar concurrencia y dos tipos de actores principales:</p>
 </div>
-<div class="paragraph">
-<p>Usuarios Humanos: Que requieren una interfaz gráfica interactiva.</p>
-</div>
-<div class="paragraph">
-<p>Bots: Que requieren una API para automatizar el juego.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Usuarios Humanos:</strong> Que requieren una interfaz gráfica interactiva.</p>
+</li>
+<li>
+<p><strong>Bots:</strong> Que requieren una API para automatizar el juego.</p>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect3">
@@ -1608,11 +1616,15 @@ Refer to details in the following sections.</p>
 </div>
 <div class="sect3">
 <h4 id="_interfaces_importantes">5.1.3. Interfaces Importantes</h4>
-<div class="paragraph">
-<p>Interfaz Web (HTTPS): Acceso para usuarios humanos.</p>
-</div>
-<div class="paragraph">
-<p>API Pública (REST/JSON): Acceso programático para los bots y comunicación interna.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Interfaz Web (HTTP):</strong> Acceso para usuarios humanos.</p>
+</li>
+<li>
+<p><strong>API Pública (REST/JSON):</strong> Acceso programático para los bots y comunicación interna.</p>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -1624,19 +1636,19 @@ Refer to details in the following sections.</p>
 <div class="sect3">
 <h4 id="_caja_blanca_sistema_yovi">5.2.1. Caja Blanca: Sistema Yovi</h4>
 <div class="paragraph">
-<p>Esta vista explota el sistema en sus contenedores principales, separando la presentación de la lógica de negocio y los datos.</p>
+<p>Esta vista explota el sistema en sus contenedores principales, demostrando nuestra arquitectura orientada a microservicios donde la gestión de usuarios y la lógica matemática del juego viven en servidores distintos.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/diagrama-contenedores.svg" alt="diagrama contenedores" width="278" height="273">
+<img src="./images/diagrama-contenedores.svg" alt="diagrama contenedores" width="373" height="220">
 </div>
 </div>
 <div class="paragraph">
-<p>Motivación:
-Se ha optado por una arquitectura cliente-servidor desacoplada para permitir que la interfaz web evolucione independientemente de la lógica y para facilitar la integración de los bots directamente contra el Backend.</p>
+<p><strong>Motivación:</strong>
+Se ha optado por una arquitectura cliente-servidor desacoplada y dividida en microservicios. Esto permite que el motor de juego (Rust) escale o se modifique sin afectar a la gestión de sesiones de usuario (Node.js).</p>
 </div>
 <div class="paragraph">
-<p>Bloques de construcción contenidos:</p>
+<p><strong>Bloques de construcción contenidos:</strong></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -1652,70 +1664,82 @@ Se ha optado por una arquitectura cliente-servidor desacoplada para permitir que
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Frontend Web</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Aplicación de Página Única (SPA). Renderiza el tablero de juego y gestiona la interacción del usuario.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Aplicación de Página Única (SPA). Renderiza el tablero hexagonal y gestiona la interacción del usuario.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Backend API</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Servidor de aplicaciones. Gestiona la autenticación, matchmaking, persistencia y orquesta el flujo de la partida.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Users Service</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Microservicio backend (Puerto 3000). Gestiona la autenticación, perfiles, estadísticas y persistencia en base de datos.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Motor de Juego (Game Engine)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Librería o módulo puro. Contiene estrictamente las reglas del juego "Y", validación de movimientos y detección de victoria.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Gamey Service</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Microservicio del Motor (Puerto 4000). Contiene estrictamente las reglas del juego "Y", la Inteligencia Artificial y la validación de movimientos.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
 <h4 id="_frontend_web">5.2.2. Frontend Web</h4>
-<div class="paragraph">
-<p>Propósito: Proveer una interfaz visual amigable para los jugadores humanos.</p>
-</div>
-<div class="paragraph">
-<p>Interfaces: Consume la API REST del Backend y utiliza WebSockets para actualizaciones en tiempo real.</p>
-</div>
-<div class="paragraph">
-<p>Tecnología: HTML5/JS (React/Angular/Vue).</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_backend_api">5.2.3. Backend API</h4>
-<div class="paragraph">
-<p>Propósito: Centralizar la lógica de negocio y seguridad. Actúa como intermediario entre los actores, la base de datos y el motor de reglas.</p>
-</div>
-<div class="paragraph">
-<p>Interfaces: Expone endpoints REST y WebSockets para el gameplay.</p>
-</div>
-<div class="paragraph">
-<p>Tecnología: Node.js / Express.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Propósito:</strong> Proveer una interfaz visual rápida y amigable para los jugadores humanos.</p>
+</li>
+<li>
+<p><strong>Interfaces:</strong> Consume las APIs REST de los microservicios backend.</p>
+</li>
+<li>
+<p><strong>Tecnología:</strong> React con TypeScript.</p>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_motor_de_juego_game_engine">5.2.4. Motor de Juego (Game Engine)</h4>
-<div class="paragraph">
-<p>Propósito: Encapsular la complejidad algorítmica del juego "Y". Asegura que las reglas se cumplan rigurosamente.</p>
+<h4 id="_users_service_node_js">5.2.3. Users Service (Node.js)</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Propósito:</strong> Centralizar la lógica de usuarios y seguridad. Actúa como intermediario exclusivo con la base de datos.</p>
+</li>
+<li>
+<p><strong>Interfaces:</strong> Expone endpoints REST para autenticación y métricas.</p>
+</li>
+<li>
+<p><strong>Tecnología:</strong> Node.js / Express.</p>
+</li>
+</ul>
 </div>
-<div class="paragraph">
-<p>Características: Módulo independiente, testeable unitariamente y sin estado.</p>
+</div>
+<div class="sect3">
+<h4 id="_gamey_service_rust">5.2.4. Gamey Service (Rust)</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Propósito:</strong> Encapsular la complejidad algorítmica del juego "Y". Asegura que las reglas se cumplan rigurosamente, manteniendo el estado de las partidas vivas en memoria.</p>
+</li>
+<li>
+<p><strong>Características:</strong> Módulo independiente, concurrente, testeable unitariamente y que expone la IA.</p>
+</li>
+</ul>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_nivel_3">5.3. Nivel 3</h3>
 <div class="paragraph arc42help">
-<p>Aquí especificamos la estructura interna del Backend API, detallando sus componentes internos.</p>
+<p>Aquí especificamos la estructura interna de los Microservicios Backend, detallando sus componentes internos.</p>
 </div>
 <div class="sect3">
-<h4 id="_caja_blanca_backend_api">5.3.1. Caja Blanca: Backend API</h4>
+<h4 id="_caja_blanca_microservicios_backend">5.3.1. Caja Blanca: Microservicios Backend</h4>
 <div class="paragraph">
-<p>El Backend se organiza siguiendo un patrón de capas (Controller - Service - Repository) para mantener el código limpio y mantenible.</p>
+<p>El Backend se divide físicamente en dos servicios independientes, cada uno con su propia estructura interna adaptada a su tecnología.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/diagrama-componentes.svg" alt="diagrama componentes" width="383" height="388">
+<img src="./images/diagrama-componentes.svg" alt="diagrama componentes" width="723" height="316">
 </div>
 </div>
 <div class="paragraph">
-<p>Bloques de construcción contenidos:</p>
+<p><strong>Bloques de construcción contenidos:</strong></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -1730,57 +1754,69 @@ Se ha optado por una arquitectura cliente-servidor desacoplada para permitir que
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Game Controller</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Gestiona las peticiones de red (HTTP/Sockets) relacionadas con el juego.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Auth &amp; Stats Controllers (Node)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Rutas de Express que gestionan el registro, login y la agregación matemática para el cálculo del ranking.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">User Controller</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Gestiona el registro, login y perfil de usuario.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Mongoose Models</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Capa de abstracción de datos (ORM) para comunicar Node.js con MongoDB de forma segura.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Matchmaking Service</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lógica para emparejar jugadores en espera o asignar un Bot si es necesario.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Axum Router (Rust)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Gestiona las peticiones de red (HTTP REST) relacionadas con el juego, inyectando el estado concurrente.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Game Service</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Orquestador de la partida. Mantiene el estado en memoria y valida movimientos con el Motor de Juego.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Game Engine (Rust)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cerebro de la ejecución. Recibe intentos de movimiento, actualiza el estado del tablero y detecta la condición de victoria (algoritmo Union-Find).</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Persistence Layer</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Capa de abstracción (DAO/Repository) para comunicar con MongoDB.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bot Strategies (Rust)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Módulos de Inteligencia Artificial que evalúan el tablero y devuelven la mejor coordenada posible según su dificultad.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_user_controller">5.3.2. User Controller</h4>
-<div class="paragraph">
-<p>Propósito: mantener una navegación segura permitiendo únicamente jugar y acceder a seccioens específicas a usuarios registrados en el sistema.
-Responsabilidades:
-- Registro de usuarios
-- Login
-- Logout</p>
+<h4 id="_auth_stats_controllers_node_js">5.3.2. Auth &amp; Stats Controllers (Node.js)</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Propósito:</strong> Mantener una navegación segura gestionando sesiones y cálculos estadísticos.</p>
+</li>
+<li>
+<p><strong>Responsabilidades:</strong> Registro, Login, consulta del historial de MongoDB y cálculo algorítmico del ranking ponderado.</p>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_servicio_de_juego">5.3.3. Servicio de Juego</h4>
-<div class="paragraph">
-<p>Propósito: Cerebro de la ejecución. Recibe intentos de movimiento, consulta validez al motor, actualiza el estado y notifica a los jugadores.</p>
-</div>
-<div class="paragraph">
-<p>Colaboradores: Motor de Juego, Persistence Layer.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_servicio_de_emparejamiento_matchmaking">5.3.4. Servicio de Emparejamiento (Matchmaking)</h4>
-<div class="paragraph">
-<p>Propósito: Gestionar la cola de jugadores. Instancia nuevos juegos a través del Game Service cuando se cumplen las condiciones de emparejamiento.</p>
+<h4 id="_axum_router_game_engine_rust">5.3.3. Axum Router &amp; Game Engine (Rust)</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Propósito:</strong> Cerebro de la ejecución de la partida. Inyecta el estado concurrente (<code>Mutex</code>), recibe intentos de movimiento, consulta la validez de la geometría del tablero, actualiza el estado y dictamina el ganador.</p>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_capa_de_persistencia">5.3.5. Capa de Persistencia</h4>
-<div class="paragraph">
-<p>Propósito: Aislar las consultas y el mapeo de datos de MongoDB del resto de la lógica de negocio.</p>
+<h4 id="_bot_strategies_rust">5.3.4. Bot Strategies (Rust)</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Propósito:</strong> Implementaciones algorítmicas de la Inteligencia Artificial (Monte Carlo, Random, etc.) que evalúan el tablero de forma aislada para devolver la jugada óptima.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_mongoose_models_capa_de_persistencia">5.3.5. Mongoose Models (Capa de Persistencia)</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Propósito:</strong> Aislar las consultas y el mapeo de datos de MongoDB del resto de la lógica de negocio del servicio de usuarios.</p>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect3">
@@ -1867,7 +1903,7 @@ Responsabilidades:
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/runtime-login.png" alt="runtime login" width="465" height="365">
+<img src="./images/runtime-login.png" alt="runtime login" width="555" height="362">
 </div>
 </div>
 </div>
@@ -1878,7 +1914,7 @@ Responsabilidades:
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/runtime-newgame.png" alt="runtime newgame" width="583" height="305">
+<img src="./images/runtime-newgame.png" alt="runtime newgame" width="685" height="303">
 </div>
 </div>
 </div>
@@ -1889,7 +1925,7 @@ Responsabilidades:
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/runtime-move.png" alt="runtime move" width="488" height="305">
+<img src="./images/runtime-move.png" alt="runtime move" width="571" height="303">
 </div>
 </div>
 </div>
@@ -1897,7 +1933,7 @@ Responsabilidades:
 <h3 id="_escenario_4_fin_de_partida_y_guardado_en_historial">6.4. Escenario 4: Fin de partida y guardado en historial</h3>
 <div class="imageblock">
 <div class="content">
-<img src="./images/runtime-endgame.png" alt="runtime endgame" width="1015" height="362">
+<img src="./images/runtime-endgame.png" alt="runtime endgame" width="1024" height="422">
 </div>
 </div>
 </div>
@@ -1935,7 +1971,7 @@ Responsabilidades:
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/runtime-logout.png" alt="runtime logout" width="697" height="316">
+<img src="./images/runtime-logout.png" alt="runtime logout" width="720" height="405">
 </div>
 </div>
 <div class="sidebarblock arc42help">
@@ -2068,7 +2104,7 @@ when your infrastructure is more complex.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/deployment-diagram.png" alt="deployment diagram" width="430" height="515">
+<img src="./images/deployment-diagram.png" alt="deployment diagram" width="748" height="411">
 </div>
 </div>
 <table class="tableblock frame-all grid-all stretch">
@@ -2088,23 +2124,23 @@ when your infrastructure is more complex.</p>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>webapp</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">TypeScript</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sirve el frontend web y expone la API pública para usuarios y bots externos.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">React / TypeScript</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Servidor web estático (ej. Nginx o Node estático) que sirve la interfaz de usuario (Single Page Application) al navegador del jugador.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>gamey</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Rust</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Motor de juego. Valida movimientos, detecta victorias y sugiere jugadas mediante las estrategias implementadas.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Rust / Axum</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Microservicio del Motor de Juego. Valida movimientos, detecta victorias y expone el endpoint público de la IA para los bots externos.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>users</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Node.js / TypeScript</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Gestiona el registro, autenticación y el historial de partidas de los usuarios.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Node.js / Express</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Microservicio backend que gestiona el registro, la autenticación, el cálculo de rankings y el historial de partidas.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>MongoDB</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">MongoDB</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Base de datos documental que persiste usuarios, credenciales y estadísticas de partidas.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Base de datos documental persistente e interna. Solo accesible por el servicio de <code>users</code>. Almacena credenciales y estadísticas.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2168,7 +2204,35 @@ when your infrastructure is more complex.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_experiencia_de_usuario_ux">8.2. Experiencia de Usuario (UX)</h3>
+<h3 id="_sistema_de_puntuación_y_ranking">8.2. Sistema de Puntuación y Ranking</h3>
+<div class="paragraph">
+<p>Para que el ranking global sea justo y evitar que los jugadores suban al top jugando exclusivamente contra bots de nivel fácil, el sistema YOVI no utiliza un simple conteo de victorias, sino un algoritmo de <strong>puntuación ponderada</strong>.</p>
+</div>
+<div class="paragraph">
+<p>En lugar de que cada victoria valga 1 punto, el backend calcula la puntuación de cada jugador basándose en estas cuatro reglas:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>1. Dificultad del rival:</strong> No todas las victorias valen lo mismo. Ganar al bot aleatorio otorga un multiplicador bajo (x1), ganar a otros jugadores humanos da más puntos (x5), y derrotar a la IA más avanzada (Monte Carlo) otorga el multiplicador máximo (x7).</p>
+</li>
+<li>
+<p><strong>2. Número de victorias:</strong> Es el factor principal; cuantas más veces derrotes a un rival concreto, más puntos acumulas.</p>
+</li>
+<li>
+<p><strong>3. Filtro anti-suerte (Confianza estadística):</strong> Si un jugador juega una sola partida contra la IA difícil y la gana por suerte, tendría un "100% de victorias". Para evitar que esto rompa el ranking, el sistema exige un mínimo de volumen. Si juegas pocas partidas, recibes solo una fracción de los puntos. Necesitas jugar unas 30 partidas contra un mismo rival para que el sistema confíe en tu nivel y te dé el 100% de tus puntos.</p>
+</li>
+<li>
+<p><strong>4. Bonus de eficacia:</strong> Si ganas muchas partidas y pierdes muy pocas contra un mismo oponente, el sistema te premia con un pequeño porcentaje extra de puntos.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Desde la perspectiva de la experiencia de usuario, dado que este sistema genera situaciones donde un jugador con menos victorias totales puede superar en el ranking a otro (por haber jugado partidas más difíciles), la interfaz web incluye una ventana explicativa con mucho detalle en la cabecera del ranking para explicar el sistema de puntuación a los jugadores.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_experiencia_de_usuario_ux">8.3. Experiencia de Usuario (UX)</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2184,7 +2248,7 @@ when your infrastructure is more complex.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_prototipos_de_pantallas">8.3. Prototipos de pantallas</h3>
+<h3 id="_prototipos_de_pantallas">8.4. Prototipos de pantallas</h3>
 <div class="paragraph">
 <p>Los prototipos originales de las pantallas del proyecto tal y como se diseñaron en las reuniones perativas se pueden encontrar a continuación:</p>
 </div>
@@ -2198,7 +2262,7 @@ when your infrastructure is more complex.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_seguridad">8.4. Seguridad</h3>
+<h3 id="_seguridad">8.5. Seguridad</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2211,20 +2275,20 @@ when your infrastructure is more complex.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_arquitectura">8.5. Arquitectura</h3>
+<h3 id="_arquitectura">8.6. Arquitectura</h3>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Microservicios:</strong> El sistema no es un único bloque, sino que está dividido en servicios independientes. Esto permite que si una parte falla o necesita cambios, no afecte a todo el sistema.</p>
+<p><strong>Microservicios Desacoplados:</strong> El sistema no es un único bloque, sino que está dividido en servicios independientes (Node.js y Rust). Esto permite aislar la carga de procesamiento matemático del juego de la gestión de sesiones de usuario.</p>
 </li>
 <li>
-<p><strong>API Gateway:</strong> Para facilitar la comunicación, el cliente web (frontend) solo se conecta a una única dirección (puerta de enlace). Esta se encarga de redirigir internamente los datos al microservicio correcto, simplificando la red.</p>
+<p><strong>Comunicación Directa (Cliente-Servidor):</strong> El frontend (React) actúa como orquestador de las peticiones, comunicándose directamente mediante HTTP/REST con el servicio correspondiente (Puerto 3000 para usuarios, Puerto 4000 para juego) sin intermediarios, optimizando la latencia de red.</p>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_desarrollo_y_operaciones">8.6. Desarrollo y Operaciones</h3>
+<h3 id="_desarrollo_y_operaciones">8.7. Desarrollo y Operaciones</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2243,7 +2307,7 @@ when your infrastructure is more complex.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_diseño_y_documentación_de_la_api">8.7. Diseño y Documentación de la API</h3>
+<h3 id="_diseño_y_documentación_de_la_api">8.8. Diseño y Documentación de la API</h3>
 <div class="paragraph">
 <p>El sistema YOVI utiliza una arquitectura orientada a servicios que se comunican mediante APIs RESTful sobre HTTP. Se ha establecido JSON como formato estándar y universal de intercambio de datos para todos los módulos.</p>
 </div>
@@ -2251,7 +2315,7 @@ when your infrastructure is more complex.</p>
 <p>La API se divide lógicamente en dos grandes bloques de responsabilidad, separados por puertos e instancias de despliegue:</p>
 </div>
 <div class="sect3">
-<h4 id="_api_de_gestión_de_usuarios_node_js_puerto_3000">8.7.1. API de Gestión de Usuarios (Node.js - Puerto 3000)</h4>
+<h4 id="_api_de_gestión_de_usuarios_node_js_puerto_3000">8.8.1. API de Gestión de Usuarios (Node.js - Puerto 3000)</h4>
 <div class="paragraph">
 <p>Este servicio centraliza la persistencia, la seguridad y el componente social del juego. Sus rutas principales incluyen:</p>
 </div>
@@ -2300,7 +2364,7 @@ when your infrastructure is more complex.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_api_del_motor_de_juego_rustaxum_puerto_4000">8.7.2. API del Motor de Juego (Rust/Axum - Puerto 4000)</h4>
+<h4 id="_api_del_motor_de_juego_rustaxum_puerto_4000">8.8.2. API del Motor de Juego (Rust/Axum - Puerto 4000)</h4>
 <div class="paragraph">
 <p>Este servicio, altamente optimizado, expone la lógica pura del juego "Y", la validación de movimientos y los motores de Inteligencia Artificial (Bots).</p>
 </div>
@@ -2326,7 +2390,7 @@ when your infrastructure is more complex.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_api_pública_para_torneos_y_bots_externos">8.7.3. API Pública para Torneos y Bots Externos</h4>
+<h4 id="_api_pública_para_torneos_y_bots_externos">8.8.3. API Pública para Torneos y Bots Externos</h4>
 <div class="paragraph">
 <p>Para cumplir con el requisito de interoperabilidad y permitir que bots desarrollados por terceros compitan contra nuestro motor, se expone un endpoint público que actúa sin necesidad de estado previo (Stateless):</p>
 </div>
@@ -3031,9 +3095,8 @@ concrete and measurable.</p>
 </tbody>
 </table>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_fiabilidad">10.4. Fiabilidad</h3>
+<div class="sect3">
+<h4 id="_fiabilidad">10.3.5. Fiabilidad</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 10%;">
@@ -3068,8 +3131,9 @@ concrete and measurable.</p>
 </tr>
 </tbody>
 </table>
+</div>
 <div class="sect3">
-<h4 id="_portabilidad">10.4.1. Portabilidad</h4>
+<h4 id="_portabilidad">10.3.6. Portabilidad</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 10%;">
@@ -3145,7 +3209,7 @@ more precisely down to a level of scenarios that can be discussed and evaluated.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_validacion_de_rendimiento_pruebas_de_carga">10.5. Validacion de Rendimiento (Pruebas de Carga)</h3>
+<h3 id="_validacion_de_rendimiento_pruebas_de_carga">10.4. Validacion de Rendimiento (Pruebas de Carga)</h3>
 <div class="paragraph">
 <p>Para comprobar el rendimiento del proyecto, el equipo de desarrollo ha diseñado y ejecutado pruebas de estrés utilizando la herramienta Gatling.</p>
 </div>
@@ -3311,10 +3375,10 @@ La prueba confirma que el servidor (desarrollado en Rust) soporta la carga de 50
 <div class="sect2">
 <h3 id="_deuda_técnica">11.2. Deuda Técnica</h3>
 <div class="paragraph">
-<p><strong>Diseño web inicial poco optimizado visualmente</strong>
-Durante las primeras fases del desarrollo se priorizará la funcionalidad sobre el diseño visual
-de la aplicación. Como resultado, la interfaz puede presentar un diseño básico con escasa
-optimización estética o de experiencia de usuario, que deberá mejorarse en iteraciones posteriores.</p>
+<p><strong>1. Optimización de CSS y Diseño Responsivo Extremo</strong> Aunque el frontend es completamente funcional y el tablero se renderiza de forma correcta, la estructura CSS requiere una refactorización profunda. Actualmente existen limitaciones en la adaptabilidad a pantallas de móviles muy pequeñas, quedando como deuda técnica la migración a un framework de utilidades CSS más robusto o la reescritura de los media queries.</p>
+</div>
+<div class="paragraph">
+<p><strong>2. Soporte Multijugador en Red (Ausencia de WebSockets)</strong> El motor actual procesa los turnos en un modelo de petición/respuesta síncrono (REST). Si en el futuro se desea escalar el proyecto para permitir partidas entre humanos en distintos ordenadores (multijugador real-time remoto), será necesario refactorizar la capa de red del servicio <code>gamey</code> para integrar WebSockets.</p>
 </div>
 <div style="page-break-after: always;"></div>
 </div>
@@ -3452,13 +3516,13 @@ usuario con múltiples filtros opcionales: resultado, rival&#8230;&#8203; Sus te
 <div class="sect3">
 <h4 id="_tests_del_backend_gamey">12.1.6. Tests del Backend (Gamey)</h4>
 <div class="paragraph">
-<p>En el motor de juego (Gamey), las pruebas se desarrollan utilizando el framework de testing integrado de forma nativa en <strong>Rust</strong> (<code>cargo test</code>). Al separar la lógica pura de la capa de red, los tests se estructuran en tres focos principales para garantizar la seguridad, el rendimiento y la fiabilidad algorítmica.</p>
+<p>En el motor de juego (Gamey), las pruebas se desarrollan utilizando el framework de testing integrado de forma nativa en Rust (<code>cargo test</code>). Al separar la lógica pura de la capa de red, los tests se estructuran en tres focos principales para garantizar la seguridad, el rendimiento y la fiabilidad algorítmica.</p>
 </div>
 <div class="sect4">
 <h5 id="_rutas_y_gestión_de_estado_concurrente_game_routes_rs">Rutas y Gestión de Estado Concurrente (<code>game_routes.rs</code>)</h5>
 <div class="paragraph">
-<p>Estos tests validan los endpoints HTTP gestionados por <strong>Axum</strong> y la inyección del estado concurrente (<code>AppState</code>). Se simulan peticiones HTTP directamente en memoria (sin abrir puertos de red reales) para agilizar la ejecución. Se verifica que el servidor responde con los códigos adecuados (ej. <code>201 Created</code> al instanciar partidas, o <code>200 OK</code> al mover).
-Un aspecto fundamental auditado aquí es la seguridad: el servidor debe rechazar de forma controlada peticiones malformadas o movimientos ilegales para evitar trampas.</p>
+<p>Estos tests validan los endpoints HTTP gestionados por Axum y la inyección del estado concurrente (<code>AppState</code>). Se simulan peticiones HTTP directamente en memoria (sin abrir puertos de red reales) para agilizar la ejecución. Se verifica que el servidor responde con los códigos adecuados (ej. <code>201 Created</code> al instanciar partidas, o <code>200 OK</code> al mover).
+Un aspecto fundamental comprobado aquí es la seguridad: el servidor debe rechazar peticiones malformadas o movimientos ilegales para evitar trampas, cosa que en la prueba de Carga se confirma.</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -3469,7 +3533,7 @@ Un aspecto fundamental auditado aquí es la seguridad: el servidor debe rechazar
 <div class="sect4">
 <h5 id="_motor_del_juego_y_game_rs">Motor del Juego "Y" (<code>game.rs</code>)</h5>
 <div class="paragraph">
-<p>En este módulo se somete a prueba el núcleo matemático del sistema de forma totalmente aislada. Los tests unitarios validan las estructuras de datos que representan el tablero hexagonal y el estado de la partida:</p>
+<p>En este módulo se somete a prueba el núcleo lógico del sistema de forma totalmente aislada. Los tests unitarios validan las estructuras de datos que representan el tablero hexagonal y el estado de la partida:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -3515,7 +3579,7 @@ Para testear algoritmos probabilísticos como Monte Carlo, se evalúan escenario
 <div class="sect3">
 <h4 id="_casos_de_uso_cubiertos">12.2.1. Casos de uso cubiertos</h4>
 <div class="paragraph">
-<p>En este apartado de muestran algunos de los casos cubiertos:</p>
+<p>En este apartado se muestran algunos de los casos cubiertos:</p>
 </div>
 <div class="sect4">
 <h5 id="_registro_de_un_nuevo_usuario">Registro de un nuevo usuario</h5>
@@ -3542,7 +3606,7 @@ Para testear algoritmos probabilísticos como Monte Carlo, se evalúan escenario
 <div class="sect4">
 <h5 id="_partida_contra_la_cpu_estrategia">Partida contra la CPU (Estrategia)</h5>
 <div class="paragraph">
-<p><strong>Descripción</strong>: Comprueba que el motor de juego gestione correctamente los turnos automáticos del Bot según la dificultad y la estrategiaseleccionada una vez empezada la partida.</p>
+<p><strong>Descripción</strong>: Comprueba que el motor de juego gestione correctamente los turnos automáticos del Bot según la dificultad y la estrategia seleccionada una vez empezada la partida.</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -3641,7 +3705,7 @@ Su objetivo es detectar fallos críticos en el servicio de forma inmediata.</p>
 <div class="sect3">
 <h4 id="_conclusiones">12.3.2. Conclusiones</h4>
 <div class="paragraph">
-<p>Los datos obtenidos durante las pruebas muestran un servicio estable, sin errores de servidor y con tiempos de respuesta aceptables. Pero hay que recordar que se está usando una muestra muy pequeña y una carga basstante nimia. Ya que esto no es una prueba de carga, si no una muestra de la monitorización de la aplicación.</p>
+<p>Los datos obtenidos durante las pruebas muestran un servicio estable, sin errores de servidor y con tiempos de respuesta aceptables. Pero hay que recordar que se está usando una muestra muy pequeña y una carga bastante nimia. Ya que esto no es una prueba de carga, si no una muestra de la monitorización de la aplicación.</p>
 </div>
 </div>
 </div>
