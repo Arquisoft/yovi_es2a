@@ -47,7 +47,7 @@ export async function createGame(
 // Obtiene el estado de la partida por su ID
 export async function getGame(gameId: string): Promise<ApiGameState> {
     // Llamamos a la API de rust y le pedimos que nos devuelva el estado de la partida con ese ID
-    const response = await fetch(`${BACKEND_URL}/game/${gameId}`); // NOSONAR: gameId comes from server
+    const response = await fetch(`${BACKEND_URL}/game/${encodeURIComponent(gameId)}`);
     // Si sale mal obtenemos el error y lo mostramos
     if (!response.ok) {
         const error = await response.json();
@@ -73,7 +73,7 @@ export async function placeToken(
 
     if (botId) body.bot = botId;
 
-    const response = await fetch(`${BACKEND_URL}/game/${gameId}/move`, { // NOSONAR: gameId comes from server
+    const response = await fetch(`${BACKEND_URL}/game/${encodeURIComponent(gameId)}/move`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -90,7 +90,7 @@ export async function resign(
     gameId: string,
     player: number
 ): Promise<ApiMakeMoveResponse> {
-    const response = await fetch(`${BACKEND_URL}/game/${gameId}/move`, { // NOSONAR: gameId comes from server
+    const response = await fetch(`${BACKEND_URL}/game/${encodeURIComponent(gameId)}/move`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ player, action: "resign" }),
@@ -116,7 +116,7 @@ export async function timeout(
     // Si hay un bot jugando, le decimos a Rust que el bot juegue su turno automáticamente después
     if (botId) body.bot = botId;
 
-    const response = await fetch(`${BACKEND_URL}/game/${gameId}/move`, { // NOSONAR: gameId comes from server
+    const response = await fetch(`${BACKEND_URL}/game/${encodeURIComponent(gameId)}/move`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -161,7 +161,7 @@ export async function getHistory(
     if (filters.size)               params.set("size", String(filters.size));
  
     const query = params.toString() ? `?${params.toString()}` : "";
-    const response = await fetch(`${USERS_URL}/history/${username}${query}`); // NOSONAR: username sanitized at login
+    const response = await fetch(`${USERS_URL}/history/${encodeURIComponent(username)}${query}`);
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error ?? "Error al obtener el historial");
@@ -196,7 +196,7 @@ export interface UserStats {
 }
 
 export async function getStats(username: string): Promise<UserStats> {
-  const response = await fetch(`${USERS_URL}/stats/${username}`); // NOSONAR: username sanitized at login
+  const response = await fetch(`${USERS_URL}/stats/${encodeURIComponent(username)}`);
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.error ?? 'Error al obtener las estadísticas');
