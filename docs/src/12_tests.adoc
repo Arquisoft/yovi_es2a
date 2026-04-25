@@ -6,6 +6,227 @@ ifndef::imagesdir[:imagesdir: ../images]
 En esta sección se describe la estrategia de aseguramiento de la calidad (QA) seguida durante el desarrollo de Yovi, detallando los diferentes niveles de pruebas realizados para garantizar la robustez del sistema.
 
 === Pruebas Unitarias
+Los tests unitarios son pruebas automatizadas que verifican el comportamiento del codigo ejecutable. Su objetivo es garantizar que cada pieza funciona correctamente por sí sola y detectar problemas de comportamiento.
+
+En estas pruebas utilizamos **mocks** para sustituir módulos externos y servicios, ya que lo que nos interesa es validar la lógica de cada fragmento y no el comportamiento del sistema completo.
+
+==== Tests del Frontend (Webapp)
+En webapp se utiliza **Vitest** como framework de testing junto con **React Testing Library** para el renderizado y simulación de interacciones de componentes. 
+
+A continuación se describen los tests unitarios más relevantes de la webapp:
+
+===== Hook useGame — Lógica principal del juego
+
+El hook `useGame` centraliza toda la lógica del juego: creación de partidas, gestión de 
+turnos, movimientos, rendición y timeout.
+
+Los tests verifican entre otras cosas que el hook arranca en estado `loading` y transiciona 
+a `ongoing` tras crear la partida, que los movimientos actualizan correctamente el estado 
+del tablero y el turno, que la rendición termina la partida con el ganador correcto, y que 
+los errores de red se capturan y exponen al componente.
+
+[plantuml, useGame, png]
+....
+@startuml
+actor Test
+participant "useGame (hook)" as Hook
+participant "gameService (mock)" as Service
+
+Test -> Hook : renderHook()
+Hook -> Service : createGame(7, 'human', ...)
+Service --> Hook : mockApiState (ongoing)
+Hook --> Test : status = 'loading' → 'ongoing'
+
+Test -> Hook : handleCellClick(0)
+Hook -> Service : placeToken('game-123', 0, 0)
+Service --> Hook : stateAfterMove
+Hook --> Test : cells[0].owner = 'PLAYER_ONE'\ncurrentPlayer = 'PLAYER_TWO'
+
+Test -> Hook : handleResign()
+Hook -> Service : resign('game-123', 0)
+Service --> Hook : mockFinishedState (winner=0)
+Hook --> Test : status = 'finished'\nwinner = 'PLAYER_ONE'
+@enduml
+....
+
+===== GameService — Capa de comunicación con la API
+
+El módulo `gameService` encapsula todas las llamadas HTTP al backend: creación de partidas, 
+movimientos, historial, estadísticas, ranking, amigos y grupos. Sus tests verifican que 
+cada función llama al endpoint correcto.
+
+Aquí un ejemplo de caso probado:
+
+[plantuml, gameService, png]
+....
+@startuml
+actor Test
+participant "gameService" as Service
+participant "fetch (mock)" as Fetch
+
+Test -> Service : createGame(7, 'human', 'random_bot')
+Service -> Fetch : POST /game/new
+Fetch --> Service : { game_id: 'game-123', ... }
+Service --> Test : mockApiState ✓
+
+Test -> Service : createGame(7)  [fetch falla]
+Service -> Fetch : POST /game/new
+Fetch --> Service : { ok: false, error: 'Error al crear la partida' }
+Service --> Test : throws Error ✓
+@enduml
+....
+
+===== Historic — Historial de partidas con filtros
+
+El componente `Historic` muestra el historial de partidas del usuario y permite filtrarlo. Sus tests cubren la carga inicial de datos, los estados de error y vacío, y la interacción con los filtros.
+
+[plantuml, historic, png]
+....
+@startuml
+actor Test
+participant "Historic (componente)" as Component
+participant "getHistory (mock)" as Service
+
+Test -> Component : render()
+Component -> Service : getHistory('testuser')
+Service --> Component : [mockRecords]
+Component --> Test : muestra 'Random Bot', 'invitado' ✓
+
+Test -> Component : selectOptions(resultado, '1')
+Component -> Service : getHistory('testuser', { resultado: '1' })
+Service --> Component : [mockRecords filtrados]
+Component --> Test : lista actualizada ✓
+
+Test -> Component : type(input, 'random_bot') + click(Buscar)
+Component -> Service : getHistory('testuser', { rival: 'random_bot' })
+Service --> Component : [mockRecords filtrados]
+Component --> Test : lista actualizada ✓
+@enduml
+....
+
+===== RegisterForm — Autenticación de usuarios
+
+El componente `AuthForm` gestiona tanto el login como el registro de usuarios. Sus tests 
+verifican el flujo completo de autenticación: validación de campos, manejo de errores del 
+servidor, almacenamiento del usuario en `localStorage` tras un login exitoso, y la 
+navegación al menú principal.
+
+[plantuml, authForm, png]
+....
+@startuml
+actor Test
+participant "AuthForm (componente)" as Component
+participant "fetch (mock)" as Fetch
+participant "localStorage" as Storage
+participant "navigate (mock)" as Router
+
+Test -> Component : render()
+Test -> Component : type(username='user1')\ntype(password='pass123')\nclick(GO!)
+Component -> Fetch : POST /login
+Fetch --> Component : { ok: true, message: 'Login success' }
+Component -> Storage : setItem('username', 'user1')
+Component -> Router : navigate('/menu')
+Router --> Test : mockNavigate llamado con '/menu' ✓
+@enduml
+....
+
+==== Tests de Datos (Users)
+El servicio de usuarios es el microservicio central que gestiona la autenticación, 
+el historial de partidas, las estadísticas, el ranking y las relaciones sociales 
+entre jugadores. Sus tests utilizan **Vitest** junto con **Supertest** para realizar 
+peticiones HTTP reales contra la aplicación sin necesidad de un servidor externo.
+
+==== Hashing — Seguridad de contraseñas
+
+El módulo `Hashing` encapsula el cifrado y verificación de contraseñas usando el algoritmo **Argon2id**. Sus tests verifican que las contraseñas se almacenan siempre cifradas, que la verificación funciona correctamente tanto para contraseñas válidas como incorrectas, y que los 
+errores internos del algoritmo se capturan sin romper la aplicación.
+
+Algunos ejemplos de los tests:
+
+[plantuml, hashing, png]
+....
+@startuml
+actor Test
+participant "Hashing" as H
+participant "argon2 (mock)" as A
+
+Test -> H : hashPassword('mi_pass')
+H -> A : argon2.hash('mi_pass')
+A --> H : '$argon2id$...'
+H --> Test : hash ≠ 'mi_pass' ✓\ncontiene '$argon2id$' ✓
+
+Test -> H : verifyPassword(hash, 'pass_incorrecta')
+H -> A : argon2.verify(hash, 'pass_incorrecta')
+A --> H : false
+H --> Test : false ✓
+
+Test -> H : hashPassword('mi_pass') [argon2 falla]
+H -> A : argon2.hash()
+A --> H : throws Error('Fallo simulado')
+H --> Test : throws 'Error al hashear la contraseña' ✓
+@enduml
+....
+
+==== History — Historial de partidas
+
+El endpoint `/history/:username` permite consultar el historial de partidas de un 
+usuario con múltiples filtros opcionales: resultado, rival... Sus tests cubren el caso base de carga de partidas, la validación de cada parámetro de filtrado, entre otros.
+
+[plantuml, history, png]
+....
+@startuml
+actor Test
+participant "GET /history/:username" as EP
+participant "GameRecord (mock)" as DB
+
+Test -> EP : GET /history/alice
+EP -> DB : find({ username: 'alice' })
+DB --> EP : [4 partidas]
+EP --> Test : 200, history.length = 4 ✓
+
+Test -> EP : GET /history/alice?resultado=1
+EP -> DB : find({ username: 'alice', resultado: '1' })
+DB --> EP : [partidas filtradas]
+EP --> Test : 200, todas resultado='1' ✓
+
+Test -> EP : GET /history/alice?resultado=win
+EP --> Test : 400, error: 'resultado must be...' ✓
+@enduml
+....
+
+==== Users Service — Endpoints principales
+
+El archivo `users-service.test.js` cubre de forma integral todos los endpoints del microservicio: registro y login de usuarios, guardado de partidas... 
+
+[plantuml, users-service, png]
+....
+@startuml
+actor Test
+participant "Users Service" as EP
+participant "User (mock)" as User
+
+Test -> EP : POST /createuser { username, password }
+EP --> Test : 201, 'Hello iyan2!' ✓
+
+Test -> EP : POST /login { username, password }
+EP -> User : findOne({ username })
+User --> EP : { username, hashed_password }
+EP --> Test : 200, 'Welcome back' ✓
+
+Test -> EP : POST /login [usuario no existe]
+EP -> User : findOne()
+User --> EP : null
+EP --> Test : 401, 'User not found' ✓
+
+Test -> EP : POST /savegame { resultado: 'X' }
+EP --> Test : 400, "must be '1' or '2'" ✓
+
+Test -> EP : POST /addfriend/iyan2 [mismo usuario]
+EP --> Test : 400 ✓
+@enduml
+....
+
+==== Tests del Backend (Gamey)
 
 
 === Pruebas End-to-End (E2E)
@@ -18,6 +239,9 @@ En este apartado de muestran algunos de los casos cubiertos:
 
 ===== Registro de un nuevo usuario
 **Descripción**: Valida que un usuario pueda crear una cuenta desde cero cuando los datos son válidos y el servidor está disponible.
+
+[plantuml, user-register, png]
+....
 @startuml
 actor Usuario
 participant "Webapp: Register" as UI
@@ -28,9 +252,13 @@ UI -> DB: Petición de registro (SUCCESS)
 DB --> UI: Confirmación de creación
 UI --> Usuario: Mensaje de éxito
 @enduml
+....
 
 ===== Autenticación de Usuario (Login)
 **Descripción**: Verifica el flujo de acceso al sistema y la redirección correcta al menú principal tras un login exitoso.
+
+[plantuml, user-login, png]
+....
 @startuml
 actor Usuario
 participant "Webapp: Login" as UI
@@ -42,9 +270,12 @@ Auth --> UI: Token / OK
 UI -> UI: Redirigir a Main Menu
 UI --> Usuario: Visualiza
 @enduml
-
+....
 ===== Partida contra la CPU (Estrategia)
 **Descripción**: Comprueba que el motor de juego gestione correctamente los turnos automáticos del Bot según la dificultad y la estrategiaseleccionada una vez empezada la partida.
+
+[plantuml, game-strategy, png]
+....
 @startuml
 actor Jugador
 participant "Webapp" as Board
@@ -56,9 +287,13 @@ Board -> Bot: Solicitar movimiento
 Bot --> Board: Realiza movimiento automático
 Board --> Jugador: Celda marcada (Bot) + Tu turno
 @enduml
+....
 
 ===== Finalización y Reinicio de Partida
 **Descripción**: Garantiza que, tras abandonar o terminar una partida, el usuario pueda volver a jugar inmediatamente sin errores de estado.
+
+[plantuml, game-surrender-and-restart, png]
+....
 @startuml
 actor Jugador
 participant "Webapp: Board" as Board
@@ -79,9 +314,13 @@ Board -> Gamey: Pide una nueva partida
 Gamey --> Board: Devuelve la información
 Board -> Jugador: Se renderiza
 @enduml
+....
 
 ===== Consulta de Estadísticas e Historial
 **Descripción**: Verifica la integración con el Datahub para mostrar el histórico de partidas y la aplicación de filtros (ej. victorias).
+
+[plantuml, user-stats, png]
+....
 @startuml
 actor Jugador
 participant "Data View" as UI
@@ -94,6 +333,7 @@ Jugador -> UI: Filtrar por "Victories"
 UI -> UI: Actualizar tabla (solo victorias)
 UI -> Jugador: Muestra los resultados 
 @enduml
+....
 
 
 === Grafana y Prometheus
