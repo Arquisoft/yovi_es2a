@@ -18,7 +18,7 @@
 //! use gamey::{GameY, Coordinates, Movement, PlayerId};
 //!
 //! // Create a new game with board size 5
-//! let mut game = GameY::new(5);
+//! let mut game = GameY::new(5, None);
 //!
 //! // Make a move
 //! let movement = Movement::Placement {

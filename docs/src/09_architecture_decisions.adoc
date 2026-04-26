@@ -217,6 +217,27 @@ Consideramos que añadir una gateway sería complicar la arquitectura de forma i
 
 * **Consecuencias:**
 ** La arquitectura es más simple y fácil de desplegar y depurar.
+** La webapp asume la responsabilidad de seleccionar el servicio correcto en cada 
+operación, acoplando ligeramente el frontend a la topología de servicios.
+** Si en el futuro se añaden más microservicios o se requiere autenticación centralizada, la introducción de un gateway sería la evolución natural del sistema que resultaría sencilla de implementar.
+
+=== ADR-005: Política de Saneamiento Estricto (Allowlist) en la Comunicación
+
+* **Estatus:** Aceptado.
+
+* **Contexto:** Durante el análisis de código estático con SonarCloud, se identificaron vulnerabilidades críticas de seguridad. Estas ocurrían al inyectar parámetros del usuario directamente en las rutas de las peticiones HTTP (fetch).
+
+* **Decisión:** Se rechaza el uso de comentarios de evasión (// NOSONAR) o listas de bloqueo de caracteres. En su lugar, se implementa una política de Validación por Lista Blanca (Allowlist).
+
+* **Justificación:** Se ha centralizado la seguridad en una función (sanitizeParam) que utiliza una expresión regular estricta (^[a-zA-Z0-9_-]+$). Esto asegura matemáticamente que cualquier dato que viaje hacia los microservicios sea inofensivo, bloqueando la petición en el cliente si se detectan caracteres de inyección (/, . o scripts). 
+
+* **Alternativas consideradas:**
+** // NOSONAR: Descartado por ser un antipatrón que oculta riesgos reales.
+
+* **Consecuencias:**
+** Mitigación efectiva de ataques de inyección en la URL.
+** Cumplimiento estricto de los estándares de seguridad de SonarCloud.
+** Ligera pérdida de flexibilidad en los nombres de usuario permitidos (restringidos a caracteres alfanuméricos y guiones).
 ** La webapp asume la responsabilidad de seleccionar el servicio correcto en cada operación, acoplando ligeramente el frontend a la topología de servicios.
 ** Si en el futuro se añaden más microservicios o se requiere autenticación centralizada, la introducción de un gateway sería la evolución natural del sistema que resultaría sencilla de implementar.
 

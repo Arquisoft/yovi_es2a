@@ -18,7 +18,7 @@ use rand::prelude::IndexedRandom;
 /// use gamey::{GameY, RandomBot, YBot};
 ///
 /// let bot = RandomBot;
-/// let game = GameY::new(5);
+/// let game = GameY::new(5, None);
 ///
 /// // The bot will always return Some when there are available moves
 /// let chosen_move = bot.choose_move(&game);
