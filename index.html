@@ -516,6 +516,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_adr_002_estrategia_de_filtrado_en_el_historial_de_partidas">9.3. ADR 002: Estrategia de filtrado en el historial de partidas</a></li>
 <li><a href="#_adr_003_fórmula_de_puntuación_ponderada_para_el_ranking_global">9.4. ADR-003: Fórmula de puntuación ponderada para el ranking global</a></li>
 <li><a href="#_adr_004_ausencia_de_gateway_acceso_directo_a_microservicios">9.5. ADR-004: Ausencia de Gateway — Acceso directo a microservicios</a></li>
+<li><a href="#_adr_005_política_de_saneamiento_estricto_allowlist_en_la_comunicación">9.6. ADR-005: Política de Saneamiento Estricto (Allowlist) en la Comunicación</a></li>
 </ul>
 </li>
 <li><a href="#section-quality-scenarios">10. Requisitos de Calidad</a>
@@ -2854,6 +2855,51 @@ operación, acoplando ligeramente el frontend a la topología de servicios.</p>
 </li>
 <li>
 <p>Si en el futuro se añaden más microservicios o se requiere autenticación centralizada, la introducción de un gateway sería la evolución natural del sistema que resultaría sencilla de implementar.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_adr_005_política_de_saneamiento_estricto_allowlist_en_la_comunicación">9.6. ADR-005: Política de Saneamiento Estricto (Allowlist) en la Comunicación</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Estatus:</strong> Aceptado.</p>
+</li>
+<li>
+<p><strong>Contexto:</strong> Durante el análisis de código estático con SonarCloud, se identificaron vulnerabilidades críticas de seguridad. Estas ocurrían al inyectar parámetros del usuario directamente en las rutas de las peticiones HTTP (fetch).</p>
+</li>
+<li>
+<p><strong>Decisión:</strong> Se rechaza el uso de comentarios de evasión (// NOSONAR) o listas de bloqueo de caracteres. En su lugar, se implementa una política de Validación por Lista Blanca (Allowlist).</p>
+</li>
+<li>
+<p><strong>Justificación:</strong> Se ha centralizado la seguridad en una función (sanitizeParam) que utiliza una expresión regular estricta (^[a-zA-Z0-9_-]+$). Esto asegura matemáticamente que cualquier dato que viaje hacia los microservicios sea inofensivo, bloqueando la petición en el cliente si se detectan caracteres de inyección (/, . o scripts).</p>
+</li>
+<li>
+<p><strong>Alternativas consideradas:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>// NOSONAR: Descartado por ser un antipatrón que oculta riesgos reales.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Consecuencias:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>Mitigación efectiva de ataques de inyección en la URL.</p>
+</li>
+<li>
+<p>Cumplimiento estricto de los estándares de seguridad de SonarCloud.</p>
+</li>
+<li>
+<p>Ligera pérdida de flexibilidad en los nombres de usuario permitidos (restringidos a caracteres alfanuméricos y guiones).</p>
 </li>
 </ul>
 </div>
