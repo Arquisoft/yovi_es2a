@@ -4,7 +4,11 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_es2a&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_es2a)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_es2a&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_es2a)
 
+<img width="1376" height="768" alt="Imagen_juegoY" src="https://github.com/user-attachments/assets/4014a8b5-27c8-4d5a-8390-bbbdc7c847e4" />
+
 Implementación web del juego de tablero Y con autenticación de usuarios, historial de partidas, estadísticas personales y monitorización en tiempo real.
+
+---
 
 ## Equipo
 
@@ -14,9 +18,10 @@ Implementación web del juego de tablero Y con autenticación de usuarios, histo
 - Enol de la Calle Iglesias (UO301431@uniovi.es)
 - Iyán Álvarez Casanovas (UO301299@uniovi.es)
 
-**Curso:** Software  Architecture  
+**Curso:** Arquitectura del Software    
 **Año:** 2025/2026
 
+---
 
 ## Características
 
@@ -28,233 +33,166 @@ Implementación web del juego de tablero Y con autenticación de usuarios, histo
 - Historial de partidas por usuario con filtros por resultado, rival, fecha y tamaño
 - Estadísticas personales: win rate, racha actual, mejor racha, rival favorito
 
+---
+
 ## Arquitectura
 
 El proyecto sigue una arquitectura basada en microservicios: cada módulo es un servicio independiente con su propia tecnología, responsabilidad y ciclo de despliegue. Docker Compose los orquesta como un sistema unificado.
 
-    - webapp/     → Frontend     (React 18 + TypeScript + Vite)
-    
-    - users/      → Backend     (Node.js + Express + MongoDB)
-    
-    - gamey/      → Motor        (Rust + Axum)
-    
-    - docs/       → Documentación (Arc42, AsciiDoc)
+    webapp/     → Frontend     (React 18 + TypeScript + Vite)
+    users/      → Usuarios     (Node.js + Express + MongoDB)
+    gamey/      → Motor        (Rust + Axum)
+    docs/       → Documentación (Arc42, AsciiDoc)
+
+---
 
 ## Enlaces utiles
 
 - Aplicación:
 - Documentación: https://arquisoft.github.io/yovi_es2a/
 
+---
 
-# Puesta en marcha
+## Puesta en marcha
 
-## Con Docker (recomendado)
+### Con Docker (recomendado)
 
     docker compose up --build
-    
------------------------------------------
 
-**Servicio   :     URL**
-
-Aplicación  :  http://localhost
-
-Usuarios   :   http://localhost:3000
-
-Motor    :     http://localhost:4000
-
-Swagger    :    http://localhost:3000/api-docs
-
-Prometheus    :    http://localhost:9090
-
-Grafana    :    http://localhost:9091
+| Servicio    | URL                        |
+|-------------|----------------------------|
+| Aplicación  | http://localhost            |
+| Usuarios    | http://localhost:3000       |
+| Motor       | http://localhost:4000       |
+| Swagger     | http://localhost:3000/api-docs |
+| Prometheus  | http://localhost:9090       |
+| Grafana     | http://localhost:9091       |
 
 
-## En local
+### En local
 
 **Users:**
 
-    cd users
-    
-    npm install
-    
-    npm start
+```bash
+cd users
+npm install
+npm start
+```
     
 **Gamey:**
 
-    cd gamey
-    
-    cargo run -- --mode server --port 4000
+```bash
+cd gamey
+cargo run -- --mode server --port 4000
+```
     
 **Webapp:**
 
-    cd webapp
-    
-    npm install
-    
-    npm run dev
-
-## Bots disponibles
-
-**Estrategia**
--------------------------------------
-random_bot     -        -        -
-monte_carlo    -        -        -
-defensive✓✓✓
-offensive✓✓✓
-positional✓✓✓
-
-Random — mueve al azar
-Defensive — bloquea amenazas del rival antes de atacar
-Offensive — busca ganar creando tenedores de victoria
-Positional — controla el centro geométrico del tablero
-
-## Project Structure
-
-The project is divided into three main components, each in its own directory:
-
-- `webapp/`: A frontend application built with React, Vite, and TypeScript.
-- `users/`: A backend service for managing users, built with Node.js and Express.
-- `gamey/`: A Rust game engine and bot service.
-- `docs/`: Architecture documentation sources following Arc42 template
-
-Each component has its own `package.json` file with the necessary scripts to run and test the application.
-
-## Basic Features
-
-- **User Registration**: The web application provides a simple form to register new users.
-- **User Service**: The user service receives the registration request, simulates some processing, and returns a welcome message.
-- **GameY**: A basic Game engine which only chooses a random piece.
-
-## Components
-
-### Webapp
-
-The `webapp` is a single-page application (SPA) created with [Vite](https://vitejs.dev/) and [React](https://reactjs.org/).
-
-- `src/App.tsx`: The main component of the application.
-- `src/RegisterForm.tsx`: The component that renders the user registration form.
-- `package.json`: Contains scripts to run, build, and test the webapp.
-- `vite.config.ts`: Configuration file for Vite.
-- `Dockerfile`: Defines the Docker image for the webapp.
-
-### Users Service
-
-The `users` service is a simple REST API built with [Node.js](https://nodejs.org/) and [Express](https://expressjs.com/).
-
-- `users-service.js`: The main file for the user service. It defines an endpoint `/createuser` to handle user creation.
-- `package.json`: Contains scripts to start the service.
-- `Dockerfile`: Defines the Docker image for the user service.
-
-### Gamey
-
-The `gamey` component is a Rust-based game engine with bot support, built with [Rust](https://www.rust-lang.org/) and [Cargo](https://doc.rust-lang.org/cargo/).
-
-- `src/main.rs`: Entry point for the application.
-- `src/lib.rs`: Library exports for the gamey engine.
-- `src/bot/`: Bot implementation and registry.
-- `src/core/`: Core game logic including actions, coordinates, game state, and player management.
-- `src/notation/`: Game notation support (YEN, YGN).
-- `src/web/`: Web interface components.
-- `Cargo.toml`: Project manifest with dependencies and metadata.
-- `Dockerfile`: Defines the Docker image for the gamey service.
-
-## Running the Project
-
-You can run this project using Docker (recommended) or locally without Docker.
-
-### With Docker
-
-This is the easiest way to get the project running. You need to have [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) installed.
-
-1. **Build and run the containers:**
-    From the root directory of the project, run:
-
-```bash
-docker-compose up --build
-```
-
-This command will build the Docker images for both the `webapp` and `users` services and start them.
-
-2.**Access the application:**
-- Web application: [http://localhost](http://localhost)
-- User service API: [http://localhost:3000](http://localhost:3000)
-- Gamey API: [http://localhost:4000](http://localhost:4000)
-
-### Without Docker
-
-To run the project locally without Docker, you will need to run each component in a separate terminal.
-
-#### Prerequisites
-
-* [Node.js](https://nodejs.org/) and npm installed.
-
-#### 1. Running the User Service
-
-Navigate to the `users` directory:
-
-```bash
-cd users
-```
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Run the service:
-
-```bash
-npm start
-```
-
-The user service will be available at `http://localhost:3000`.
-
-#### 2. Running the Web Application
-
-Navigate to the `webapp` directory:
-
 ```bash
 cd webapp
-```
-
-Install dependencies:
-
-```bash
 npm install
-```
-
-Run the application:
-
-```bash
 npm run dev
 ```
 
-The web application will be available at `http://localhost:5173`.
+---
 
-#### 3. Running the GameY application
+## Bots disponibles
 
-At this moment the GameY application is not needed but once it is needed you should also start it from the command line.
+| Estrategia   | easy | medium | hard |
+|--------------|------|--------|------|
+| `random_bot` | —    | —      | —    |
+| `defensive`  | ✓    | ✓      | ✓    |
+| `offensive`  | ✓    | ✓      | ✓    |
+| `positional` | ✓    | ✓      | ✓    |
+| `monte carlo` | —    | —      | —    |
 
-## Available Scripts
+- **Random** — mueve al azar
+- **Defensive** — bloquea amenazas del rival antes de atacar
+- **Offensive** — busca ganar creando tenedores de victoria
+- **Positional** — controla el centro geométrico del tablero
+- **Monte Carlo** — busca la mejor estrategia posible (dificultad máxima)
 
-Each component has its own set of scripts defined in its `package.json`. Here are some of the most important ones:
+---
 
-### Webapp (`webapp/package.json`)
+## Testing
 
-- `npm run dev`: Starts the development server for the webapp.
-- `npm test`: Runs the unit tests.
-- `npm run test:e2e`: Runs the end-to-end tests.
-- `npm run start:all`: A convenience script to start both the `webapp` and the `users` service concurrently.
+**Webapp:**
+```bash
+cd webapp
+npm test           # tests unitarios con Vitest
+```
 
-### Users (`users/package.json`)
+**Users:**
+```bash
+cd users
+npm test           # tests unitarios con Vitest
+```
 
-- `npm start`: Starts the user service.
-- `npm test`: Runs the tests for the service.
+**Gamey:**
+```bash
+cd gamey
+cargo test
+```
 
-### Gamey (`gamey/Cargo.toml`)
+---
 
-- `cargo build`: Builds the gamey application.
-- `cargo test`: Runs the unit tests.
-- `cargo run`: Runs the gamey application.
-- `cargo doc`: Generates documentation for the GameY engine application
+## Monitorización
+
+El sistema incluye monitorizacion basada en Prometheus y Grafana.
+
+Levantarlo de forma independiente:
+
+```bash
+docker compose up -d prometheus grafana
+```
+
+Grafana accesible en `http://localhost:9091` con las credenciales `admin / admin`.
+
+---
+
+## Tecnologías
+
+| Capa            | Tecnologías                                      |
+|-----------------|--------------------------------------------------|
+| Frontend        | React, TypeScript, Vite                          |
+| Backend usuarios| Node.js, Express, MongoDB, Mongoose, argon2      |
+| Motor de juego  | Rust, Axum, Tokio, UUID                          |
+| Base de datos   | MongoDB Atlas                                    |
+| Contenedores    | Docker, Docker Compose                           |
+| CI/CD           | GitHub Actions, SonarCloud                       |
+| Observabilidad  | Prometheus, Grafana                              |
+| Testing         | Vitest, cargo test                               |
+
+---
+
+## Estructura del repositorio
+
+```
+yovi_es2a/
+├── webapp/                  # Frontend React
+│   ├── src/
+│   │   ├── components/      # GameBoard, AuthForm, EndGameOverlay
+│   │   ├── hooks/           # useGame (lógica central del juego)
+│   │   ├── pages/           # Lobby, Game, Historic, Stats, Login
+│   │   ├── services/        # gameService.ts (llamadas HTTP)
+│   │   ├── styles/          # CSS por componente
+│   │   └── types/           # Tipos TypeScript de la API
+│   └── Dockerfile
+├── users/                   # Servicio de usuarios
+│   ├── src/
+│   │   ├── models/          # User.js, GameRecord.js
+│   │   ├── database.js
+│   │   └── hashing.js       # argon2
+│   ├── monitoring/          # Configuración Prometheus y Grafana
+│   ├── users-service.js     # Servidor Express con todos los endpoints
+│   └── Dockerfile
+├── gamey/                   # Motor del juego en Rust
+│   ├── src/
+│   │   ├── core/            # Lógica del tablero y condición de victoria
+│   │   ├── bot/             # Implementaciones de bots
+│   │   └── bot_server/      # API REST con Axum
+│   └── Dockerfile
+├── docs/                    # Documentación Arc42
+├── docker-compose.yml
+└── README.md
+```
