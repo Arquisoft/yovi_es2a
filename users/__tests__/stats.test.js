@@ -102,7 +102,6 @@ describe('GET /stats/:username', () => {
         expect(res.body).toHaveProperty('rivalStats')
     })
 
-    // ── Cálculo de totales ─────────────────────────────────────────────────
 
     it('cuenta correctamente el total de partidas', async () => {
         mockFindResult(partidasVariadas)
@@ -122,7 +121,6 @@ describe('GET /stats/:username', () => {
     })
 
     it('calcula correctamente el winRate con un decimal', async () => {
-        // 3 victorias de 5 partidas = 60%
         mockFindResult(partidasVariadas)
 
         const res = await request(app).get('/stats/alice')
@@ -154,11 +152,8 @@ describe('GET /stats/:username', () => {
 
     
 
-    // ── Rachas ────────────────────────────────────────────────────────────
 
     it('calcula la racha actual correctamente cuando arranca con victorias', async () => {
-        // find() devuelve ordenado desc (más reciente primero)
-        // Las 2 primeras son victorias -> racha actual = 2
         mockFindResult([
             { username: 'alice', rival: 'random_bot', resultado: '1' },
             { username: 'alice', rival: 'random_bot', resultado: '1' },
@@ -184,7 +179,6 @@ describe('GET /stats/:username', () => {
     })
 
     it('calcula la mejor racha histórica correctamente', async () => {
-        // En orden cronológico: V V V D V -> mejor racha = 3
         mockFindResult([
             { username: 'alice', rival: 'random_bot', resultado: '1' }, // más reciente
             { username: 'alice', rival: 'random_bot', resultado: '2' },
@@ -213,10 +207,8 @@ describe('GET /stats/:username', () => {
 
     
 
-    // ── Estadísticas por rival ─────────────────────────────────────────────
 
     it('identifica correctamente el rival más jugado', async () => {
-        // random_bot aparece 3 veces, los demás 1 vez
         mockFindResult(partidasVariadas)
 
         const res = await request(app).get('/stats/alice')
@@ -240,7 +232,6 @@ describe('GET /stats/:username', () => {
         const res = await request(app).get('/stats/alice')
         const rb = res.body.rivalStats['random_bot']
 
-        // random_bot: 3 partidas, 3 victorias
         expect(rb.total).toBe(3)
         expect(rb.wins).toBe(3)
         expect(rb.losses).toBe(0)
@@ -258,8 +249,6 @@ describe('GET /stats/:username', () => {
     })
 
     
-    // ── Errores ───────────────────────────────────────────────────────────
-
     it('devuelve 500 si la base de datos falla', async () => {
         mockFindThrows()
 

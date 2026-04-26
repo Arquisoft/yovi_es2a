@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-//La estructura del usuario para nuestra BD
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -11,7 +10,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   }
-}, { timestamps: true });   //Añade automoaticamente createdAT y updatedAT
+}, { timestamps: true });   
 
-//Crea y exporta el modelo User basado en userSchema
 export default mongoose.model('User', userSchema);

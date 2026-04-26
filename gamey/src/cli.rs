@@ -378,8 +378,6 @@ mod tests {
     use crate::{GameY, PlayerId, Movement, Coordinates, RandomBot, RenderOptions};
     use std::fs;
 
-    // --- TESTS ORIGINALES (Ya los tenías) ---
-
     #[test]
     fn test_mode_display_computer() {
         assert_eq!(format!("{}", Mode::Computer), "computer");
@@ -550,11 +548,8 @@ mod tests {
         assert!(debug.contains("5"));
     }
 
-    // --- NUEVOS TESTS PARA SUBIR LA COBERTURA DE LOGICA ---
-
     #[test]
     fn test_print_help_coverage() {
-        // Simplemente lo llamamos para cubrir las líneas de los println!
         print_help();
     }
 
@@ -565,7 +560,6 @@ mod tests {
             player: PlayerId::new(0),
             coords: Coordinates::from_index(0, 7),
         };
-        // Un movimiento válido debe devolver true
         let success = apply_move(&mut game, movement, "Error in test");
         assert!(success);
     }
@@ -575,35 +569,28 @@ mod tests {
         let mut game = GameY::new(7, None);
         let coords = Coordinates::from_index(0, 7);
         
-        // Creamos un movimiento en la celda 0
         let move1 = Movement::Placement {
             player: PlayerId::new(0),
             coords,
         };
-        // Lo aplicamos la primera vez (esto es VÁLIDO)
         apply_move(&mut game, move1, "Error in first move");
         
-        // Creamos OTRO movimiento EXACTAMENTE en la misma celda
         let move2 = Movement::Placement {
             player: PlayerId::new(1),
             coords,
         };
-        // Intentar poner una ficha encima de otra ya ocupada es INVÁLIDO siempre
         let success = apply_move(&mut game, move2, "Error expected");
         
-        // Ahora sí, success debe ser false
         assert!(!success); 
     }
 
     #[test]
     fn test_trigger_bot_move() {
         let mut game = GameY::new(7, None);
-        let bot = RandomBot; // Usamos el bot más básico
+        let bot = RandomBot; 
         
-        // Hacemos que el bot juegue (como es aleatorio, elegirá alguna celda libre)
         trigger_bot_move(&mut game, &bot);
         
-        // El turno debió pasar al jugador 1 porque el bot (jugador 0) acaba de tirar
         assert_eq!(game.next_player(), Some(PlayerId::new(1)));
     }
 
@@ -612,7 +599,6 @@ mod tests {
         let mut game = GameY::new(7, None);
         let bot = RandomBot;
         
-        // En modo Humano, el bot NO debe jugar tras nuestro movimiento
         handle_place_command(&mut game, 0, PlayerId::new(0), Mode::Human, &bot);
         
         // Turno del jugador 1
@@ -624,10 +610,8 @@ mod tests {
         let mut game = GameY::new(7, None);
         let bot = RandomBot;
         
-        // En modo Computer, nosotros tiramos el 0, y el bot automáticamente tira el 1
         handle_place_command(&mut game, 0, PlayerId::new(0), Mode::Computer, &bot);
         
-        // Como el bot ya ha tirado, vuelve a ser el turno del jugador 0
         assert_eq!(game.next_player(), Some(PlayerId::new(0)));
     }
 
@@ -638,8 +622,6 @@ mod tests {
         let mut render_opts = RenderOptions::default();
         let bot = RandomBot;
 
-        // En lugar de asumir si son 'true' o 'false' por defecto, 
-        // guardamos su valor inicial y comprobamos que se invierten (toggle)
         let initial_coords = render_opts.show_3d_coords;
         process_input("show_coords", &mut game, &player, &mut render_opts, Mode::Human, &bot).unwrap();
         assert_eq!(render_opts.show_3d_coords, !initial_coords);
@@ -652,7 +634,6 @@ mod tests {
         process_input("show_colors", &mut game, &player, &mut render_opts, Mode::Human, &bot).unwrap();
         assert_eq!(render_opts.show_colors, !initial_colors);
         
-        // Comandos de ayuda y errores (no cambian el estado pero no deben hacer que explote el código)
         process_input("help", &mut game, &player, &mut render_opts, Mode::Human, &bot).unwrap();
         process_input("  ", &mut game, &player, &mut render_opts, Mode::Human, &bot).unwrap();
         process_input("comando_invalido_123", &mut game, &player, &mut render_opts, Mode::Human, &bot).unwrap();
@@ -664,24 +645,19 @@ mod tests {
         let mut render_opts = RenderOptions::default();
         let bot = RandomBot;
 
-        // Movimiento válido
         process_input("5", &mut game, &PlayerId::new(0), &mut render_opts, Mode::Human, &bot).unwrap();
         assert_eq!(game.next_player(), Some(PlayerId::new(1)));
 
-        // Guardar partida
         let test_filename = "test_cli_save_state.json";
         process_input(&format!("save {}", test_filename), &mut game, &PlayerId::new(1), &mut render_opts, Mode::Human, &bot).unwrap();
         
         assert!(std::path::Path::new(test_filename).exists());
 
-        // Cargar partida
         process_input(&format!("load {}", test_filename), &mut game, &PlayerId::new(1), &mut render_opts, Mode::Human, &bot).unwrap();
         assert_eq!(game.next_player(), Some(PlayerId::new(1))); // Comprobamos que cargó el turno 1
 
-        // Limpiar fichero temporal
         let _ = fs::remove_file(test_filename);
 
-        // Rendición (Resign)
         process_input("resign", &mut game, &PlayerId::new(1), &mut render_opts, Mode::Human, &bot).unwrap();
         assert!(game.check_game_over());
     }

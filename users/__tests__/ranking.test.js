@@ -49,9 +49,7 @@ vi.mock('mongoose', async () => {
 
 import app from '../users-service.js'
 
-// ─── Datos de prueba ──────────────────────────────────────────────────────────
 
-// alice: 3 victorias contra random_bot (d=1.0), 2 derrotas
 const partidasAlice = [
     { username: 'alice', rival: 'random_bot', resultado: '1' },
     { username: 'alice', rival: 'random_bot', resultado: '1' },
@@ -60,17 +58,14 @@ const partidasAlice = [
     { username: 'alice', rival: 'random_bot', resultado: '2' },
 ]
 
-// bob: 2 victorias contra monte_carlo_bot (d=7.0)
 const partidasBob = [
     { username: 'bob', rival: 'monte_carlo_bot', resultado: '1' },
     { username: 'bob', rival: 'monte_carlo_bot', resultado: '1' },
     { username: 'bob', rival: 'monte_carlo_bot', resultado: '2' },
 ]
 
-// Mezcla de ambos para tests multi-usuario
 const partidasMultiUsuario = [...partidasAlice, ...partidasBob]
 
-// ─── Tests ───────────────────────────────────────────────────────────────────
 
 describe('GET /ranking', () => {
 
@@ -83,7 +78,6 @@ describe('GET /ranking', () => {
         vi.restoreAllMocks()
     })
 
-    // ── Estructura de la respuesta ─────────────────────────────────────────
 
     it('devuelve 200 con ranking vacío si no hay partidas', async () => {
         mockFindResult([])
@@ -118,7 +112,6 @@ describe('GET /ranking', () => {
         expect(entry).toHaveProperty('wins')
     })
 
-    // ── Posiciones y orden ─────────────────────────────────────────────────
 
     it('con un solo usuario aparece en posición 1', async () => {
         mockFindResult(partidasAlice)
@@ -136,7 +129,6 @@ describe('GET /ranking', () => {
         const res = await request(app).get('/ranking')
         const ranking = res.body.ranking
 
-        // bob gana contra monte_carlo (d=7) así que debe superar a alice (d=1)
         expect(ranking[0].username).toBe('bob')
         expect(ranking[1].username).toBe('alice')
         expect(ranking[0].score).toBeGreaterThan(ranking[1].score)
@@ -155,7 +147,6 @@ describe('GET /ranking', () => {
 
     
 
-    // ── Cálculo de totales ─────────────────────────────────────────────────
 
     it('totalGames refleja el total de partidas jugadas por el usuario', async () => {
         mockFindResult(partidasAlice)
@@ -194,10 +185,8 @@ describe('GET /ranking', () => {
 
     
 
-    // ── Fórmula: dificultad ────────────────────────────────────────────────
 
     it('victoria contra rival difícil puntúa más que contra rival fácil', async () => {
-        // charlie gana 1 vez contra monte_carlo (d=7), dave gana 1 vez contra random (d=1)
         mockFindResult([
             { username: 'charlie', rival: 'monte_carlo_bot', resultado: '1' },
             { username: 'charlie', rival: 'monte_carlo_bot', resultado: '2' },
@@ -215,7 +204,6 @@ describe('GET /ranking', () => {
     })
 
     it('rival desconocido (humano) usa el peso por defecto de 5.0', async () => {
-        // eve gana contra humano (d=5), frank gana contra random (d=1), mismas partidas
         mockFindResult([
             { username: 'eve',   rival: 'jugador_humano', resultado: '1' },
             { username: 'eve',   rival: 'jugador_humano', resultado: '2' },
@@ -232,10 +220,8 @@ describe('GET /ranking', () => {
         expect(eve.score).toBeGreaterThan(frank.score)
     })
 
-    // ── Fórmula: eficacia ──────────────────────────────────────────────────
 
     it('más victorias absolutas supera a mejor eficacia cuando la diferencia es grande', async () => {
-        // ivan: 20 victorias en 40 partidas (50%), julia: 5 victorias en 5 partidas (100%)
         const partidasIvan = Array.from({ length: 20 }, () =>
             ({ username: 'ivan', rival: 'random_bot', resultado: '1' })
         ).concat(Array.from({ length: 20 }, () =>
@@ -257,10 +243,8 @@ describe('GET /ranking', () => {
         expect(ivan.score).toBeGreaterThan(julia.score)
     })
 
-    // ── Fórmula: confianza estadística C(N) ───────────────────────────────
 
     it('1 partida ganada no genera una puntuación desproporcionada', async () => {
-        // karen gana 1 partida, lee gana 10 — karen no debe superar a lee
         mockFindResult([
             { username: 'karen', rival: 'random_bot', resultado: '1' },
             ...Array.from({ length: 10 }, () =>
@@ -279,10 +263,8 @@ describe('GET /ranking', () => {
         expect(lee.score).toBeGreaterThan(karen.score)
     })
 
-    // ── Límite de 10 resultados ────────────────────────────────────────────
 
     it('devuelve como máximo 10 jugadores aunque haya más', async () => {
-        // Generamos 15 usuarios distintos con 1 partida ganada cada uno
         const muchasPartidas = Array.from({ length: 15 }, (_, i) => ({
             username: `user${i}`,
             rival: 'random_bot',
@@ -294,8 +276,6 @@ describe('GET /ranking', () => {
 
         expect(res.body.ranking.length).toBeLessThanOrEqual(10)
     })
-
-    // ── Errores ────────────────────────────────────────────────────────────
 
     it('devuelve 500 si la base de datos falla', async () => {
         mockFindThrows()

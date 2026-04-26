@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-// Schema para membresía en grupos
 const groupMemberSchema = new mongoose.Schema({
   groupId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -20,7 +19,6 @@ const groupMemberSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-// Índice único compound: no duplicados de (groupId, username)
 groupMemberSchema.index({ groupId: 1, username: 1 }, { unique: true });
 
 export default mongoose.model('GroupMember', groupMemberSchema);

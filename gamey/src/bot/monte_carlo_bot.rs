@@ -7,7 +7,6 @@ use crate::bot::bot_utils::BotUtils;
 pub struct MonteCarloBot {
     pub my_player_id: PlayerId,
     pub opponent_id: PlayerId,
-    /// Número de simulaciones por casilla candidata
     pub simulations: u32,
 }
 
@@ -131,7 +130,7 @@ mod tests {
         MonteCarloBot {
             my_player_id: PlayerId::new(0),
             opponent_id: PlayerId::new(1),
-            simulations: 10, // Pocas simulaciones para que los tests sean rápidos
+            simulations: 10, 
         }
     }
 
@@ -190,7 +189,6 @@ mod tests {
             coords: Coordinates::new(1, 1, 0),
         }).unwrap();
 
-        // El bot debe elegir (0,2,0) que es la victoria inmediata
         let chosen = bot.choose_move(&game).unwrap();
         let idx = chosen.to_index(game.board_size());
         let win_idx = Coordinates::new(0, 2, 0).to_index(game.board_size());

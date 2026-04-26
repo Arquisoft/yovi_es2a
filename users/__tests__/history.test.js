@@ -1,29 +1,18 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest'
 import request from 'supertest'
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MOCKS — deben declararse antes de cualquier import de la app
-//
-// GameRecord.find() devuelve un objeto encadenado con .sort() y .lean().
-// Guardamos la función en una variable exportada para poder cambiar su
-// valor en cada test con mockFindResult(...).
-// ─────────────────────────────────────────────────────────────────────────────
 
-// Resultado que devolverá find() por defecto (array vacío)
 let findResult = []
 
-// Helper para cambiar el resultado desde los tests
 function mockFindResult(data) {
     findResult = data
 }
 
-// Helper para hacer que find() lance un error
 let findShouldThrow = false
 function mockFindThrows() {
     findShouldThrow = true
 }
 
-// Mock de GameRecord
 vi.mock('../src/models/GameRecord.js', () => {
     const mockLean = vi.fn(async () => {
         if (findShouldThrow) throw new Error('DB error')
@@ -32,8 +21,6 @@ vi.mock('../src/models/GameRecord.js', () => {
     const mockSort = vi.fn(() => ({ lean: mockLean }))
     const mockFind = vi.fn(() => ({ sort: mockSort }))
 
-    // MockGameRecord es una clase cuyo constructor guarda los datos
-    // y expone save() — necesario para POST /savegame
     let savedRecord = null
     function MockGameRecord(data) {
         Object.assign(this, data)
@@ -49,7 +36,6 @@ vi.mock('../src/models/GameRecord.js', () => {
     return { default: MockGameRecord }
 })
 
-// Mock de User (necesario porque users-service.js lo importa siempre)
 vi.mock('../src/models/User.js', () => {
     function MockUser() {
         this.save = vi.fn().mockResolvedValue(true)
@@ -57,7 +43,6 @@ vi.mock('../src/models/User.js', () => {
     return { default: MockUser }
 })
 
-// Mock de mongoose (evita conexión real a MongoDB)
 vi.mock('mongoose', async () => {
     function Schema() {
         this.index = vi.fn();
@@ -76,13 +61,9 @@ vi.mock('mongoose', async () => {
     }
 })
 
-// Importamos la app DESPUÉS de los mocks
 import app from '../users-service.js'
 
 
-// ─────────────────────────────────────────────────────────────────────────────
-// POST /savegame
-// ─────────────────────────────────────────────────────────────────────────────
 describe('POST /savegame', () => {
     beforeEach(() => {
         findShouldThrow = false
@@ -158,11 +139,8 @@ describe('POST /savegame', () => {
 })
 
 
-// ─────────────────────────────────────────────────────────────────────────────
-// GET /history/:username
-// ─────────────────────────────────────────────────────────────────────────────
+
 describe('GET /history/:username', () => {
-    // Partidas de ejemplo reutilizables entre tests
     const partidas = [
         { username: 'alice', rival: 'random_bot',  resultado: '1', size: 7,  createdAt: new Date('2024-03-10') },
         { username: 'alice', rival: 'smart_bot',   resultado: '2', size: 9,  createdAt: new Date('2024-03-08') },
@@ -179,7 +157,6 @@ describe('GET /history/:username', () => {
         vi.restoreAllMocks()
     })
 
-    // ── Caso base ──────────────────────────────────────────────────────────
 
     it('devuelve 200 y el historial completo del usuario', async () => {
         const res = await request(app).get('/history/alice')
@@ -206,7 +183,6 @@ describe('GET /history/:username', () => {
         expect(Array.isArray(res.body.history)).toBe(true)
     })
 
-    // ── Filtro por resultado ───────────────────────────────────────────────
 
     it('acepta resultado=1 como filtro válido', async () => {
         mockFindResult(partidas.filter(p => p.resultado === '1'))
@@ -247,7 +223,6 @@ describe('GET /history/:username', () => {
         expect(res.status).toBe(400)
     })
 
-    // ── Filtro por rival ───────────────────────────────────────────────────
 
     it('filtra por nombre de rival (mock devuelve solo las coincidencias)', async () => {
         mockFindResult(partidas.filter(p => p.rival.includes('random_bot')))
@@ -266,7 +241,6 @@ describe('GET /history/:username', () => {
         expect(res.status).toBe(200)
     })
 
-    // ── Filtro por size ────────────────────────────────────────────────────
 
     it('filtra por tamaño de tablero', async () => {
         mockFindResult(partidas.filter(p => p.size === 7))
@@ -284,7 +258,6 @@ describe('GET /history/:username', () => {
         expect(res.body.error).toMatch(/size must be a number/)
     })
 
-    // ── Filtro por fechas ──────────────────────────────────────────────────
 
     it('acepta fechaDesde sin error', async () => {
         mockFindResult(partidas.filter(p => p.createdAt >= new Date('2024-03-01')))
@@ -314,7 +287,6 @@ describe('GET /history/:username', () => {
         expect(res.status).toBe(200)
     })
 
-    // ── Combinación de filtros ─────────────────────────────────────────────
 
     it('combina filtros resultado + rival sin error', async () => {
         mockFindResult(partidas.filter(p => p.resultado === '1' && p.rival === 'random_bot'))
@@ -338,7 +310,6 @@ describe('GET /history/:username', () => {
         expect(res.status).toBe(200)
     })
 
-    // ── Errores de infraestructura ─────────────────────────────────────────
 
     it('devuelve 500 si la base de datos falla', async () => {
         mockFindThrows()

@@ -93,7 +93,6 @@ mod tests {
         }
     }
 
-    // Tests de nombre
     #[test]
     fn test_positional_easy_name() {
         let bot = make_bot(Difficulty::Easy);
@@ -112,7 +111,6 @@ mod tests {
         assert_eq!(bot.name(), "positional_hard");
     }
 
-    // Tests de tablero vacío y lleno
     #[test]
     fn test_easy_returns_move_on_empty_board() {
         let bot = make_bot(Difficulty::Easy);
@@ -167,7 +165,6 @@ mod tests {
         assert!(bot.choose_move(&game).is_none());
     }
 
-    // Tests de victoria inmediata (los tres niveles deben ganar si pueden)
     #[test]
     fn test_easy_takes_immediate_win() {
         let bot = make_bot(Difficulty::Easy);
@@ -251,7 +248,6 @@ mod tests {
         assert_eq!(idx, win_idx);
     }
 
-    // Tests de bloqueo (el rival está a punto de ganar)
     #[test]
     fn test_hard_blocks_opponent_win() {
         let bot = make_bot(Difficulty::Hard);
@@ -280,7 +276,6 @@ mod tests {
         assert_eq!(idx, block_idx);
     }
 
-    // Tests de movimiento válido (la casilla elegida existe en el tablero)
     #[test]
     fn test_easy_returns_valid_cell() {
         let bot = make_bot(Difficulty::Easy);
