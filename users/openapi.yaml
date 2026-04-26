@@ -1,49 +1,26 @@
 openapi: 3.0.0
 info:
-  title: User Service API
+  title: YOVI API (Users + Game Engine)
   version: 1.0.0
-  description: API for managing users
+  description: API completa para la gestión de usuarios, componente social y motor de juego.
 paths:
   /createuser:
     post:
       summary: Creates a new user
-      description: Creates a new user with the given username.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required:
-                - username
-                - password
+              required: [username, password]
               properties:
-                username:
-                  type: string
-                  example: "testuser"
-                password:
-                  type: string
-                  example: "mypassword"
+                username: { type: string, example: "testuser" }
+                password: { type: string, example: "mypassword" }
       responses:
-        '201':
-          description: User created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Hello testuser!"
-                  user:
-                    type: object
-                    properties:
-                      username:
-                        type: string
-        '400':
-          description: Username or password missing
-        '409':
-          description: Username already taken
+        '201': { description: User created successfully }
+        '400': { description: Username or password missing }
+        '409': { description: Username already taken }
 
   /login:
     post:
@@ -54,38 +31,14 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-                - username
-                - password
+              required: [username, password]
               properties:
-                username:
-                  type: string
-                  example: "testuser"
-                password:
-                  type: string
-                  example: "mypassword"
+                username: { type: string, example: "testuser" }
+                password: { type: string, example: "mypassword" }
       responses:
-        '200':
-          description: Login successful
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Welcome back, testuser!"
-                  user:
-                    type: object
-                    properties:
-                      username:
-                        type: string
-        '400':
-          description: Username or password missing
-        '401':
-          description: User not found or invalid password
-        '500':
-          description: Internal server error
+        '200': { description: Login successful }
+        '400': { description: Username or password missing }
+        '401': { description: User not found or invalid password }
 
   /savegame:
     post:
@@ -96,137 +49,25 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-                - username
-                - rival
-                - resultado
+              required: [username, rival, resultado]
               properties:
-                username:
-                  type: string
-                  example: "testuser"
-                rival:
-                  type: string
-                  example: "random_bot"
-                resultado:
-                  type: string
-                  enum: ['1', '2']
-                  description: "'1' = user wins, '2' = user loses"
-                  example: "1"
-                size:
-                  type: integer
-                  example: 7
-                  description: "Board size (e.g. 7 for a 7x7 board)"
+                username: { type: string }
+                rival: { type: string }
+                resultado: { type: string, enum: ['1', '2'] }
+                size: { type: integer }
       responses:
-        '201':
-          description: Game saved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Game saved"
-                  record:
-                    type: object
-                    properties:
-                      username:
-                        type: string
-                      rival:
-                        type: string
-                      resultado:
-                        type: string
-                      createdAt:
-                        type: string
-                        format: date-time
-        '400':
-          description: Missing or invalid fields
-        '500':
-          description: Internal server error
+        '201': { description: Game saved successfully }
 
   /history/{username}:
     get:
       summary: Returns the game history of a user
-      description: >
-        Returns the list of finished games for the given user, ordered by date descending.
-        Supports optional filters via query parameters.
       parameters:
         - name: username
           in: path
           required: true
-          schema:
-            type: string
-          example: "testuser"
-        - name: resultado
-          in: query
-          required: false
-          description: "Filter by result: '1' = win, '2' = loss"
-          schema:
-            type: string
-            enum: ['1', '2']
-        - name: rival
-          in: query
-          required: false
-          description: "Filter by rival name (partial match, case-insensitive)"
-          schema:
-            type: string
-          example: "random_bot"
-        - name: fechaDesde
-          in: query
-          required: false
-          description: "Filter games from this date (ISO format: YYYY-MM-DD)"
-          schema:
-            type: string
-            format: date
-          example: "2024-01-01"
-        - name: fechaHasta
-          in: query
-          required: false
-          description: "Filter games up to and including this date (ISO format: YYYY-MM-DD)"
-          schema:
-            type: string
-            format: date
-          example: "2024-12-31"
-        - name: size
-          in: query
-          required: false
-          description: "Filter by board size"
-          schema:
-            type: integer
-          example: 7
+          schema: { type: string }
       responses:
-        '200':
-          description: Game history retrieved
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  username:
-                    type: string
-                  history:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        _id:
-                          type: string
-                        username:
-                          type: string
-                        rival:
-                          type: string
-                        resultado:
-                          type: string
-                          enum: ['1', '2']
-                        size:
-                          type: integer
-                        createdAt:
-                          type: string
-                          format: date-time
-        '400':
-          description: Invalid filter value
-        '500':
-          description: Internal server error
+        '200': { description: Game history retrieved }
 
   /stats/{username}:
     get:
@@ -235,31 +76,204 @@ paths:
         - name: username
           in: path
           required: true
-          schema:
-            type: string
+          schema: { type: string }
       responses:
-        '200':
-          description: Stats calculated successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  username:        { type: string }
-                  total:           { type: integer }
-                  wins:            { type: integer }
-                  losses:          { type: integer }
-                  winRate:         { type: number }
-                  currentStreak:   { type: integer }
-                  bestStreak:      { type: integer }
-                  mostPlayedRival: { type: string, nullable: true }
-                  rivalStats:
-                    type: object
-                    additionalProperties:
-                      type: object
-                      properties:
-                        wins:   { type: integer }
-                        losses: { type: integer }
-                        total:  { type: integer }
-        '500':
-          description: Internal server error
+        '200': { description: Stats calculated successfully }
+
+  /ranking:
+    get:
+      summary: Returns the top 10 players by score
+      responses:
+        '200': { description: Ranking retrieved successfully }
+
+  /user/{username}:
+    get:
+      summary: Returns public data of a user
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: User data retrieved }
+
+  /addfriend/{friendUsername}:
+    post:
+      summary: Adds a user as a friend
+      parameters:
+        - name: friendUsername
+          in: path
+          required: true
+          schema: { type: string }
+        - name: X-User
+          in: header
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Friend added successfully }
+
+  /removefriend/{friendUsername}:
+    delete:
+      summary: Removes a friend
+      parameters:
+        - name: friendUsername
+          in: path
+          required: true
+          schema: { type: string }
+        - name: X-User
+          in: header
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Friend removed successfully }
+
+  /friends/{username}:
+    get:
+      summary: Returns the friend list of a user
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Friends list retrieved }
+
+  /groups:
+    get:
+      summary: Returns all public groups
+      responses:
+        '200': { description: Groups retrieved }
+
+  /creategroup:
+    post:
+      summary: Creates a new group
+      parameters:
+        - name: X-User
+          in: header
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                description: { type: string }
+      responses:
+        '200': { description: Group created successfully }
+
+  /group/{groupId}:
+    get:
+      summary: Returns details of a specific group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Group details retrieved }
+
+  /joingroup/{groupId}:
+    post:
+      summary: Joins a public group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: X-User
+          in: header
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Joined group successfully }
+
+  /leavegroup/{groupId}:
+    delete:
+      summary: Leaves a group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: X-User
+          in: header
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Left group successfully }
+
+  /mygroups:
+    get:
+      summary: Returns the groups the user belongs to
+      parameters:
+        - name: X-User
+          in: header
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: User's groups retrieved }
+
+  /game/new:
+    post:
+      summary: (Motor Rust) Crea una nueva partida
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                size: { type: integer }
+                mode: { type: string }
+                bot: { type: string }
+      responses:
+        '201': { description: Partida creada con UUID }
+          
+  /game/{gameId}:
+    get:
+      summary: (Motor Rust) Obtiene el estado de una partida
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Estado del tablero devuelto }
+          
+  /game/{gameId}/move:
+    post:
+      summary: (Motor Rust) Realiza un movimiento o acción
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                player: { type: string }
+                action: { type: string, enum: ['place', 'resign', 'timeout'] }
+                cell_index: { type: integer, nullable: true }
+      responses:
+        '200': { description: Movimiento aceptado y nuevo estado }
+          
+  /play:
+    get:
+      summary: (Motor Rust) API Pública para Bots externos (YEN)
+      parameters:
+        - name: position
+          in: query
+          required: true
+          schema: { type: string }
+        - name: bot_id
+          in: query
+          schema: { type: string }
+      responses:
+        '200': { description: Devuelve la coordenada del siguiente movimiento }
