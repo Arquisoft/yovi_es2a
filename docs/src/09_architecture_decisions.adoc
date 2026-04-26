@@ -64,14 +64,45 @@ Por último, la integración con el microservicio de usuarios en Node.js es dire
 ** No se dispone de validación de integridad referencial a nivel de base de datos, aunque no resulta especialmente relevante dada nuestra estructura de datos.
 ** La integración con el microservicio de usuarios en Node.js es directa mediante Mongoose.
 
-=== ADR 002: Estrategia de filtrado en el historial de partidas
+=== ADR-002: Estrategia de filtrado en el historial de partidas
 
 * **Estatus:** Aceptado.
 * **Contexto:** El usuario necesita consultar miles de registros. Realizar peticiones por cada pulsación de tecla (live search) saturaría el servicio de usuarios.
 * **Decisión:** Se implementa un estado temporal en el Frontend para el input de "Rival" y una ejecución "Lazy" de la búsqueda. La petición a la API solo se dispara al pulsar el botón "Buscar".
 * **Consecuencias:** Mejora del rendimiento de red y reducción de carga en MongoDB.
 
-=== ADR-003: Fórmula de puntuación ponderada para el ranking global
+=== ADR-003: Argon2id como algoritmo de hashing de contraseñas
+
+* **Estatus:** Aceptado.
+
+* **Contexto:** El sistema necesita almacenar contraseñas de usuarios de forma 
+segura en MongoDB. Era necesario elegir un algoritmo de hashing que protegiera 
+las credenciales ante posibles filtraciones de la base de datos.
+
+* **Decisión:** Se utiliza **Argon2id** mediante la librería `argon2` de Node.js para hashear las contraseñas antes de persistirlas y para verificarlas en el login.
+
+* **Justificación:** Investigando un poco descubrimos que Argon2id es actualmente la recomendación del OWASP (Open Web Application Security Project) para el almacenamiento seguro de contraseñas. A diferencia de alternativas como bcrypt o SHA-256, Argon2id está diseñado para ser resistente tanto a ataques de fuerza bruta por GPU como a ataques de canal lateral, gracias a su configuración de coste de memoria y tiempo. Su variante `id` combina las ventajas de Argon2i (resistencia a side-channel) y Argon2d (resistencia a GPU), siendo la opción más equilibrada y segura.
+
+[NOTE]
+Los ataques de canal lateral son técnica de ciberseguridad que obtiene información confidencial (como claves criptográficas) analizando características físicas indirectas de un sistema —consumo de energía, tiempo de ejecución, emisiones electromagnéticas o sonido— en lugar de explotar vulnerabilidades en el código
+
+
+* **Alternativas consideradas:**
+** _bcrypt_ → Válido y ampliamente usado, pero más antiguo y menos resistente a 
+hardware moderno de ataque paralelo.
+** _SHA-256 / SHA-512_ → Descartados. Son algoritmos de propósito general, no 
+diseñados para contraseñas, y son vulnerables a ataques de fuerza bruta por su 
+velocidad de cómputo.
+
+* **Consecuencias:**
+** Las contraseñas nunca se almacenan en texto plano ni con hashes reversibles.
+** El proceso de login introduce una latencia mínima pero aceptable por el coste 
+computacional del algoritmo, lo que es precisamente una de sus propiedades de seguridad. Esto retrasa un poco los tiempos de respuesta, pero no lo suficiente como para afectar negativamente la experiencia del usuario ni al rendimiento general de la aplicación.
+** Ante una filtración de la base de datos, los hashes son computacionalmente 
+inviables de revertir en un tiempo razonable.
+
+=== ADR-005
+: Fórmula de puntuación ponderada para el ranking global
 
 * **Estatus:** Aceptado.
 
@@ -132,7 +163,7 @@ aporte       = 7.0 · 5 · 0.632 · 1.5  ≈ 33.18 puntos
 ** El cálculo en tiempo real puede degradarse con un volumen muy elevado de `GameRecords`. Mitigable con un índice MongoDB sobre `username`.
 ** Incorporar un nuevo bot requiere únicamente asignarle un peso en `RIVAL_WEIGHTS` del servicio `users`.
 
-=== ADR-004: Ausencia de Gateway — Acceso directo a microservicios
+=== ADR-006: Ausencia de Gateway — Acceso directo a microservicios
 
 * **Estatus:** Aceptado.
 
