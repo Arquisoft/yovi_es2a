@@ -101,11 +101,39 @@ computacional del algoritmo, lo que es precisamente una de sus propiedades de se
 ** Ante una filtración de la base de datos, los hashes son computacionalmente 
 inviables de revertir en un tiempo razonable.
 
-=== ADR-004: Autenticación sin tokens — localStorage y header X-User
+=== ADR-004: Identificación de usuario mediante localStorage y header X-User
 
-* **Estatus:** Aceptado.
+* Estatus: Aceptado.
 
-* TODO
+* Decisión:
+Se implementa un mecanismo de identificación de usuario en cliente, basado en el almacenamiento del identificador (`_id`) en `localStorage`, el cual se envía en cada petición HTTP mediante el header personalizado `X-User`.
+
+Este mecanismo no constituye un sistema de autenticación, sino únicamente una forma de identificar al usuario en sistemas de baja criticidad.
+
+* Justificación:
+El flujo funciona de la siguiente manera: tras un login exitoso, el microservicio de usuarios devuelve el `_id` (identificador único en MongoDB). Este valor se almacena en el `localStorage` del navegador bajo la clave `userId`. En las peticiones posteriores que requieren identificación (como consultar historial, perfil o ranking), el frontend incluye este valor en el header `X-User`.
+
+La decisión se basa en priorizar la simplicidad de implementación, reduciendo la complejidad tanto en cliente como en servidor. No se requiere gestión de tokens (firma, expiración, refresh) ni almacenamiento de sesiones.
+
+El backend utiliza este identificador para recuperar la información del usuario desde la base de datos.
+
+Se asume explícitamente que el cliente es responsable de enviar el identificador y que el servidor no valida su autenticidad.
+
+* Alternativas consideradas:
+** JWT (JSON Web Token) → Descartado por añadir complejidad (firma, expiración, validación), aunque proporciona autenticación verificable y mayor seguridad.
+** Cookies con HttpOnly + sesión → Descartado por requerir estado en el servidor y configuración adicional (protección CSRF, gestión de cookies seguras).
+
+* Consecuencias:
+** Ventajas:
+*** Implementación simple y rápida.
+*** Bajo acoplamiento entre cliente y servidor.
+*** No requiere gestión de sesiones ni tokens.
+
+** Limitaciones y riesgos:
+*** No existe autenticación real: el servidor confía en el valor recibido.
+*** Posible suplantación de identidad enviando un `X-User` arbitrario.
+*** No hay expiración automática de sesión.
+*** Requiere validación de existencia del usuario en cada petición.
 
 === ADR-005
 : Fórmula de puntuación ponderada para el ranking global
@@ -191,3 +219,36 @@ Consideramos que añadir una gateway sería complicar la arquitectura de forma i
 ** La arquitectura es más simple y fácil de desplegar y depurar.
 ** La webapp asume la responsabilidad de seleccionar el servicio correcto en cada operación, acoplando ligeramente el frontend a la topología de servicios.
 ** Si en el futuro se añaden más microservicios o se requiere autenticación centralizada, la introducción de un gateway sería la evolución natural del sistema que resultaría sencilla de implementar.
+
+=== ADR-007: Sistema de Amigos y Grupos
+
+* **Estatus:** Aceptado.
+
+* **Contexto:** Se decide añadir sistema YOVI un componente social básico que permitiera a los jugadores identificar a otros usuarios como amigos y participar en grupos para organizar partidas privadas.
+
+* **Decisión:** Se implementa un sistema de relaciones sociales con las siguientes características:
+
+**Amigos — Relación directa sin solicitud:**
+* `POST /addfriend/:friendUsername`: Añade directamente al usuario especificado como amigo, sin mecanismo de solicitud/aceptación. La relación se almacena en la colección `Friend` con documentos `{ from, to }`.
+* `DELETE /removefriend/:friendUsername`: Elimina la relación de amistad.
+* `GET /friends/:username`: Devuelve la lista de amigos del usuario junto con sus estadísticas (partidas jugadas, victorias, ratio de victoria).
+
+**Grupos — Un usuario, un grupo:**
+* `POST /creategroup`: Crea un nuevo grupo público. El creador se añade automáticamente como admin y abandona cualquier grupo anterior al que pertenezca.
+* `POST /joingroup/:groupId`: Un usuario se une a un grupo público. **Restricción:** un usuario solo puede pertenecer a un grupo a la vez.
+* `GET /group/:groupId`: Devuelve los detalles del grupo y la lista de miembros con sus roles.
+
+* **Justificación:**
+La decisión de implementar amigos y grupos como relaciones directas (sin solicitudes ni invitaciones) responde a la prioridad de simplicidad del proyecto. No se consideró necesario un flujo de solicitud-aceptación para amigos ni un sistema de invitaciones para grupos en esta versión.
+
+La restricción de "un usuario, un grupo" simplifica la lógica de pertenencia y evita la complejidad de gestionar múltiples grupos por usuario.
+
+* **Alternativas consideradas:**
+** Solicitudes de amistad → Descartado para esta versión. Añadiría estados (pendiente, aceptado, rechazado) y notificaciones.
+
+* **Consecuencias:**
+** La consulta de amigos es simple: búsqueda en la colección `Friend` por `from`.
+** Un usuario puede ver sus amigos y sus estadísticas desde el frontend.
+** Un usuario puede abandonar su grupo actual uniéndose a otro, o creando uno nuevo.
+** No hay sistema de chat integrado dentro de grupos.
+** No hay posibilidad de expulsar miembros ni de transferir el rol de admin.
