@@ -23,13 +23,10 @@ use crate::{
 /// Todos los campos son opcionales: si no se envían se usan los valores por defecto.
 #[derive(Debug, Deserialize)]
 pub struct CreateGameRequest {
-    /// Tamaño del tablero (longitud de un lado). Por defecto: 7.
     #[serde(default = "default_board_size")]
     pub size: u32,
-    /// Modo de juego: "human" (2 jugadores) o "computer" (humano vs bot).
     #[serde(default = "default_mode")]
     pub mode: String,
-    /// Identificador del bot cuando mode == "computer". Por defecto: "random_bot".
     #[serde(default = "default_bot")]
     pub bot: String,
     pub timer: Option<u32>,
@@ -162,16 +159,6 @@ fn build_cells_from_yen(game: &GameY, size: u32, total: u32) -> Vec<CellState> {
 }
 
 // ─── Handlers (endpoints) ─────────────────────────────────────────────────────
-
-/// `POST /v1/game`
-///
-/// Crea una nueva partida y devuelve su estado inicial.
-///
-/// ### Ejemplo de body (todos los campos son opcionales)
-/// ```json
-/// { "size": 7, "mode": "human" }
-/// { "size": 5, "mode": "computer", "bot": "random_bot" }
-/// ```
 pub async fn create_game(
     State(state): State<AppState>,
     Json(req): Json<CreateGameRequest>,
@@ -186,8 +173,7 @@ pub async fn create_game(
     (StatusCode::CREATED, Json(response))
 }
 
-/// `GET /v1/game/{game_id}`
-///
+/// `GET /game/{game_id}`
 /// Devuelve el estado actual de una partida existente.
 pub async fn get_game(
     State(state): State<AppState>,
@@ -211,17 +197,7 @@ pub async fn get_game(
     }
 }
 
-/// `POST /v1/game/{game_id}/move`
-///
-/// Aplica un movimiento al juego. Si se incluye el campo `bot` en el body,
-/// el bot jugará su turno automáticamente después del humano.
-///
-/// ### Ejemplos de body
-/// ```json
-/// { "player": 0, "action": "place", "cell_index": 12 }
-/// { "player": 0, "action": "resign" }
-/// { "player": 0, "action": "place", "cell_index": 12, "bot": "random_bot" }
-/// ```
+/// `POST /game/{game_id}/move``
 pub async fn make_move(
     State(state): State<AppState>,
     Path(game_id): Path<Uuid>,
@@ -348,17 +324,15 @@ fn trigger_bot_move(game: &mut GameY, bot: &dyn YBot) -> Option<AppliedMove> {
     }
 }
 
-// ─── Endpoint /v1/play ────────────────────────────────────────────────────────
+// ─── Endpoint /play ────────────────────────────────────────────────────────
  
 // 1. Lo que recibimos en la URL (?position={...}&bot_id=...)
 #[derive(Debug, Deserialize)]
 pub struct CompetitionPlayQuery {
-    // Es un string, pero por dentro esconde un JSON que tendremos que parsear
     pub position: String,
     pub bot_id: Option<String>,
 }
 
-// 2. El JSON que va dentro de 'position' según el enunciado
 #[derive(Debug, Deserialize)]
 pub struct YenPosition {
     pub size: u32,
@@ -367,13 +341,10 @@ pub struct YenPosition {
     pub layout: String,
 }
 
-// 3. El formato EXACTO de respuesta que piden
 #[derive(Debug, Serialize)]
 pub struct CompetitionResponse {
-    // Si mueve, mandamos coords. Option se serializa si no es nulo.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub coords: Option<Coords3D>,
-    // Si se rinde o hace swap, mandamos action.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub action: Option<String>,
 }
@@ -391,14 +362,11 @@ pub async fn play_competition(
     Query(query): Query<CompetitionPlayQuery>,
 ) -> impl IntoResponse {
     
-    // 1. Extraemos el JSON oculto dentro del string 'position' de la URL
     let yen_data: YenPosition = match serde_json::from_str(&query.position) {
         Ok(data) => data,
         Err(e) => return (StatusCode::BAD_REQUEST, format!("Invalid JSON in position: {}", e)).into_response(),
     };
 
-    // 2. Reconstruimos el YEN y el Juego
-    // (Asumo que tienes un YEN::new en tu código que acepta estos campos)
     let yen = YEN::new(yen_data.size, yen_data.turn, yen_data.players, yen_data.layout);
     
     let game = match GameY::try_from(yen) {
@@ -413,29 +381,24 @@ pub async fn play_competition(
         None => return (StatusCode::BAD_REQUEST, format!("Bot {} not found", bot_name)).into_response(),
     };
 
-    // 4. El bot elige
     if game.check_game_over() {
-        // Si ya ha perdido/terminado y nos llaman, nos rendimos
         let resp = CompetitionResponse { coords: None, action: Some("resign".to_string()) };
         return (StatusCode::OK, Json(resp)).into_response();
     }
 
     match bot.choose_move(&game) {
         Some(coords) => {
-            // Asumo que tu objeto de coordenadas tiene campos x, y, z o algún método para obtenerlos
-            // Si tus coordenadas son x,y cartesianas, adáptalo a lo que sea que signifique x,y,z en YEN para ellos.
             let resp = CompetitionResponse {
                 coords: Some(Coords3D {
                     x: coords.x, 
                     y: coords.y, 
-                    z: coords.z  // Ojo aquí con cómo manejas la Z en tu código interno
+                    z: coords.z  
                 }),
                 action: None,
             };
             (StatusCode::OK, Json(resp)).into_response()
         },
         None => {
-            // Si el bot se bloquea, nos rendimos (resign)
             let resp = CompetitionResponse { coords: None, action: Some("resign".to_string()) };
             (StatusCode::OK, Json(resp)).into_response()
         }
@@ -454,10 +417,7 @@ mod tests {
     use std::sync::Arc;
     use uuid::Uuid;
 
-    // ==========================================
     // TESTS DE CREACIÓN Y OBTENCIÓN DE PARTIDAS
-    // ==========================================
-
     #[test]
     fn test_defaults() {
         assert_eq!(default_board_size(), 7);
@@ -478,7 +438,6 @@ mod tests {
         let response = create_game(State(state.clone()), Json(req)).await.into_response();
         assert_eq!(response.status(), StatusCode::CREATED);
 
-        // CORRECCIÓN APLICADA AQUÍ
         let games_arc = state.games();
         let games = games_arc.lock().await;
         assert_eq!(games.len(), 1);
@@ -489,7 +448,6 @@ mod tests {
         let state = AppState::new(YBotRegistry::new());
         let game_id = Uuid::new_v4();
         {
-            // CORRECCIÓN APLICADA AQUÍ
             let games_arc = state.games();
             let mut games = games_arc.lock().await;
             games.insert(game_id, GameY::new(7, None));
@@ -506,9 +464,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::NOT_FOUND);
     }
 
-    // ==========================================
     // TESTS DE MOVIMIENTOS (MAKE_MOVE)
-    // ==========================================
 
     #[tokio::test]
     async fn test_make_move_success_place() {
@@ -653,7 +609,6 @@ mod tests {
             games.insert(game_id, game);
         }
 
-        // Intentamos mover a la misma celda (turno del jugador 1)
         let req = MakeMoveRequest {
             player: 1,
             action: "place".to_string(),
@@ -666,10 +621,7 @@ mod tests {
     }
 
 
-    // ==========================================
     // TESTS DEL TORNEO (PLAY_COMPETITION)
-    // ==========================================
-
     #[tokio::test]
     async fn test_play_competition_success() {
         let registry = YBotRegistry::new().with_bot(Arc::new(RandomBot));

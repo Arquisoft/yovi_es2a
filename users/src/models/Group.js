@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-// Schema para grupos/comunidades públicas de usuarios
 const groupSchema = new mongoose.Schema({
   name: {
     type: String,

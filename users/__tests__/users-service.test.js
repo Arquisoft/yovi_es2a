@@ -2,22 +2,19 @@ import { describe, it, expect, afterEach, vi } from 'vitest'
 import request from 'supertest'
 import Friend from '../src/models/Friend.js'
 
-// ─── 1. MOCKS DE DEPENDENCIAS Y BASE DE DATOS ──────────────────────────────
 
-// Usamos vi.hoisted() para que Vitest eleve estas funciones antes que los vi.mock()
 const { createChainableMock, mockSave } = vi.hoisted(() => {
     return {
         createChainableMock: (resolvedValue) => ({
             select: vi.fn().mockReturnThis(),
             sort: vi.fn().mockReturnThis(),
             lean: vi.fn().mockResolvedValue(resolvedValue),
-            then: (resolve) => resolve(resolvedValue) // ¡El truco para que funcione con o sin .lean()!
+            then: (resolve) => resolve(resolvedValue) 
         }),
         mockSave: vi.fn().mockResolvedValue(true)
     };
 });
 
-// Mock del Hashing (evita lentitud en tests y problemas de encriptación)
 vi.mock('../src/hashing.js', () => ({
     default: {
         hashPassword: vi.fn().mockResolvedValue('hashed_password'),
@@ -25,7 +22,6 @@ vi.mock('../src/hashing.js', () => ({
     }
 }));
 
-// Mocks de los Modelos de MongoDB
 vi.mock('../src/models/User.js', () => {
     const MockUser = function(data) { Object.assign(this, data); this.save = mockSave; };
     MockUser.findOne = vi.fn();
@@ -67,13 +63,11 @@ vi.mock('../src/models/GroupMember.js', () => {
 
 vi.mock('../src/database.js', () => ({ default: vi.fn() }));
 
-// Importamos la app DESPUÉS de hacer los mocks
 import app from '../users-service.js'
 import User from '../src/models/User.js'
 import GameRecord from '../src/models/GameRecord.js'
-import Group from '../src/models/Group.js'          // <--- AÑADE ESTA LÍNEA
+import Group from '../src/models/Group.js'          
 import GroupMember from '../src/models/GroupMember.js'
-// ─── 2. BATERÍA DE TESTS ───────────────────────────────────────────────────
 
 describe('Users Service Endpoints', () => {
     afterEach(() => {
@@ -138,7 +132,6 @@ describe('Users Service Endpoints', () => {
 
     describe('GET /stats/:username', () => {
         it('devuelve las estadísticas correctamente para un usuario con partidas', async () => {
-            // Simulamos que la base de datos devuelve 2 partidas
             GameRecord.find.mockReturnValueOnce(createChainableMock([
                 { resultado: '1', rival: 'random_bot' },
                 { resultado: '2', rival: 'random_bot' }
@@ -163,7 +156,6 @@ describe('Users Service Endpoints', () => {
 
     describe('POST /creategroup', () => {
         it('crea un grupo correctamente', async () => {
-            // Simulamos que el usuario existe en la BBDD
             User.findOne.mockResolvedValueOnce({ username: 'iyan2' });
             
             const res = await request(app)
@@ -199,12 +191,10 @@ describe('Users Service Endpoints', () => {
 
     describe('POST /joingroup', () => {
         it('añade un usuario al grupo correctamente', async () => {
-            // Mockeamos el grupo (necesita ser público), el usuario (debe existir) y que no sea miembro aún
             Group.findById.mockReturnValueOnce(createChainableMock({ _id: 'group1', isPublic: true }));
             User.findOne.mockResolvedValueOnce({ username: 'iyan2' });
             GroupMember.findOne.mockReturnValueOnce(createChainableMock(null));
 
-            // ¡Corregido! El groupId va en la URL
             const res = await request(app).post('/joingroup/group1').set('x-user', 'iyan2');
             expect([200, 201]).toContain(res.status);
         });
@@ -212,7 +202,6 @@ describe('Users Service Endpoints', () => {
         it('falla si el grupo no existe', async () => {
             Group.findById.mockReturnValueOnce(createChainableMock(null));
             
-            // ¡Corregido! El groupId va en la URL
             const res = await request(app).post('/joingroup/falso').set('x-user', 'iyan2');
             expect(res.status).toBe(404);
         });
@@ -223,7 +212,6 @@ describe('Users Service Endpoints', () => {
             GroupMember.deleteOne.mockResolvedValueOnce({ deletedCount: 1 });
             GroupMember.countDocuments.mockResolvedValueOnce(1); // Aún quedan miembros
 
-            // ¡Corregido! Es un método .delete() y el groupId va en la URL
             const res = await request(app).delete('/leavegroup/group1').set('x-user', 'iyan2');
             expect(res.status).toBe(200);
         });
@@ -232,21 +220,18 @@ describe('Users Service Endpoints', () => {
     // ─── TESTS DE MANEJO DE ERRORES (Catch blocks) ─────────────────────────
     describe('Manejo de Errores 500', () => {
         it('devuelve 500 si la base de datos falla al crear usuario', async () => {
-            // Forzamos un error en el mock
             const originalMock = User.findOne;
             User.findOne = vi.fn().mockRejectedValue(new Error('DB connection failed'));
             
             const res = await request(app).post('/login').send({ username: 'iyan2', password: '123' });
             expect(res.status).toBe(500);
             expect(res.body.error).toBe('Internal server error');            
-            // Restauramos el mock
             User.findOne = originalMock;
         });
     });
 
     describe('GET /user/:username', () => {
         it('devuelve los datos públicos del usuario', async () => {
-            // Mock con select() encadenado
             User.findOne.mockReturnValueOnce({ select: vi.fn().mockResolvedValue({ username: 'iyan2' }) });
             GameRecord.find.mockReturnValueOnce(createChainableMock([{ resultado: '1' }]));
 
@@ -264,7 +249,6 @@ describe('Users Service Endpoints', () => {
 
     describe('POST /addfriend/:friendUsername', () => {
         it('añade un amigo correctamente', async () => {
-            // El endpoint hace Promise.all con dos findOne
             User.findOne
                 .mockResolvedValueOnce({ username: 'iyan2' }) // current user
                 .mockResolvedValueOnce({ username: 'amigo1' }); // friend
@@ -300,7 +284,6 @@ describe('Users Service Endpoints', () => {
         });
     });
 
-    // ─── TESTS DE BÚSQUEDA DE GRUPOS ───────────────────────────────────────
 
     describe('GET /groups', () => {
         it('devuelve la lista de grupos públicos', async () => {

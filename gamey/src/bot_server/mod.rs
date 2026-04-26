@@ -60,7 +60,7 @@ pub fn create_router(state: AppState) -> axum::Router {
         .route("/game/new",                axum::routing::post(game_routes::create_game))
         .route("/game/{game_id}",          axum::routing::get(game_routes::get_game))
         .route("/game/{game_id}/move",     axum::routing::post(game_routes::make_move))
-        // ── API para bots externos (nuevo) ───────────────────────────────────
+        // ── API para bots externos  ───────────────────────────────────
         .route("/play", axum::routing::get(game_routes::play_competition))
         .layer(cors)
         .with_state(state)
@@ -129,7 +129,6 @@ mod tests {
         body::Body,
         http::{Request, StatusCode},
     };
-    // Importamos ServiceExt para poder usar 'oneshot' y enviar peticiones en memoria
     use tower::ServiceExt;
 
     // 1. Test del handler de estado de forma directa
@@ -162,32 +161,24 @@ mod tests {
         let state = create_default_state();
         let bot_names = state.bots().names();
         
-        // Verificamos que se han registrado varios bots (cubre la cadena de .with_bot)
         assert!(!bot_names.is_empty());
         assert!(bot_names.contains(&"random_bot".to_string()));
         
-        // Debería haber bastantes bots registrados (Random, Defensive, Offensive, Positional, MonteCarlo)
         assert!(bot_names.len() >= 10); 
     }
 
-    // 4. EL TRUCO MEJORADO: Forzar error de Bind con Timeout de seguridad
     #[tokio::test]
     async fn test_run_bot_server_bind_error() {
-        // Bloqueamos un puerto usando la misma librería asíncrona que usa tu servidor (Tokio)
         let blocker = tokio::net::TcpListener::bind("0.0.0.0:0").await.expect("Failed to bind blocker");
         let port = blocker.local_addr().unwrap().port();
 
-        // Le ponemos un límite de tiempo de 1 segundo. 
-        // Si el servidor arranca y se queda colgado esperando, esto cortará la ejecución.
         let result = tokio::time::timeout(
             std::time::Duration::from_secs(1),
             run_bot_server(port)
         ).await;
 
-        // Comprobamos qué ha pasado
         match result {
             Ok(Err(GameYError::ServerError { message })) => {
-                // ¡Perfecto! El puerto estaba bloqueado y devolvió tu error de servidor
                 assert!(message.contains("Failed to bind"));
             }
             Ok(Ok(_)) => panic!("El servidor arrancó en un puerto bloqueado, esto no debería pasar en Rust"),
