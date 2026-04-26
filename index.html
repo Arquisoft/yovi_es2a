@@ -513,10 +513,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel2">
 <li><a href="#_introducción">9.1. Introducción</a></li>
 <li><a href="#_adr_001_uso_de_mongodb_como_base_de_datos">9.2. ADR-001: Uso de MongoDB como base de datos</a></li>
-<li><a href="#_adr_002_estrategia_de_filtrado_en_el_historial_de_partidas">9.3. ADR 002: Estrategia de filtrado en el historial de partidas</a></li>
-<li><a href="#_adr_003_fórmula_de_puntuación_ponderada_para_el_ranking_global">9.4. ADR-003: Fórmula de puntuación ponderada para el ranking global</a></li>
-<li><a href="#_adr_004_ausencia_de_gateway_acceso_directo_a_microservicios">9.5. ADR-004: Ausencia de Gateway — Acceso directo a microservicios</a></li>
-<li><a href="#_adr_005_política_de_saneamiento_estricto_allowlist_en_la_comunicación">9.6. ADR-005: Política de Saneamiento Estricto (Allowlist) en la Comunicación</a></li>
+<li><a href="#_adr_002_estrategia_de_filtrado_en_el_historial_de_partidas">9.3. ADR-002: Estrategia de filtrado en el historial de partidas</a></li>
+<li><a href="#_adr_003_argon2id_como_algoritmo_de_hashing_de_contraseñas">9.4. ADR-003: Argon2id como algoritmo de hashing de contraseñas</a></li>
+<li><a href="#_adr_004_identificación_de_usuario_mediante_localstorage_y_header_x_user">9.5. ADR-004: Identificación de usuario mediante localStorage y header X-User</a></li>
+<li><a href="#_adr_005_fórmula_de_puntuación_ponderada_para_el_ranking_global">9.6. ADR-005: Fórmula de puntuación ponderada para el ranking global</a></li>
+<li><a href="#_adr_006_ausencia_de_gateway_acceso_directo_a_microservicios">9.7. ADR-006: Ausencia de Gateway — Acceso directo a microservicios</a></li>
+<li><a href="#_adr_007_política_de_saneamiento_estricto_allowlist_en_la_comunicación">9.8. ADR-007: Política de Saneamiento Estricto (Allowlist) en la Comunicación</a></li>
+<li><a href="#_adr_008_sistema_de_amigos_y_grupos">9.9. ADR-008: Sistema de Amigos y Grupos</a></li>
 </ul>
 </li>
 <li><a href="#section-quality-scenarios">10. Requisitos de Calidad</a>
@@ -1252,7 +1255,7 @@ together with a mapping table showing the relationships between channels and inp
 <div class="title">Note</div>
 </td>
 <td class="content">
-La <strong>notación YEN</strong> es el formato estándar utilizado registrar el estado del tablero en la comunicación del motor de juego. Más información al respecto en el glosario.
+La <strong>notación YEN</strong> es el formato estándar utilizado para registrar el estado del tablero en la comunicación del motor de juego. Más información al respecto en el glosario.
 </td>
 </tr>
 </table>
@@ -1360,7 +1363,7 @@ La <strong>notación YEN</strong> es el formato estándar utilizado registrar el
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Datos de usuario, partidas, grupos y amistades</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Datos de usuario, partidas</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Consulta y persistencia de registros</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">BSON / Driver Mongoose (interno)</p></td>
 </tr>
@@ -1503,6 +1506,10 @@ Refer to details in the following sections.</p>
 </ul>
 </div>
 </li>
+<li>
+<p><strong>Monitorización y Análisis de Rendimiento:</strong>
+<strong><em>Grafana y Prometheus:</em></strong> Herramientas seleccionadas para la monitorización en tiempo real del rendimiento del sistem para identificar cuellos de botella y optimizar la experiencia del usuario.</p>
+</li>
 </ul>
 </div>
 </div>
@@ -1525,7 +1532,7 @@ Refer to details in the following sections.</p>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Metodología</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Seguiremos una metodología basada en <strong>reuniones semanales</strong>. Estas sesiones se utilizarán para ponerse al día, definir objetivos a corto plazo (1 semana) y tomar las decisiones importantes o cruciales para el rumbo general del proyecto.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Seguiremos una metodología basada en <strong>reuniones semanales</strong>. Estas sesiones se utilizarán para ponerse al día, definir objetivos a corto plazo (una semana) y tomar las decisiones importantes o cruciales para el rumbo general del proyecto.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Gestión del Proyecto</strong></p></td>
@@ -2251,7 +2258,7 @@ when your infrastructure is more complex.</p>
 <div class="sect2">
 <h3 id="_prototipos_de_pantallas">8.4. Prototipos de pantallas</h3>
 <div class="paragraph">
-<p>Los prototipos originales de las pantallas del proyecto tal y como se diseñaron en las reuniones perativas se pueden encontrar a continuación:</p>
+<p>Los prototipos originales de las pantallas del proyecto tal y como se diseñaron en las reuniones operativas se pueden encontrar a continuación:</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -2614,16 +2621,16 @@ There you will find links and examples about ADR.</p>
 </li>
 <li>
 <p><strong>Justificación:</strong>
-Consideramos una mejor decisión el uso de una base de datos NoSQL como MongoDB debido a la simplicidad del modelo de datos y la ausencia de relaciones complejas. MongoDB permite almacenar documentos JSON, lo que se simplifica mucho la gestión de la información de los usuarios y su historial de partidas sin necesidad de diseñar esquemas rígidos o realizar migraciones frecuentes.</p>
+Consideramos una mejor decisión el uso de una base de datos NoSQL como MongoDB debido a la simplicidad del modelo de datos y la ausencia de relaciones complejas. MongoDB permite almacenar documentos JSON, lo que simplifica mucho la gestión de la información de los usuarios y su historial de partidas sin necesidad de diseñar esquemas rígidos o realizar migraciones frecuentes.</p>
 <div class="paragraph">
-<p>De hecho, gracias a la flexibilidad en el esquema que proporciona Mongo, pudímos despreocuparnos en gran medida de la información relacionada con el historial y las estadísticas de cada usuario, lo que nos permitió centrarnos e ir poco a poco con el proyecto.</p>
+<p>De hecho, gracias a la flexibilidad en el esquema que proporciona Mongo, pudimos despreocuparnos en gran medida de la información relacionada con el historial y las estadísticas de cada usuario, lo que nos permitió centrarnos e ir poco a poco con el proyecto.</p>
 </div>
 <div class="paragraph">
-<p>Por último, la integración con el microservicio de usuarios en Node.js es directa mediante Mongoose, lo que facilita el desarrollo y mantenimiento del sistema. Por no hablar de que los miembros de equipo ya teníamos cierta experiencia con bases de datos no relacionales y consideramos interesante prácticar el uso de MongoDB.</p>
+<p>Por último, la integración con el microservicio de usuarios en Node.js es directa mediante Mongoose, lo que facilita el desarrollo y mantenimiento del sistema. Por no hablar de que los miembros del equipo ya teníamos cierta experiencia con bases de datos no relacionales y consideramos interesante practicar el uso de MongoDB.</p>
 </div>
 </li>
 <li>
-<p><strong>Alternativas consideradas:</strong> PostgreSQL / MySQL &#8594; Descartadas por añadir complejidad innecesaria (esquemas rígidos, migraciones) para un modelo de datos tan simple y sin relaciones entre entidades.</p>
+<p><strong>Alternativas consideradas:</strong> PostgreSQL / MySQL &#8594; Descartadas por añadir complejidad innecesaria (esquemas rígidos, migraciones) para un modelo de datos tan simple.</p>
 </li>
 <li>
 <p><strong>Consecuencias:</strong></p>
@@ -2645,7 +2652,7 @@ Consideramos una mejor decisión el uso de una base de datos NoSQL como MongoDB 
 </div>
 </div>
 <div class="sect2">
-<h3 id="_adr_002_estrategia_de_filtrado_en_el_historial_de_partidas">9.3. ADR 002: Estrategia de filtrado en el historial de partidas</h3>
+<h3 id="_adr_002_estrategia_de_filtrado_en_el_historial_de_partidas">9.3. ADR-002: Estrategia de filtrado en el historial de partidas</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2664,7 +2671,171 @@ Consideramos una mejor decisión el uso de una base de datos NoSQL como MongoDB 
 </div>
 </div>
 <div class="sect2">
-<h3 id="_adr_003_fórmula_de_puntuación_ponderada_para_el_ranking_global">9.4. ADR-003: Fórmula de puntuación ponderada para el ranking global</h3>
+<h3 id="_adr_003_argon2id_como_algoritmo_de_hashing_de_contraseñas">9.4. ADR-003: Argon2id como algoritmo de hashing de contraseñas</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Estatus:</strong> Aceptado.</p>
+</li>
+<li>
+<p><strong>Contexto:</strong> El sistema necesita almacenar contraseñas de usuarios de forma
+segura en MongoDB. Era necesario elegir un algoritmo de hashing que protegiera
+las credenciales ante posibles filtraciones de la base de datos.</p>
+</li>
+<li>
+<p><strong>Decisión:</strong> Se utiliza <strong>Argon2id</strong> mediante la librería <code>argon2</code> de Node.js para hashear las contraseñas antes de persistirlas y para verificarlas en el login.</p>
+</li>
+<li>
+<p><strong>Justificación:</strong> Investigando un poco descubrimos que Argon2id es actualmente la recomendación del OWASP (Open Web Application Security Project) para el almacenamiento seguro de contraseñas. A diferencia de alternativas como bcrypt o SHA-256, Argon2id está diseñado para ser resistente tanto a ataques de fuerza bruta por GPU como a ataques de canal lateral, gracias a su configuración de coste de memoria y tiempo. Su variante <code>id</code> combina las ventajas de Argon2i (resistencia a side-channel) y Argon2d (resistencia a GPU), siendo la opción más equilibrada y segura.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Los ataques de canal lateral son técnicas de ciberseguridad que obtienen información confidencial (como claves criptográficas) analizando características físicas indirectas de un sistema —consumo de energía, tiempo de ejecución, emisiones electromagnéticas o sonido— en lugar de explotar vulnerabilidades en el código.
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Alternativas consideradas:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p><em>bcrypt</em> → Válido y ampliamente usado, pero más antiguo y menos resistente a
+hardware moderno de ataque paralelo.</p>
+</li>
+<li>
+<p><em>SHA-256 / SHA-512</em> → Descartados. Son algoritmos de propósito general, no
+diseñados para contraseñas, y son vulnerables a ataques de fuerza bruta por su
+velocidad de cómputo.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Consecuencias:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>Las contraseñas nunca se almacenan en texto plano ni con hashes reversibles.</p>
+</li>
+<li>
+<p>El proceso de login introduce una latencia mínima pero aceptable por el coste
+computacional del algoritmo, lo que es precisamente una de sus propiedades de seguridad. Esto retrasa un poco los tiempos de respuesta, pero no lo suficiente como para afectar negativamente la experiencia del usuario ni al rendimiento general de la aplicación.</p>
+</li>
+<li>
+<p>Ante una filtración de la base de datos, los hashes son computacionalmente
+inviables de revertir en un tiempo razonable.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_adr_004_identificación_de_usuario_mediante_localstorage_y_header_x_user">9.5. ADR-004: Identificación de usuario mediante localStorage y header X-User</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Estatus:</strong> Aceptado.</p>
+</li>
+<li>
+<p><strong>Decisión:</strong>
+Se implementa un mecanismo de identificación de usuario en cliente, basado en el almacenamiento del identificador (<code>_id</code>) en <code>localStorage</code>, el cual se envía en cada petición HTTP mediante el header personalizado <code>X-User</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Este mecanismo no constituye un sistema de autenticación, sino únicamente una forma de identificar al usuario en sistemas de baja criticidad.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Justificación:</strong>
+El flujo funciona de la siguiente manera: tras un login exitoso, el microservicio de usuarios devuelve el <code>_id</code> (identificador único en MongoDB). Este valor se almacena en el <code>localStorage</code> del navegador bajo la clave <code>userId</code>. En las peticiones posteriores que requieren identificación (como consultar historial, perfil o ranking), el frontend incluye este valor en el header <code>X-User</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>La decisión se basa en priorizar la simplicidad de implementación, reduciendo la complejidad tanto en cliente como en servidor. No se requiere gestión de tokens (firma, expiración, refresh) ni almacenamiento de sesiones.</p>
+</div>
+<div class="paragraph">
+<p>El backend utiliza este identificador para recuperar la información del usuario desde la base de datos.</p>
+</div>
+<div class="paragraph">
+<p>Se asume explícitamente que el cliente es responsable de enviar el identificador y que el servidor no valida su autenticidad.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Alternativas consideradas:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>JWT (JSON Web Token) → Descartado por añadir complejidad (firma, expiración, validación), aunque proporciona autenticación verificable y mayor seguridad.</p>
+</li>
+<li>
+<p>Cookies con HttpOnly + sesión → Descartado por requerir estado en el servidor y configuración adicional (protección CSRF, gestión de cookies seguras).</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Consecuencias:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>Ventajas:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Implementación simple y rápida.</p>
+</li>
+<li>
+<p>Bajo acoplamiento entre cliente y servidor.</p>
+</li>
+<li>
+<p>No requiere gestión de sesiones ni tokens.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Limitaciones y riesgos:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>No existe autenticación real: el servidor confía en el valor recibido.</p>
+</li>
+<li>
+<p>Posible suplantación de identidad enviando un <code>X-User</code> arbitrario.</p>
+</li>
+<li>
+<p>No hay expiración automática de sesión.</p>
+</li>
+<li>
+<p>Requiere validación de existencia del usuario en cada petición.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_adr_005_fórmula_de_puntuación_ponderada_para_el_ranking_global">9.6. ADR-005: Fórmula de puntuación ponderada para el ranking global</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2799,21 +2970,21 @@ aporte       = 7.0 · 5 · 0.632 · 1.5  ≈ 33.18 puntos</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_adr_004_ausencia_de_gateway_acceso_directo_a_microservicios">9.5. ADR-004: Ausencia de Gateway — Acceso directo a microservicios</h3>
+<h3 id="_adr_006_ausencia_de_gateway_acceso_directo_a_microservicios">9.7. ADR-006: Ausencia de Gateway — Acceso directo a microservicios</h3>
 <div class="ulist">
 <ul>
 <li>
 <p><strong>Estatus:</strong> Aceptado.</p>
 </li>
 <li>
-<p><strong>Contexto:</strong> En una arquitectura de microservicios, como vimos más tarde en clase, es habitual centralizar el tráfico entrante a través de un gateway que actúe como punto único de entrada. Para el momento de tomar esta decisión teníamos que definir el cómo hacer la API públca para los bots externos.</p>
+<p><strong>Contexto:</strong> En una arquitectura de microservicios, como vimos más tarde en clase, es habitual centralizar el tráfico entrante a través de un gateway que actúe como punto único de entrada. Para el momento de tomar esta decisión teníamos que definir el cómo hacer la API pública para los bots externos.</p>
 </li>
 <li>
 <p><strong>Decisión:</strong> Se descarta el uso de un gateway centralizado. En su lugar:</p>
 <div class="ulist">
 <ul>
 <li>
-<p>La <strong>webapp</strong> (React) accede directamente a <code>users</code> para operaciones hacer las operaciones relacionadas con la gestión de usuarios y directamente a <code>gamey</code> para la lógica del juego.</p>
+<p>La <strong>webapp</strong> (React) accede directamente a <code>users</code> para hacer las operaciones relacionadas con la gestión de usuarios y directamente a <code>gamey</code> para la lógica del juego.</p>
 </li>
 <li>
 <p>Los <strong>bots externos</strong> acceden directamente al motor de juego mediante
@@ -2823,21 +2994,17 @@ aporte       = 7.0 · 5 · 0.632 · 1.5  ≈ 33.18 puntos</code></pre>
 </div>
 </li>
 <li>
-<p><strong>Justificación:</strong>
-Consideramos que añadir una gateway sería complicar la arquitectura de forma innecesaria en vista de la poca cantidad de endpoints disponibles y la simplicidad de estos. Además, en vista de que nuestra aplicación no está diseñada para manejar un amplio tráfico de bots externos o usuarios, por lo que resolvimos tomar la opción más sencilla de implementar.</p>
+<p><strong>Justificación:</strong> Consideramos que añadir una gateway sería complicar la arquitectura de forma innecesaria en vista de la poca cantidad de endpoints disponibles y la simplicidad de estos. Además, en vista de que nuestra aplicación no está diseñada para manejar un amplio tráfico de bots externos o usuarios, resolvimos tomar la opción más sencilla de implementar.</p>
 </li>
 <li>
 <p><strong>Alternativas consideradas:</strong></p>
 <div class="ulist">
 <ul>
 <li>
-<p><em>nginx como reverse proxy</em> → Descartado. Añade configuración adicional sin
-aportar valor real dado que no hay colisión de puertos ni necesidad de balanceo
-de carga con el volumen actual.</p>
+<p><em>nginx como reverse proxy</em> → Descartado. Añade configuración adicional sin aportar valor real dado que no hay colisión de puertos ni necesidad de balanceo de carga con el volumen actual.</p>
 </li>
 <li>
-<p><em>Gateway Node.js propio</em> → Descartado. Requeriría desarrollo y mantenimiento
-de una capa extra que duplicaría lógica ya presente en la webapp.</p>
+<p><em>Gateway Node.js propio</em> → Descartado. Requeriría desarrollo y mantenimiento de una capa extra que duplicaría lógica ya presente en la webapp.</p>
 </li>
 </ul>
 </div>
@@ -2850,8 +3017,7 @@ de una capa extra que duplicaría lógica ya presente en la webapp.</p>
 <p>La arquitectura es más simple y fácil de desplegar y depurar.</p>
 </li>
 <li>
-<p>La webapp asume la responsabilidad de seleccionar el servicio correcto en cada
-operación, acoplando ligeramente el frontend a la topología de servicios.</p>
+<p>La webapp asume la responsabilidad de seleccionar el servicio correcto en cada operación, acoplando ligeramente el frontend a la topología de servicios.</p>
 </li>
 <li>
 <p>Si en el futuro se añaden más microservicios o se requiere autenticación centralizada, la introducción de un gateway sería la evolución natural del sistema que resultaría sencilla de implementar.</p>
@@ -2863,7 +3029,7 @@ operación, acoplando ligeramente el frontend a la topología de servicios.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_adr_005_política_de_saneamiento_estricto_allowlist_en_la_comunicación">9.6. ADR-005: Política de Saneamiento Estricto (Allowlist) en la Comunicación</h3>
+<h3 id="_adr_007_política_de_saneamiento_estricto_allowlist_en_la_comunicación">9.8. ADR-007: Política de Saneamiento Estricto (Allowlist) en la Comunicación</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2906,6 +3072,81 @@ operación, acoplando ligeramente el frontend a la topología de servicios.</p>
 </li>
 </ul>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_adr_008_sistema_de_amigos_y_grupos">9.9. ADR-008: Sistema de Amigos y Grupos</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Estatus:</strong> Aceptado.</p>
+</li>
+<li>
+<p><strong>Contexto:</strong> Se decide añadir sistema YOVI un componente social básico que permitiera a los jugadores identificar a otros usuarios como amigos y participar en grupos para organizar partidas privadas.</p>
+</li>
+<li>
+<p><strong>Decisión:</strong> Se implementa un sistema de relaciones sociales con las siguientes características:</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Amigos — Relación directa sin solicitud:</strong>
+* <code>POST /addfriend/:friendUsername</code>: Añade directamente al usuario especificado como amigo, sin mecanismo de solicitud/aceptación. La relación se almacena en la colección <code>Friend</code> con documentos <code>{ from, to }</code>.
+* <code>DELETE /removefriend/:friendUsername</code>: Elimina la relación de amistad.
+* <code>GET /friends/:username</code>: Devuelve la lista de amigos del usuario junto con sus estadísticas (partidas jugadas, victorias, ratio de victoria).</p>
+</div>
+<div class="paragraph">
+<p><strong>Grupos — Un usuario, un grupo:</strong>
+* <code>POST /creategroup</code>: Crea un nuevo grupo público. El creador se añade automáticamente como admin y abandona cualquier grupo anterior al que pertenezca.
+* <code>POST /joingroup/:groupId</code>: Un usuario se une a un grupo público. <strong>Restricción:</strong> un usuario solo puede pertenecer a un grupo a la vez.
+* <code>GET /group/:groupId</code>: Devuelve los detalles del grupo y la lista de miembros con sus roles.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Justificación:</strong>
+La decisión de implementar amigos y grupos como relaciones directas (sin solicitudes ni invitaciones) responde a la prioridad de simplicidad del proyecto. No se consideró necesario un flujo de solicitud-aceptación para amigos ni un sistema de invitaciones para grupos en esta versión.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>La restricción de "un usuario, un grupo" simplifica la lógica de pertenencia y evita la complejidad de gestionar múltiples grupos por usuario.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Alternativas consideradas:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>Solicitudes de amistad → Descartado para esta versión. Añadiría estados (pendiente, aceptado, rechazado) y notificaciones.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Consecuencias:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>La consulta de amigos es simple: búsqueda en la colección <code>Friend</code> por <code>from</code>.</p>
+</li>
+<li>
+<p>Un usuario puede ver sus amigos y sus estadísticas desde el frontend.</p>
+</li>
+<li>
+<p>Un usuario puede abandonar su grupo actual uniéndose a otro, o creando uno nuevo.</p>
+</li>
+<li>
+<p>No hay sistema de chat integrado dentro de grupos.</p>
+</li>
+<li>
+<p>No hay posibilidad de expulsar miembros ni de transferir el rol de admin.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
@@ -2941,7 +3182,7 @@ concrete and measurable.</p>
 <p>El objetivo principal de esta sección es definir las metas de calidad que el sistema YOVI debe cumplir para asegurar una experiencia de usuario satisfactoria. Mientras que los requisitos funcionales describen qué hace el sistema, los requerimientos de calidad describen cómo de bien debe funcionar bajo condiciones específicas.</p>
 </div>
 <div class="paragraph">
-<p>Para estructurar estas metas, utilizamos las herramientas detalladas en los siguientes apartados:</p>
+<p>Para estructurar estas metas utilizamos las herramientas detalladas en los siguientes apartados:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -3965,11 +4206,7 @@ endpoint <code>GET /play</code>.</em></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>Formato ligero de intercambio de datos utilizado para la comunicación entre frontend, backend y bots a través de la API REST.</em></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>WebSocket</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Protocolo de comunicación bidireccional en tiempo real utilizado para actualizar el estado de la partida sin recargar la página.</em></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>HTTPS</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>HTTP</em></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>Protocolo seguro de comunicación utilizado para proteger la transmisión de datos entre clientes y servidores.</em></p></td>
 </tr>
 <tr>
@@ -4003,6 +4240,23 @@ endpoint <code>GET /play</code>.</em></p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>Factor de Confianza &#169;</em></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>Componente de la fórmula de ranking definido como <code>C(n) = 1 − exp(−n / 10)</code>. Penaliza a jugadores con pocas partidas jugadas frente a un rival concreto, evitando que una única victoria contra un rival difícil infle artificialmente la puntuación.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Argon2id</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Algoritmo de hashing de contraseñas utilizado por el sistema para proteger
+las credenciales de los usuarios. Recomendación actual de OWASP. El sistema lo configura con 64 MB de coste de memoria, 3 iteraciones y 4 hilos de paralelismo.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>SPA (Single Page Application)</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Tipo de aplicación web que carga una única página HTML y actualiza el
+contenido dinámicamente sin recargar el navegador. La webapp de Yovi es una
+SPA construida con React y enrutamiento mediante <code>HashRouter</code>.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>X-User</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Header HTTP personalizado utilizado por la webapp para identificar al usuario
+en las peticiones que requieren autenticación. Su valor es el <code>username</code>
+almacenado en <code>localStorage</code> tras el login.</em></p></td>
 </tr>
 </tbody>
 </table>
