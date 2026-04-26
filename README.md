@@ -48,7 +48,7 @@ El proyecto sigue una arquitectura basada en microservicios: cada módulo es un 
 
 ## Enlaces utiles
 
-- Aplicación:
+- Aplicación: http://68.221.24.159/
 - Documentación: https://arquisoft.github.io/yovi_es2a/
 
 ---
