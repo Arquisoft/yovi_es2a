@@ -1,14 +1,12 @@
-# Yovi_es2a - Game Y at UniOvi
+# Yovi_es2a
 
 [![Release — Test, Build, Publish, Deploy](https://github.com/arquisoft/yovi_es2a/actions/workflows/release-deploy.yml/badge.svg)](https://github.com/arquisoft/yovi_es2a/actions/workflows/release-deploy.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_es2a&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_es2a)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_es2a&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_es2a)
 
-This project implements a distributed system for the Game Y, developed as part of the Software Architecture course. It includes a web interface, a user management service, and a game engine.
+Implementación web del juego de tablero Y con autenticación de usuarios, historial de partidas, estadísticas personales y monitorización en tiempo real.
 
-# URL Deployment: http://68.221.24.159/
-
-## Team
+## Equipo
 
 - Sergio González Martínez (UO300798@uniovi.es)
 - Iyán Díaz Pereda (UO300006@uniovi.es)
@@ -16,13 +14,99 @@ This project implements a distributed system for the Game Y, developed as part o
 - Enol de la Calle Iglesias (UO301431@uniovi.es)
 - Iyán Álvarez Casanovas (UO301299@uniovi.es)
 
-**Course:** Software  Architecture  
-**Academic Year:** 2025/2026
+**Curso:** Software  Architecture  
+**Año:** 2025/2026
 
-## Architecture Overview
 
-- Frontend (React) → communicates with → Users API (Node.js)
-- Game engine (Rust) → provides game logic and bots
+## Características
+
+- Registro e inicio de sesión con contraseña
+- Partidas locales (2 jugadores) y contra bots de IA
+- 4 estrategias de bot en 3 niveles de dificultad (fácil, medio, difícil)
+- Estrategia extra de dificultad extrema (monte carlo)
+- Selector de tamaño de tablero (4×4 a 30×30)
+- Historial de partidas por usuario con filtros por resultado, rival, fecha y tamaño
+- Estadísticas personales: win rate, racha actual, mejor racha, rival favorito
+
+## Arquitectura
+
+El proyecto sigue una arquitectura basada en microservicios: cada módulo es un servicio independiente con su propia tecnología, responsabilidad y ciclo de despliegue. Docker Compose los orquesta como un sistema unificado.
+
+    - webapp/     → Frontend     (React 18 + TypeScript + Vite)
+    
+    - users/      → Backend     (Node.js + Express + MongoDB)
+    
+    - gamey/      → Motor        (Rust + Axum)
+    
+    - docs/       → Documentación (Arc42, AsciiDoc)
+
+## Enlaces utiles
+
+- Aplicación:
+- Documentación: https://arquisoft.github.io/yovi_es2a/
+
+
+# Puesta en marcha
+
+## Con Docker (recomendado)
+
+    docker compose up --build
+    
+-----------------------------------------
+
+**Servicio   :     URL**
+
+Aplicación  :  http://localhost
+
+Usuarios   :   http://localhost:3000
+
+Motor    :     http://localhost:4000
+
+Swagger    :    http://localhost:3000/api-docs
+
+Prometheus    :    http://localhost:9090
+
+Grafana    :    http://localhost:9091
+
+
+## En local
+
+**Users:**
+
+    cd users
+    
+    npm install
+    
+    npm start
+    
+**Gamey:**
+
+    cd gamey
+    
+    cargo run -- --mode server --port 4000
+    
+**Webapp:**
+
+    cd webapp
+    
+    npm install
+    
+    npm run dev
+
+## Bots disponibles
+
+**Estrategia**
+-------------------------------------
+random_bot     -        -        -
+monte_carlo    -        -        -
+defensive✓✓✓
+offensive✓✓✓
+positional✓✓✓
+
+Random — mueve al azar
+Defensive — bloquea amenazas del rival antes de atacar
+Offensive — busca ganar creando tenedores de victoria
+Positional — controla el centro geométrico del tablero
 
 ## Project Structure
 
