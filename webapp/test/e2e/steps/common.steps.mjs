@@ -27,8 +27,8 @@ Given('I have an active game against {string} {string}', async function (difficu
     await page.click('.play-btn.ready')
     
     // Esperamos al contenedor y TAMBIÉN a que se dibujen las celdas
-    await page.waitForSelector('.game-board', { state: 'visible', timeout: 5000 })
-    await page.waitForSelector('.table-cell.empty', { state: 'visible', timeout: 10000 })
+    await page.waitForSelector('.game-board', { state: 'visible', timeout: 15000 })
+    await page.waitForSelector('.table-cell.empty', { state: 'visible', timeout: 30000 })
 })
 
 // Le enseñamos a Playwright a aceptar el pop-up de confirmación

@@ -30,8 +30,8 @@ Given('I have an active human game', async function () {
     await page.click('.play-btn.ready');
     
     // Esperamos a las celdas
-    await page.waitForSelector('.game-board', { state: 'visible', timeout: 5000 });
-    await page.waitForSelector('.table-cell.empty', { state: 'visible', timeout: 10000 });
+    await page.waitForSelector('.game-board', { state: 'visible', timeout: 30000 });
+    await page.waitForSelector('.table-cell.empty', { state: 'visible', timeout: 30000 });
 });
 
 When('I configure the board for a human game', async function () {

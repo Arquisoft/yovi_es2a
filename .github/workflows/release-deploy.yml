@@ -65,26 +65,39 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build gamey (release mode)
+        run: |
+          cd gamey
+          cargo build --release
+
       - name: Install users dependencies
         run: |
           cd users
           npm ci
+
       - name: Install webapp dependencies
         run: |
           cd webapp
           npm ci
+
       - name: Install Playwright browsers
         run: |
           cd webapp
           npm run test:e2e:install-browsers
+
       - name: Run E2E tests (start servers and run cucumber)
         run: |
           cd webapp
-          npm run test:e2e
+          npm run test:e2e:ci
         env:
           MONGODB_STRING: mongodb://localhost:27017/test
 
