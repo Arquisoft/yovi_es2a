@@ -51,13 +51,13 @@ El objetivo de este registro es proporcionar trazabilidad y justificación sobre
 * **Decisión:** Se utilizará **MongoDB** como base de datos, en lugar de una base de datos relacional como PostgreSQL o MySQL.
 
 * **Justificación:**
-Consideramos una mejor decisión el uso de una base de datos NoSQL como MongoDB debido a la simplicidad del modelo de datos y la ausencia de relaciones complejas. MongoDB permite almacenar documentos JSON, lo que se simplifica mucho la gestión de la información de los usuarios y su historial de partidas sin necesidad de diseñar esquemas rígidos o realizar migraciones frecuentes.
+Consideramos una mejor decisión el uso de una base de datos NoSQL como MongoDB debido a la simplicidad del modelo de datos y la ausencia de relaciones complejas. MongoDB permite almacenar documentos JSON, lo que simplifica mucho la gestión de la información de los usuarios y su historial de partidas sin necesidad de diseñar esquemas rígidos o realizar migraciones frecuentes.
 +
 De hecho, gracias a la flexibilidad en el esquema que proporciona Mongo, pudímos despreocuparnos en gran medida de la información relacionada con el historial y las estadísticas de cada usuario, lo que nos permitió centrarnos e ir poco a poco con el proyecto.
 +
 Por último, la integración con el microservicio de usuarios en Node.js es directa mediante Mongoose, lo que facilita el desarrollo y mantenimiento del sistema. Por no hablar de que los miembros de equipo ya teníamos cierta experiencia con bases de datos no relacionales y consideramos interesante prácticar el uso de MongoDB.
 
-* **Alternativas consideradas:** PostgreSQL / MySQL -> Descartadas por añadir complejidad innecesaria (esquemas rígidos, migraciones) para un modelo de datos tan simple y sin relaciones entre entidades. 
+* **Alternativas consideradas:** PostgreSQL / MySQL -> Descartadas por añadir complejidad innecesaria (esquemas rígidos, migraciones) para un modelo de datos tan simple. 
 
 * **Consecuencias:**
 ** El esquema es flexible y fácil de extender.
@@ -139,22 +139,18 @@ aporte       = 7.0 · 5 · 0.632 · 1.5  ≈ 33.18 puntos
 * **Contexto:** En una arquitectura de microservicios, como vimos más tarde en clase, es habitual centralizar el tráfico entrante a través de un gateway que actúe como punto único de entrada. Para el momento de tomar esta decisión teníamos que definir el cómo hacer la API públca para los bots externos.
 
 * **Decisión:** Se descarta el uso de un gateway centralizado. En su lugar:
-** La **webapp** (React) accede directamente a `users` para operaciones hacer las operaciones relacionadas con la gestión de usuarios y directamente a `gamey` para la lógica del juego.
+** La **webapp** (React) accede directamente a `users` para hacer las operaciones relacionadas con la gestión de usuarios y directamente a `gamey` para la lógica del juego.
 ** Los **bots externos** acceden directamente al motor de juego mediante 
 `GET /play` en notación YEN, sin intermediario.
 
 * **Justificación:** 
-Consideramos que añadir una gateway sería complicar la arquitectura de forma innecesaria en vista de la poca cantidad de endpoints disponibles y la simplicidad de estos. Además, en vista de que nuestra aplicación no está diseñada para manejar un amplio tráfico de bots externos o usuarios, por lo que resolvimos tomar la opción más sencilla de implementar.
+Consideramos que añadir una gateway sería complicar la arquitectura de forma innecesaria en vista de la poca cantidad de endpoints disponibles y la simplicidad de estos. Además, en vista de que nuestra aplicación no está diseñada para manejar un amplio tráfico de bots externos o usuarios, resolvimos tomar la opción más sencilla de implementar.
 
 * **Alternativas consideradas:**
-** _nginx como reverse proxy_ → Descartado. Añade configuración adicional sin 
-aportar valor real dado que no hay colisión de puertos ni necesidad de balanceo 
-de carga con el volumen actual.
-** _Gateway Node.js propio_ → Descartado. Requeriría desarrollo y mantenimiento 
-de una capa extra que duplicaría lógica ya presente en la webapp.
+** _nginx como reverse proxy_ → Descartado. Añade configuración adicional sin aportar valor real dado que no hay colisión de puertos ni necesidad de balanceo de carga con el volumen actual.
+** _Gateway Node.js propio_ → Descartado. Requeriría desarrollo y mantenimiento de una capa extra que duplicaría lógica ya presente en la webapp.
 
 * **Consecuencias:**
 ** La arquitectura es más simple y fácil de desplegar y depurar.
-** La webapp asume la responsabilidad de seleccionar el servicio correcto en cada 
-operación, acoplando ligeramente el frontend a la topología de servicios.
+** La webapp asume la responsabilidad de seleccionar el servicio correcto en cada operación, acoplando ligeramente el frontend a la topología de servicios.
 ** Si en el futuro se añaden más microservicios o se requiere autenticación centralizada, la introducción de un gateway sería la evolución natural del sistema que resultaría sencilla de implementar.

@@ -66,7 +66,7 @@ actor "Usuario" as user
 actor "Bot externo" as bot
 
 ' El usuario se descarga la web
-user --> webapp : HTTPS (Descarga SPA)
+user --> webapp : HTTP (Descarga SPA)
 
 ' El navegador del usuario ataca a las APIs
 user --> users : HTTP/REST (Auth/Estadísticas)
