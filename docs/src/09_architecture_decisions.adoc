@@ -101,6 +101,12 @@ computacional del algoritmo, lo que es precisamente una de sus propiedades de se
 ** Ante una filtración de la base de datos, los hashes son computacionalmente 
 inviables de revertir en un tiempo razonable.
 
+=== ADR-004: Autenticación sin tokens — localStorage y header X-User
+
+* **Estatus:** Aceptado.
+
+* TODO
+
 === ADR-005
 : Fórmula de puntuación ponderada para el ranking global
 
