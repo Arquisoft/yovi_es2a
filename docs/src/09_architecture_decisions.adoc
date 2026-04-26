@@ -53,9 +53,9 @@ El objetivo de este registro es proporcionar trazabilidad y justificación sobre
 * **Justificación:**
 Consideramos una mejor decisión el uso de una base de datos NoSQL como MongoDB debido a la simplicidad del modelo de datos y la ausencia de relaciones complejas. MongoDB permite almacenar documentos JSON, lo que simplifica mucho la gestión de la información de los usuarios y su historial de partidas sin necesidad de diseñar esquemas rígidos o realizar migraciones frecuentes.
 +
-De hecho, gracias a la flexibilidad en el esquema que proporciona Mongo, pudímos despreocuparnos en gran medida de la información relacionada con el historial y las estadísticas de cada usuario, lo que nos permitió centrarnos e ir poco a poco con el proyecto.
+De hecho, gracias a la flexibilidad en el esquema que proporciona Mongo, pudimos despreocuparnos en gran medida de la información relacionada con el historial y las estadísticas de cada usuario, lo que nos permitió centrarnos e ir poco a poco con el proyecto.
 +
-Por último, la integración con el microservicio de usuarios en Node.js es directa mediante Mongoose, lo que facilita el desarrollo y mantenimiento del sistema. Por no hablar de que los miembros de equipo ya teníamos cierta experiencia con bases de datos no relacionales y consideramos interesante prácticar el uso de MongoDB.
+Por último, la integración con el microservicio de usuarios en Node.js es directa mediante Mongoose, lo que facilita el desarrollo y mantenimiento del sistema. Por no hablar de que los miembros del equipo ya teníamos cierta experiencia con bases de datos no relacionales y consideramos interesante practicar el uso de MongoDB.
 
 * **Alternativas consideradas:** PostgreSQL / MySQL -> Descartadas por añadir complejidad innecesaria (esquemas rígidos, migraciones) para un modelo de datos tan simple. 
 
@@ -84,8 +84,7 @@ las credenciales ante posibles filtraciones de la base de datos.
 * **Justificación:** Investigando un poco descubrimos que Argon2id es actualmente la recomendación del OWASP (Open Web Application Security Project) para el almacenamiento seguro de contraseñas. A diferencia de alternativas como bcrypt o SHA-256, Argon2id está diseñado para ser resistente tanto a ataques de fuerza bruta por GPU como a ataques de canal lateral, gracias a su configuración de coste de memoria y tiempo. Su variante `id` combina las ventajas de Argon2i (resistencia a side-channel) y Argon2d (resistencia a GPU), siendo la opción más equilibrada y segura.
 
 [NOTE]
-Los ataques de canal lateral son técnica de ciberseguridad que obtiene información confidencial (como claves criptográficas) analizando características físicas indirectas de un sistema —consumo de energía, tiempo de ejecución, emisiones electromagnéticas o sonido— en lugar de explotar vulnerabilidades en el código
-
+Los ataques de canal lateral son técnicas de ciberseguridad que obtienen información confidencial (como claves criptográficas) analizando características físicas indirectas de un sistema —consumo de energía, tiempo de ejecución, emisiones electromagnéticas o sonido— en lugar de explotar vulnerabilidades en el código.
 
 * **Alternativas consideradas:**
 ** _bcrypt_ → Válido y ampliamente usado, pero más antiguo y menos resistente a 
@@ -103,14 +102,14 @@ inviables de revertir en un tiempo razonable.
 
 === ADR-004: Identificación de usuario mediante localStorage y header X-User
 
-* Estatus: Aceptado.
+* **Estatus:** Aceptado.
 
-* Decisión:
+* **Decisión:**
 Se implementa un mecanismo de identificación de usuario en cliente, basado en el almacenamiento del identificador (`_id`) en `localStorage`, el cual se envía en cada petición HTTP mediante el header personalizado `X-User`.
 
 Este mecanismo no constituye un sistema de autenticación, sino únicamente una forma de identificar al usuario en sistemas de baja criticidad.
 
-* Justificación:
+* **Justificación:**
 El flujo funciona de la siguiente manera: tras un login exitoso, el microservicio de usuarios devuelve el `_id` (identificador único en MongoDB). Este valor se almacena en el `localStorage` del navegador bajo la clave `userId`. En las peticiones posteriores que requieren identificación (como consultar historial, perfil o ranking), el frontend incluye este valor en el header `X-User`.
 
 La decisión se basa en priorizar la simplicidad de implementación, reduciendo la complejidad tanto en cliente como en servidor. No se requiere gestión de tokens (firma, expiración, refresh) ni almacenamiento de sesiones.
@@ -119,11 +118,11 @@ El backend utiliza este identificador para recuperar la información del usuario
 
 Se asume explícitamente que el cliente es responsable de enviar el identificador y que el servidor no valida su autenticidad.
 
-* Alternativas consideradas:
+* **Alternativas consideradas:**
 ** JWT (JSON Web Token) → Descartado por añadir complejidad (firma, expiración, validación), aunque proporciona autenticación verificable y mayor seguridad.
 ** Cookies con HttpOnly + sesión → Descartado por requerir estado en el servidor y configuración adicional (protección CSRF, gestión de cookies seguras).
 
-* Consecuencias:
+* **Consecuencias:**
 ** Ventajas:
 *** Implementación simple y rápida.
 *** Bajo acoplamiento entre cliente y servidor.
@@ -135,8 +134,7 @@ Se asume explícitamente que el cliente es responsable de enviar el identificado
 *** No hay expiración automática de sesión.
 *** Requiere validación de existencia del usuario en cada petición.
 
-=== ADR-005
-: Fórmula de puntuación ponderada para el ranking global
+=== ADR-005: Fórmula de puntuación ponderada para el ranking global
 
 * **Estatus:** Aceptado.
 
@@ -201,15 +199,14 @@ aporte       = 7.0 · 5 · 0.632 · 1.5  ≈ 33.18 puntos
 
 * **Estatus:** Aceptado.
 
-* **Contexto:** En una arquitectura de microservicios, como vimos más tarde en clase, es habitual centralizar el tráfico entrante a través de un gateway que actúe como punto único de entrada. Para el momento de tomar esta decisión teníamos que definir el cómo hacer la API públca para los bots externos.
+* **Contexto:** En una arquitectura de microservicios, como vimos más tarde en clase, es habitual centralizar el tráfico entrante a través de un gateway que actúe como punto único de entrada. Para el momento de tomar esta decisión teníamos que definir el cómo hacer la API pública para los bots externos.
 
 * **Decisión:** Se descarta el uso de un gateway centralizado. En su lugar:
 ** La **webapp** (React) accede directamente a `users` para hacer las operaciones relacionadas con la gestión de usuarios y directamente a `gamey` para la lógica del juego.
 ** Los **bots externos** acceden directamente al motor de juego mediante 
 `GET /play` en notación YEN, sin intermediario.
 
-* **Justificación:** 
-Consideramos que añadir una gateway sería complicar la arquitectura de forma innecesaria en vista de la poca cantidad de endpoints disponibles y la simplicidad de estos. Además, en vista de que nuestra aplicación no está diseñada para manejar un amplio tráfico de bots externos o usuarios, resolvimos tomar la opción más sencilla de implementar.
+* **Justificación:** Consideramos que añadir una gateway sería complicar la arquitectura de forma innecesaria en vista de la poca cantidad de endpoints disponibles y la simplicidad de estos. Además, en vista de que nuestra aplicación no está diseñada para manejar un amplio tráfico de bots externos o usuarios, resolvimos tomar la opción más sencilla de implementar.
 
 * **Alternativas consideradas:**
 ** _nginx como reverse proxy_ → Descartado. Añade configuración adicional sin aportar valor real dado que no hay colisión de puertos ni necesidad de balanceo de carga con el volumen actual.
@@ -217,11 +214,10 @@ Consideramos que añadir una gateway sería complicar la arquitectura de forma i
 
 * **Consecuencias:**
 ** La arquitectura es más simple y fácil de desplegar y depurar.
-** La webapp asume la responsabilidad de seleccionar el servicio correcto en cada 
-operación, acoplando ligeramente el frontend a la topología de servicios.
+** La webapp asume la responsabilidad de seleccionar el servicio correcto en cada operación, acoplando ligeramente el frontend a la topología de servicios.
 ** Si en el futuro se añaden más microservicios o se requiere autenticación centralizada, la introducción de un gateway sería la evolución natural del sistema que resultaría sencilla de implementar.
 
-=== ADR-005: Política de Saneamiento Estricto (Allowlist) en la Comunicación
+=== ADR-007: Política de Saneamiento Estricto (Allowlist) en la Comunicación
 
 * **Estatus:** Aceptado.
 
@@ -238,10 +234,8 @@ operación, acoplando ligeramente el frontend a la topología de servicios.
 ** Mitigación efectiva de ataques de inyección en la URL.
 ** Cumplimiento estricto de los estándares de seguridad de SonarCloud.
 ** Ligera pérdida de flexibilidad en los nombres de usuario permitidos (restringidos a caracteres alfanuméricos y guiones).
-** La webapp asume la responsabilidad de seleccionar el servicio correcto en cada operación, acoplando ligeramente el frontend a la topología de servicios.
-** Si en el futuro se añaden más microservicios o se requiere autenticación centralizada, la introducción de un gateway sería la evolución natural del sistema que resultaría sencilla de implementar.
 
-=== ADR-007: Sistema de Amigos y Grupos
+=== ADR-008: Sistema de Amigos y Grupos
 
 * **Estatus:** Aceptado.
 
