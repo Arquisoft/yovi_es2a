@@ -33,7 +33,7 @@ Desde la perspectiva de la experiencia de usuario, dado que este sistema genera 
 * **Diseño Adaptable:** La interfaz se adapta a diferentes tamaños de tablero, asegurando que el tablero triangular sea jugable tanto en su tamaño mínimo (4) como máximo (30).
 
 === Prototipos de pantallas
-Los prototipos originales de las pantallas del proyecto tal y como se diseñaron en las reuniones perativas se pueden encontrar a continuación:
+Los prototipos originales de las pantallas del proyecto tal y como se diseñaron en las reuniones operativas se pueden encontrar a continuación:
 
 image::screen_prototypes.jpeg[Prototipos de pantallas]
 
