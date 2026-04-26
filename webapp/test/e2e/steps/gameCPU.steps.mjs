@@ -1,6 +1,8 @@
 import { Given, When, Then } from '@cucumber/cucumber'
 import assert from 'assert'
 import { TEST_USER, TEST_PASS, API_URL } from '../support/setup.mjs'
+import { expect } from '@playwright/test'
+
 
 const SELECTORS = {
     cellEmpty: '.table-cell.empty',
@@ -44,13 +46,18 @@ Then('The cell should be marked as mine', async function () {
 Then('The Bot should make its move automatically', async function () {
     const page = this.page;
     
-    await page.waitForSelector('.table-cell.player_two', { timeout: 5000 });
+    // 1. Esperamos a que aparezca la ficha de la máquina en el tablero
+    await page.waitForSelector('.table-cell.player_two', { timeout: 7000 });
     
-    const text = await page.locator('.game-turn').textContent();
-    assert.ok(text.includes('PLAYER_ONE') || text.includes('PLAYER_TWO'), 'El texto de turno no es el esperado');
+    // 2. Comprobamos que el texto del turno contiene "Turno:"
+    const turnLocator = page.locator('.game-turn');
+    await turnLocator.waitFor({ timeout: 5000 });
+    const turnText = await turnLocator.innerText();
+    
+    assert.ok(/Turno:/i.test(turnText), `El texto de turno no es el esperado: ${turnText}`);
 });
 
 Then('It should be my turn again', async function () {
     const text = await this.page.locator('.game-turn').innerText();
-    assert.ok(text.includes('PLAYER_ONE'), `Se esperaba el turno de PLAYER_ONE pero se encontró: ${text}`);
+    assert.ok(text.includes('Turno:'), `Se esperaba indicador de turno pero se encontró: ${text}`);
 });

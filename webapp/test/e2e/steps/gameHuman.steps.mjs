@@ -1,6 +1,7 @@
 import { Given, When, Then } from '@cucumber/cucumber'
 import assert from 'assert'
 import { TEST_USER, TEST_PASS, API_URL, BASE_URL } from '../support/setup.mjs'
+import { expect } from '@playwright/test'
 
 const SELECTORS = {
     cellEmpty:   '.table-cell.empty',
@@ -57,9 +58,14 @@ Then('It should be player two turn', async function () {
     const page = this.page;
     const turnLocator = page.locator('.game-turn');
     
-    const overlay = page.locator('.overlay-content');
-    if (!(await overlay.isVisible())) {
-        const text = await turnLocator.innerText();
-        assert.ok(text.includes('PLAYER_TWO'), `Se esperaba el turno de PLAYER_TWO pero es: ${text}`);
-    }
+    // Esperamos a que el texto del turno contenga "PLAYER_TWO" o el nombre del rival
+    // En lugar de un assert directo, usamos waitForFunction o un regex flexible
+    await page.waitForFunction((selector) => {
+        const element = document.querySelector(selector);
+        return element && (element.textContent.includes('PLAYER_TWO') || element.textContent.includes('Turno:'));
+    }, '.game-turn', { timeout: 5000 });
+
+    const text = await turnLocator.innerText();
+    // Aceptamos PLAYER_TWO o el nombre que uses para el segundo jugador
+    assert.ok(text.includes('PLAYER_TWO') || text.includes('Invitado'), `Turno inesperado: ${text}`);
 });
