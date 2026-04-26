@@ -1,18 +1,16 @@
-/* --- CELL.CSS (Hexágonos Neón) --- */
 .table-cell {
   width: 3.5vmin;
   height: 3.5vmin;
 
   clip-path: polygon(
-      50% 0%,     /* punta superior */
-      100% 25%,   /* esquina superior derecha */
-      100% 75%,   /* esquina inferior derecha */
-      50% 100%,   /* punta inferior */
-      0% 75%,     /* esquina inferior izquierda */
-      0% 25%      /* esquina superior izquierda */
+      50% 0%,     
+      100% 25%,   
+      100% 75%,   
+      50% 100%,   
+      0% 75%,     
+      0% 25%    
   );
 
-  /* Celdas vacías: Cristal ahumado oscuro */
   background-color: rgba(255, 255, 255, 0.1); 
   filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.4));
   border: none;
@@ -32,20 +30,17 @@
     margin-left: 0;
 }
 
-/* Efecto hover en celdas vacías */
 .table-cell.empty:hover {
   background-color: rgba(255, 255, 255, 0.25);
-  transform: scale(1.1); /* Efecto pop sutil */
+  transform: scale(1.1);
 }
 
-/* JUGADOR 1 (Por ejemplo, Magenta Neón) */
 .table-cell.player_one {
   background-color: #ff00ff;
   box-shadow: 0 0 10px #ff00ff, inset 0 0 10px rgba(0,0,0,0.5); /* Brillo */
   cursor: not-allowed;
 }
 
-/* JUGADOR 2 (Por ejemplo, Cian Neón) */
 .table-cell.player_two {
   background-color: #00f0ff;
   box-shadow: 0 0 10px #00f0ff, inset 0 0 10px rgba(0,0,0,0.5); /* Brillo */

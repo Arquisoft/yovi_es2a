@@ -18,27 +18,22 @@ export function Game({ size: _size }: GameProps): JSX.Element {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Leemos el modo, botId y boardSize del state que viene desde el Lobby
     const mode: "human" | "computer" = location.state?.mode ?? "computer";
     const botId: string = location.state?.botId ?? "random_bot";
 
-    const timerDuration: number | null = location.state?.timer ?? null; // <-- NUEVO
+    const timerDuration: number | null = location.state?.timer ?? null; 
 
-    // El tamaño del tablero es el que viene del Lobby, o el prop, o 7
     const boardSize: number = location.state?.boardSize ?? 7;
     const size = boardSize ?? _size ?? 7;
 
     const username = localStorage.getItem("username") ?? undefined;
     const { cells, currentPlayer, winner, status, error, handleCellClick, handleResign, handleTimeout, resetGame, moveCount } = useGame({ size, mode, botId, username, timer: timerDuration });   
     
-    // --- NUEVO: Lógica del Reloj a Prueba de Bots ---
     const [timeLeft, setTimeLeft] = useState<number | null>(timerDuration);
     
-    // AHORA TRACKEAMOS EL NUMERO DE MOVIMIENTO, NO EL JUGADOR
     const [trackedMove, setTrackedMove] = useState<number>(moveCount); 
     const isTimeoutProcessing = useRef(false);
 
-    // Si el número de movimiento cambia, reiniciamos reloj
     if (moveCount !== trackedMove) {
         setTrackedMove(moveCount);
         if (timerDuration && status === "ongoing") {
@@ -92,10 +87,8 @@ export function Game({ size: _size }: GameProps): JSX.Element {
                                 rival={mode === "computer" ? botId : (location.state?.rival || "Jugador 2")}
             />}
 
-            {/* Aquí aplicamos la clase game-container que hace el efecto cristal */}
             <div className="game-container">
                 
-                {/* --- NUEVO: La Cabecera Arriba (Turno, Reloj y Botón) --- */}
                 <div className="game-header">
                     <div className="game-turn">
                         {getTurnLabel()}
@@ -114,7 +107,6 @@ export function Game({ size: _size }: GameProps): JSX.Element {
 
                 {error && <p className="error" style={{ color: '#ff0055', marginBottom: '1rem' }}>{error}</p>}
 
-                {/* --- Tablero --- */}
                 <GameBoard
                     cells={cells}
                     size={size}

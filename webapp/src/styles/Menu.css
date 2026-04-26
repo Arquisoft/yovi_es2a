@@ -1,4 +1,3 @@
-/* --- MENU.CSS (Estilo Cristal/Neón) --- */
 .menu-container {
     width: 100%;
     min-height: 100vh;
@@ -10,7 +9,6 @@
 }
 
 .menu-card {
-    /* Efecto Cristal (Glassmorphism) */
     background: rgba(15, 15, 20, 0.65); 
     backdrop-filter: blur(12px); 
     -webkit-backdrop-filter: blur(12px);
@@ -20,7 +18,7 @@
     padding: 3rem 2.5rem;
     width: 100%;
     max-width: 420px;
-    color: #ffffff; /* Texto blanco */
+    color: #ffffff; 
     text-align: center;
 }
 
@@ -29,7 +27,7 @@
     font-weight: bold;
     margin: 0 0 0.5rem 0;
     letter-spacing: 0.15em;
-    color: #00f0ff; /* Titulo en Cian Neón */
+    color: #00f0ff; 
     text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
 }
 
@@ -64,7 +62,6 @@
     transform: translateY(-2px);
 }
 
-/* Efecto Neón Cian para Jugar */
 .menu-option-btn.play:hover {
     background: rgba(0, 240, 255, 0.1);
     border-color: #00f0ff;
@@ -72,7 +69,6 @@
     box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
 }
 
-/* Efecto Neón Magenta para Datos */
 .menu-option-btn.data:hover {
     background: rgba(255, 0, 255, 0.1);
     border-color: #ff00ff;
@@ -81,7 +77,6 @@
 
 }
 
-/* Efecto Neón Dorado para Ranking */
 .menu-option-btn.ranking:hover {
     background: rgba(255, 215, 0, 0.1);
     border-color: #ffd700;

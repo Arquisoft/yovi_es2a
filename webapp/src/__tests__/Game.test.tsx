@@ -70,7 +70,7 @@ describe('Game Component', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorage.setItem('username', 'testuser'); // necesario para getTurnLabel()
+    localStorage.setItem('username', 'testuser'); 
 
     mockUseAuthComprobation.mockReturnValue(undefined);
     mockGetLoggedUser.mockReturnValue('testuser');

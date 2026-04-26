@@ -22,7 +22,6 @@ import {
     getMyGroups
 } from '../services/gameService'
 
-// Mock del localStorage para las funciones de amigos y grupos
 const mockLocalStorage = {
     getItem: vi.fn(),
 };
@@ -74,8 +73,6 @@ describe('gameService', () => {
     afterEach(() => {
         vi.restoreAllMocks()
     })
-
-    // ─── TESTS EXISTENTES ──────────────────────────────────────────────────
 
     describe('createGame', () => {
         test('llama al endpoint correcto y devuelve el estado inicial', async () => {
@@ -206,8 +203,6 @@ describe('gameService', () => {
             await expect(getStats('testuser')).rejects.toThrow('Error al obtener las estadísticas')
         })
     })
-
-    // ─── NUEVOS TESTS (COBERTURA AÑADIDA) ──────────────────────────────────
 
     describe('timeout', () => {
         test('envía la acción timeout correctamente sin bot', async () => {

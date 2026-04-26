@@ -5,12 +5,6 @@ import type { ApiGameState, ApiMakeMoveResponse } from "../types/gameApi";
 const BACKEND_URL = import.meta.env.VITE_GAMEY_URL ?? "http://localhost:4000";
 const USERS_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
-// ============================================================================
-// ESCUDO DE SEGURIDAD (SONARCLOUD)
-// Validación estricta mediante Expresión Regular (Allowlist)
-// Evita ataques de SSRF / Path Traversal asegurando que el parámetro 
-// solo contiene caracteres alfanuméricos, guiones o guiones bajos.
-// ============================================================================
 function sanitizeParam(param: string): string {
     if (!/^[a-zA-Z0-9_-]+$/.test(param)) {
         throw new Error("Parámetro inválido por seguridad. Formato incorrecto.");
@@ -37,7 +31,6 @@ export async function createGame(
     return response.json();
 }
 
-// Obtiene el estado de la partida por su ID
 export async function getGame(gameId: string): Promise<ApiGameState> {
     const safeId = sanitizeParam(gameId);
     const response = await fetch(`${BACKEND_URL}/game/${safeId}`);
@@ -48,7 +41,6 @@ export async function getGame(gameId: string): Promise<ApiGameState> {
     return response.json();
 }
 
-// Hace un movimiento en la partida
 export async function placeToken(
     gameId: string,
     player: number,
@@ -227,9 +219,6 @@ export async function getRanking(): Promise<RankingEntry[]> {
     return data.ranking;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// FRIENDS & GROUPS SERVICES
-// ─────────────────────────────────────────────────────────────────────────────
 
 export interface UserPublicData {
     username: string;

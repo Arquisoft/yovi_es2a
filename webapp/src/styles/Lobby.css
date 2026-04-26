@@ -1,4 +1,3 @@
-/* --- LOBBY.CSS (Estilo Cristal/Neón) --- */
 .lobby-container {
     width: 100%;
     min-height: 100vh;
@@ -10,7 +9,6 @@
 }
 
 .lobby-card {
-    /* Efecto Cristal (Glassmorphism) */
     background: rgba(15, 15, 20, 0.65); 
     backdrop-filter: blur(12px); 
     -webkit-backdrop-filter: blur(12px);
@@ -20,7 +18,7 @@
     padding: 2.5rem;
     width: 100%;
     max-width: 500px;
-    color: #ffffff; /* Texto principal blanco */
+    color: #ffffff; 
     position: relative;
 }
 
@@ -29,7 +27,7 @@
     font-weight: bold;
     margin: 0 0 0.5rem 0;
     text-align: center;
-    color: #00f0ff; /* Titulo Neón */
+    color: #00f0ff; 
     text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
 }
 
@@ -47,7 +45,6 @@
     margin-bottom: 2rem;
 }
 
-/* Botones genéricos de selección */
 .mode-btn, .bot-btn, .diff-btn {
     background: rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.15);
@@ -75,7 +72,6 @@
     background: rgba(255, 255, 255, 0.05);
 }
 
-/* Estado activo (Seleccionado) */
 .mode-btn.active, .bot-btn.active, .diff-btn.active {
     background: rgba(0, 240, 255, 0.1);
     color: #ffffff;
@@ -142,7 +138,6 @@
     border-radius: 12px;
 }
 
-/* Botón gigante de PLAY */
 .play-btn {
     width: 100%;
     padding: 1.2rem;
@@ -178,7 +173,6 @@
     margin-bottom: 0.5rem;
 }
 
-/* Opcional: El botoncito de Historial si lo tienes arriba a la derecha */
 .history-btn {
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -196,11 +190,10 @@
     color: #ffffff;
 }
 
-/* Panel de Historial (Si se abre encima del Lobby) */
 .history-panel {
     position: absolute;
     inset: 0;
-    background: rgba(15, 15, 20, 0.95); /* Muy oscuro para tapar lo de atrás */
+    background: rgba(15, 15, 20, 0.95);
     border-radius: 24px;
     padding: 1.5rem;
     overflow-y: auto;

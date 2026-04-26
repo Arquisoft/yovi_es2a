@@ -1,4 +1,3 @@
-/* --- DATAHUB.CSS (Estilo Cristal/Neón) --- */
 .datahub-container {
     width: 100%;
     min-height: 100vh;
@@ -9,9 +8,7 @@
     box-sizing: border-box;
 }
 
-/* La gran caja que envuelve todo */
 .datahub-card {
-    /* Efecto Cristal (Glassmorphism) */
     background: rgba(15, 15, 20, 0.65); 
     backdrop-filter: blur(12px); 
     -webkit-backdrop-filter: blur(12px);
@@ -21,7 +18,7 @@
     padding: 2rem 2.5rem;
     width: 100%;
     max-width: 780px;
-    color: #ffffff; /* Obligamos a que el texto base sea blanco */
+    color: #ffffff; 
 }
 
 .datahub-header {
@@ -31,7 +28,6 @@
     margin-bottom: 1.75rem;
 }
 
-/* Botón de volver */
 .datahub-back-btn {
     background: rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -56,11 +52,10 @@
     font-size: 1.5rem;
     font-weight: bold;
     margin: 0;
-    color: #00f0ff; /* Titulo en Cian Neón */
+    color: #00f0ff; 
     text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
 }
 
-/* Contenedor de las pestañas */
 .datahub-tabs {
     display: flex;
     gap: 0;
@@ -68,7 +63,6 @@
     margin-bottom: 1.75rem;
 }
 
-/* Pestañas inactivas */
 .datahub-tab {
     background: none;
     border: none;
@@ -78,7 +72,7 @@
     font-weight: 600;
     cursor: pointer;
     font-family: inherit;
-    color: #a1a1a1; /* Gris claro */
+    color: #a1a1a1; 
     margin-bottom: -2px;
     transition: all 0.3s ease;
     border-radius: 8px 8px 0 0;
@@ -89,11 +83,10 @@
     background: rgba(255, 255, 255, 0.05);
 }
 
-/* Pestaña activa */
 .datahub-tab.active {
-    color: #00f0ff; /* Texto Cian */
-    border-bottom-color: #00f0ff; /* Línea Cian */
-    background: rgba(0, 240, 255, 0.05); /* Ligero brillo de fondo */
+    color: #00f0ff; 
+    border-bottom-color: #00f0ff;
+    background: rgba(0, 240, 255, 0.05); 
     text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
 }
 

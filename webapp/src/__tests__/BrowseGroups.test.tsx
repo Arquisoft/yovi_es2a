@@ -203,7 +203,6 @@ describe('BrowseGroups', () => {
         
         render(<BrowseGroups />)
         
-        // El error se muestra directamente, no necesita waitFor
         expect(await screen.findByText('Error de red')).toBeInTheDocument()
     })
 
@@ -222,7 +221,6 @@ describe('BrowseGroups', () => {
         const joinButtons = screen.getAllByText(/unirse/i)
         await user.click(joinButtons[0])
         
-        // El error se muestra directamente
         expect(await screen.findByText('Error al unirse')).toBeInTheDocument()
     })
 
@@ -242,7 +240,6 @@ describe('BrowseGroups', () => {
         await user.type(screen.getByPlaceholderText('Ej: Jugadores Avanzados'), 'Nuevo Grupo')
         await user.click(screen.getByText(/✅ crear/i))
         
-        // El error se muestra directamente
         expect(await screen.findByText('Error al crear')).toBeInTheDocument()
     })
 
@@ -258,7 +255,6 @@ describe('BrowseGroups', () => {
             expect(screen.getAllByText('Grupo A').length).toBeGreaterThan(0)
         })
         
-        // El grupo 1 debería mostrar "Miembro" en lugar de "Unirse"
         expect(screen.getByText('✓ Miembro')).toBeInTheDocument()
     })
 })

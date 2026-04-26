@@ -12,10 +12,8 @@ export function EndGameOverlay({ winner, onResetClick, onMenuClick, rival, usern
     let mensaje = "";
 
     if (winner === "PLAYER_ONE") {
-        // Victoria del usuario logueado
         mensaje = `Victoria jugador ${username || "1"}`;
     } else if (winner === "PLAYER_TWO") {
-        // Victoria del oponente (Nombre del Bot o nombre del Rival)
         mensaje = `Victoria jugador ${rival}`;
     } else {
         mensaje = "¡Empate!";

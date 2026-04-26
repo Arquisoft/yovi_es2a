@@ -21,7 +21,19 @@ const Navbar: React.FC = () => {
 
     return (
         <nav className="navbar">
-            <div className="navbar-left">
+            <div 
+                className="navbar-left" 
+                onClick={() => navigate('/menu')}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        navigate('/menu');
+                    }
+                }}
+            >
+                <img src="/favicon.ico" alt="Logo YOVI" className="navbar-logo" />
                 <span className="navbar-brand">YOVI_ES2A</span>
             </div>
             <div className="navbar-right">
