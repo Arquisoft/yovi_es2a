@@ -31,7 +31,7 @@ endif::arc42help[]
 
 El objetivo principal de esta sección es definir las metas de calidad que el sistema YOVI debe cumplir para asegurar una experiencia de usuario satisfactoria. Mientras que los requisitos funcionales describen qué hace el sistema, los requerimientos de calidad describen cómo de bien debe funcionar bajo condiciones específicas.
 
-Para estructurar estas metas, utilizamos las herramientas detalladas en los siguientes apartados:
+Para estructurar estas metas utilizamos las herramientas detalladas en los siguientes apartados:
 
 * **Árbol de Calidad:** Una representación jerárquica que desglosa los atributos de calidad de alto nivel.
 * **Escenarios de Calidad:** Descripciones detalladas que permiten evaluar si el sistema cumple con las expectativas de los stakeholders.

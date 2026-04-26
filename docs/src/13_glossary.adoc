@@ -51,10 +51,7 @@ endpoint `GET /play`.
 | JSON (JavaScript Object Notation)
 | Formato ligero de intercambio de datos utilizado para la comunicación entre frontend, backend y bots a través de la API REST.
 
-| WebSocket
-| Protocolo de comunicación bidireccional en tiempo real utilizado para actualizar el estado de la partida sin recargar la página.
-
-| HTTPS
+| HTTP
 | Protocolo seguro de comunicación utilizado para proteger la transmisión de datos entre clientes y servidores.
 
 | Microservicio
@@ -80,4 +77,18 @@ endpoint `GET /play`.
  
 | Factor de Confianza (C)
 | Componente de la fórmula de ranking definido como `C(n) = 1 − exp(−n / 10)`. Penaliza a jugadores con pocas partidas jugadas frente a un rival concreto, evitando que una única victoria contra un rival difícil infle artificialmente la puntuación.
+
+| Argon2id
+| Algoritmo de hashing de contraseñas utilizado por el sistema para proteger 
+las credenciales de los usuarios. Recomendación actual de OWASP. El sistema lo configura con 64 MB de coste de memoria, 3 iteraciones y 4 hilos de paralelismo.
+
+| SPA (Single Page Application)
+| Tipo de aplicación web que carga una única página HTML y actualiza el 
+contenido dinámicamente sin recargar el navegador. La webapp de Yovi es una 
+SPA construida con React y enrutamiento mediante ``HashRouter``.
+
+| X-User
+| Header HTTP personalizado utilizado por la webapp para identificar al usuario 
+en las peticiones que requieren autenticación. Su valor es el ``username`` 
+almacenado en ``localStorage`` tras el login.
 |===

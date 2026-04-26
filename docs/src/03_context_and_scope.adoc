@@ -125,7 +125,7 @@ endif::arc42help[]
 |===
 
 [NOTE]
-La **notación YEN** es el formato estándar utilizado registrar el estado del tablero en la comunicación del motor de juego. Más información al respecto en el glosario.
+La **notación YEN** es el formato estándar utilizado para registrar el estado del tablero en la comunicación del motor de juego. Más información al respecto en el glosario.
 
 
 .Interfaz Web (Jugadores, HTTP)
@@ -161,7 +161,7 @@ La **notación YEN** es el formato estándar utilizado registrar el estado del t
 [options="header"]
 |===
 | Input al sistema | Output del sistema | Formato / Canal
-| Datos de usuario, partidas, grupos y amistades | Consulta y persistencia de registros | BSON / Driver Mongoose (interno)
+| Datos de usuario, partidas | Consulta y persistencia de registros | BSON / Driver Mongoose (interno)
 |===
 
 * Protocolo: Conexión interna mediante el driver de mongodb desde el servicio `users`.
