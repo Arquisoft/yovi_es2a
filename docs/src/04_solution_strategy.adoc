@@ -62,6 +62,9 @@ Basándonos en los requisitos del proyecto, se han seleccionado las siguientes t
 * **Pruebas y Aseguramiento de Calidad:**
 ** _Vitest, cargo test y Pruebas Manuales E2E:_ Ecosistema de pruebas unitarias y End-to-End (E2E) empleado para garantizar la fiabilidad matemática del motor de juego, el renderizado de la interfaz y la correcta integración entre los microservicios.
 
+* **Monitorización y Análisis de Rendimiento:**
+**_Grafana y Prometheus:_** Herramientas seleccionadas para la monitorización en tiempo real del rendimiento del sistem para identificar cuellos de botella y optimizar la experiencia del usuario. 
+
 === Decisiones de Organización
 
 Para asegurar el correcto desarrollo del proyecto, el equipo ha tomado las siguientes decisiones conjuntas respecto a la metodología y gestión:
@@ -71,7 +74,7 @@ Para asegurar el correcto desarrollo del proyecto, el equipo ha tomado las sigui
 | Ámbito | Decisión y Motivación
 
 | **Metodología**
-| Seguiremos una metodología basada en **reuniones semanales**. Estas sesiones se utilizarán para ponerse al día, definir objetivos a corto plazo (1 semana) y tomar las decisiones importantes o cruciales para el rumbo general del proyecto.
+| Seguiremos una metodología basada en **reuniones semanales**. Estas sesiones se utilizarán para ponerse al día, definir objetivos a corto plazo (una semana) y tomar las decisiones importantes o cruciales para el rumbo general del proyecto.
 
 | **Gestión del Proyecto**
 | Usaremos **GitHub** como herramienta central, tanto para el control de versiones del código como para la gestión de tareas y trabajo en equipo, utilizando principalmente los _Issues_.

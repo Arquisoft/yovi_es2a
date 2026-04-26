@@ -51,27 +51,64 @@ El objetivo de este registro es proporcionar trazabilidad y justificación sobre
 * **Decisión:** Se utilizará **MongoDB** como base de datos, en lugar de una base de datos relacional como PostgreSQL o MySQL.
 
 * **Justificación:**
-Consideramos una mejor decisión el uso de una base de datos NoSQL como MongoDB debido a la simplicidad del modelo de datos y la ausencia de relaciones complejas. MongoDB permite almacenar documentos JSON, lo que se simplifica mucho la gestión de la información de los usuarios y su historial de partidas sin necesidad de diseñar esquemas rígidos o realizar migraciones frecuentes.
+Consideramos una mejor decisión el uso de una base de datos NoSQL como MongoDB debido a la simplicidad del modelo de datos y la ausencia de relaciones complejas. MongoDB permite almacenar documentos JSON, lo que simplifica mucho la gestión de la información de los usuarios y su historial de partidas sin necesidad de diseñar esquemas rígidos o realizar migraciones frecuentes.
 +
 De hecho, gracias a la flexibilidad en el esquema que proporciona Mongo, pudímos despreocuparnos en gran medida de la información relacionada con el historial y las estadísticas de cada usuario, lo que nos permitió centrarnos e ir poco a poco con el proyecto.
 +
 Por último, la integración con el microservicio de usuarios en Node.js es directa mediante Mongoose, lo que facilita el desarrollo y mantenimiento del sistema. Por no hablar de que los miembros de equipo ya teníamos cierta experiencia con bases de datos no relacionales y consideramos interesante prácticar el uso de MongoDB.
 
-* **Alternativas consideradas:** PostgreSQL / MySQL -> Descartadas por añadir complejidad innecesaria (esquemas rígidos, migraciones) para un modelo de datos tan simple y sin relaciones entre entidades. 
+* **Alternativas consideradas:** PostgreSQL / MySQL -> Descartadas por añadir complejidad innecesaria (esquemas rígidos, migraciones) para un modelo de datos tan simple. 
 
 * **Consecuencias:**
 ** El esquema es flexible y fácil de extender.
 ** No se dispone de validación de integridad referencial a nivel de base de datos, aunque no resulta especialmente relevante dada nuestra estructura de datos.
 ** La integración con el microservicio de usuarios en Node.js es directa mediante Mongoose.
 
-=== ADR 002: Estrategia de filtrado en el historial de partidas
+=== ADR-002: Estrategia de filtrado en el historial de partidas
 
 * **Estatus:** Aceptado.
 * **Contexto:** El usuario necesita consultar miles de registros. Realizar peticiones por cada pulsación de tecla (live search) saturaría el servicio de usuarios.
 * **Decisión:** Se implementa un estado temporal en el Frontend para el input de "Rival" y una ejecución "Lazy" de la búsqueda. La petición a la API solo se dispara al pulsar el botón "Buscar".
 * **Consecuencias:** Mejora del rendimiento de red y reducción de carga en MongoDB.
 
-=== ADR-003: Fórmula de puntuación ponderada para el ranking global
+=== ADR-003: Argon2id como algoritmo de hashing de contraseñas
+
+* **Estatus:** Aceptado.
+
+* **Contexto:** El sistema necesita almacenar contraseñas de usuarios de forma 
+segura en MongoDB. Era necesario elegir un algoritmo de hashing que protegiera 
+las credenciales ante posibles filtraciones de la base de datos.
+
+* **Decisión:** Se utiliza **Argon2id** mediante la librería `argon2` de Node.js para hashear las contraseñas antes de persistirlas y para verificarlas en el login.
+
+* **Justificación:** Investigando un poco descubrimos que Argon2id es actualmente la recomendación del OWASP (Open Web Application Security Project) para el almacenamiento seguro de contraseñas. A diferencia de alternativas como bcrypt o SHA-256, Argon2id está diseñado para ser resistente tanto a ataques de fuerza bruta por GPU como a ataques de canal lateral, gracias a su configuración de coste de memoria y tiempo. Su variante `id` combina las ventajas de Argon2i (resistencia a side-channel) y Argon2d (resistencia a GPU), siendo la opción más equilibrada y segura.
+
+[NOTE]
+Los ataques de canal lateral son técnica de ciberseguridad que obtiene información confidencial (como claves criptográficas) analizando características físicas indirectas de un sistema —consumo de energía, tiempo de ejecución, emisiones electromagnéticas o sonido— en lugar de explotar vulnerabilidades en el código
+
+
+* **Alternativas consideradas:**
+** _bcrypt_ → Válido y ampliamente usado, pero más antiguo y menos resistente a 
+hardware moderno de ataque paralelo.
+** _SHA-256 / SHA-512_ → Descartados. Son algoritmos de propósito general, no 
+diseñados para contraseñas, y son vulnerables a ataques de fuerza bruta por su 
+velocidad de cómputo.
+
+* **Consecuencias:**
+** Las contraseñas nunca se almacenan en texto plano ni con hashes reversibles.
+** El proceso de login introduce una latencia mínima pero aceptable por el coste 
+computacional del algoritmo, lo que es precisamente una de sus propiedades de seguridad. Esto retrasa un poco los tiempos de respuesta, pero no lo suficiente como para afectar negativamente la experiencia del usuario ni al rendimiento general de la aplicación.
+** Ante una filtración de la base de datos, los hashes son computacionalmente 
+inviables de revertir en un tiempo razonable.
+
+=== ADR-004: Autenticación sin tokens — localStorage y header X-User
+
+* **Estatus:** Aceptado.
+
+* TODO
+
+=== ADR-005
+: Fórmula de puntuación ponderada para el ranking global
 
 * **Estatus:** Aceptado.
 
@@ -132,29 +169,25 @@ aporte       = 7.0 · 5 · 0.632 · 1.5  ≈ 33.18 puntos
 ** El cálculo en tiempo real puede degradarse con un volumen muy elevado de `GameRecords`. Mitigable con un índice MongoDB sobre `username`.
 ** Incorporar un nuevo bot requiere únicamente asignarle un peso en `RIVAL_WEIGHTS` del servicio `users`.
 
-=== ADR-004: Ausencia de Gateway — Acceso directo a microservicios
+=== ADR-006: Ausencia de Gateway — Acceso directo a microservicios
 
 * **Estatus:** Aceptado.
 
 * **Contexto:** En una arquitectura de microservicios, como vimos más tarde en clase, es habitual centralizar el tráfico entrante a través de un gateway que actúe como punto único de entrada. Para el momento de tomar esta decisión teníamos que definir el cómo hacer la API públca para los bots externos.
 
 * **Decisión:** Se descarta el uso de un gateway centralizado. En su lugar:
-** La **webapp** (React) accede directamente a `users` para operaciones hacer las operaciones relacionadas con la gestión de usuarios y directamente a `gamey` para la lógica del juego.
+** La **webapp** (React) accede directamente a `users` para hacer las operaciones relacionadas con la gestión de usuarios y directamente a `gamey` para la lógica del juego.
 ** Los **bots externos** acceden directamente al motor de juego mediante 
 `GET /play` en notación YEN, sin intermediario.
 
 * **Justificación:** 
-Consideramos que añadir una gateway sería complicar la arquitectura de forma innecesaria en vista de la poca cantidad de endpoints disponibles y la simplicidad de estos. Además, en vista de que nuestra aplicación no está diseñada para manejar un amplio tráfico de bots externos o usuarios, por lo que resolvimos tomar la opción más sencilla de implementar.
+Consideramos que añadir una gateway sería complicar la arquitectura de forma innecesaria en vista de la poca cantidad de endpoints disponibles y la simplicidad de estos. Además, en vista de que nuestra aplicación no está diseñada para manejar un amplio tráfico de bots externos o usuarios, resolvimos tomar la opción más sencilla de implementar.
 
 * **Alternativas consideradas:**
-** _nginx como reverse proxy_ → Descartado. Añade configuración adicional sin 
-aportar valor real dado que no hay colisión de puertos ni necesidad de balanceo 
-de carga con el volumen actual.
-** _Gateway Node.js propio_ → Descartado. Requeriría desarrollo y mantenimiento 
-de una capa extra que duplicaría lógica ya presente en la webapp.
+** _nginx como reverse proxy_ → Descartado. Añade configuración adicional sin aportar valor real dado que no hay colisión de puertos ni necesidad de balanceo de carga con el volumen actual.
+** _Gateway Node.js propio_ → Descartado. Requeriría desarrollo y mantenimiento de una capa extra que duplicaría lógica ya presente en la webapp.
 
 * **Consecuencias:**
 ** La arquitectura es más simple y fácil de desplegar y depurar.
-** La webapp asume la responsabilidad de seleccionar el servicio correcto en cada 
-operación, acoplando ligeramente el frontend a la topología de servicios.
+** La webapp asume la responsabilidad de seleccionar el servicio correcto en cada operación, acoplando ligeramente el frontend a la topología de servicios.
 ** Si en el futuro se añaden más microservicios o se requiere autenticación centralizada, la introducción de un gateway sería la evolución natural del sistema que resultaría sencilla de implementar.
