@@ -27,14 +27,20 @@ Given('I have an active human game', async function () {
     const page = this.page;
     await page.click('.mode-btn:has-text("vs Humano")');
     await page.click('.play-btn.ready');
+    
+    // Esperamos a las celdas
     await page.waitForSelector('.game-board', { state: 'visible', timeout: 5000 });
+    await page.waitForSelector('.table-cell.empty', { state: 'visible', timeout: 10000 });
 });
 
 When('I configure the board for a human game', async function () {
     const page = this.page
     await page.click('.mode-btn:has-text("vs Humano")')
     await page.click('.play-btn.ready')
+    
+    // Esperamos a las celdas
     await page.waitForSelector('.game-board', { state: 'visible', timeout: 5000 })
+    await page.waitForSelector('.table-cell.empty', { state: 'visible', timeout: 10000 })
 })
 
 When('Player one clicks on an empty cell', async function () {

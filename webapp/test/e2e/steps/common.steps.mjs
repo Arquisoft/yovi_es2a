@@ -16,7 +16,7 @@ Given('I am logged in and on the play menu', async function () {
     await page.waitForSelector('.mode-btn:has-text("vs Máquina")')
 })
 
-// Paso compartido: iniciar partida contra bot concreto desde el menú de juego
+// Añadimos una espera explícita a que aparezcan las celdas
 Given('I have an active game against {string} {string}', async function (difficulty, opponent) {
     const page = this.page
     await page.click('.mode-btn:has-text("vs Máquina")')
@@ -25,12 +25,20 @@ Given('I have an active game against {string} {string}', async function (difficu
         await page.click(`.diff-btn.diff-${difficulty.toLowerCase()}`)
     }
     await page.click('.play-btn.ready')
+    
+    // Esperamos al contenedor y TAMBIÉN a que se dibujen las celdas
     await page.waitForSelector('.game-board', { state: 'visible', timeout: 5000 })
+    await page.waitForSelector('.table-cell.empty', { state: 'visible', timeout: 10000 })
 })
 
+// Le enseñamos a Playwright a aceptar el pop-up de confirmación
 When('I click on the surrender button', async function () {
     const page = this.page;
-    await this.page.click('.btn-surrender');
+    
+    // IMPORTANTE: Le decimos al bot que cuando salga un 'window.confirm', le dé a Aceptar
+    page.once('dialog', dialog => dialog.accept());
+    
+    await page.click('.btn-surrender');
 });
 
 Then('I should see the game board', async function () {
