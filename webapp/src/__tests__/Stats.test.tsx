@@ -37,7 +37,6 @@ describe('Stats', () => {
         localStorage.clear()
     })
 
-    // ── Sin sesión ─────────────────────────────────────────────────────────
 
     it('muestra mensaje de inicio de sesión si no hay usuario en localStorage', () => {
         localStorage.clear()
@@ -46,7 +45,6 @@ describe('Stats', () => {
         expect(screen.getByText(/debes iniciar sesión/i)).toBeInTheDocument()
     })
 
-    // ── Estado de carga ────────────────────────────────────────────────────
 
     it('muestra el indicador de carga mientras espera la respuesta', () => {
         vi.mocked(getStats).mockReturnValue(new Promise(() => {}))
@@ -56,7 +54,6 @@ describe('Stats', () => {
         expect(screen.getByText(/cargando estadísticas/i)).toBeInTheDocument()
     })
 
-    // ── Error de la API ────────────────────────────────────────────────────
 
     it('muestra el mensaje de error si la API falla', async () => {
         vi.mocked(getStats).mockRejectedValue(new Error('Timeout'))
@@ -68,7 +65,6 @@ describe('Stats', () => {
         )
     })
 
-    // ── Sin partidas ───────────────────────────────────────────────────────
 
     it('muestra el mensaje de sin partidas si total es 0', async () => {
         vi.mocked(getStats).mockResolvedValue({ ...statsMock, total: 0 })
@@ -80,7 +76,6 @@ describe('Stats', () => {
         )
     })
 
-    // ── Renderizado normal ─────────────────────────────────────────────────
 
     it('muestra el título con el nombre de usuario', async () => {
         render(<Stats />)
@@ -119,7 +114,6 @@ describe('Stats', () => {
         })
     })
 
-    // ── Rival favorito ─────────────────────────────────────────────────────
 
     it('muestra el rival favorito cuando existe', async () => {
         render(<Stats />)
@@ -140,13 +134,11 @@ describe('Stats', () => {
         expect(screen.queryByText(/rival favorito/i)).not.toBeInTheDocument()
     })
 
-    // ── Tabla por rival ────────────────────────────────────────────────────
 
     it('renderiza las tarjetas de rivales con nombres amigables', async () => {
         render(<Stats />)
 
         await waitFor(() => {
-            // Los nombres amigables deben aparecer, no los identificadores internos
             expect(screen.getByText('Bot Defensivo (Fácil)')).toBeInTheDocument()
             expect(screen.getAllByText('Bot Aleatorio').length).toBeGreaterThanOrEqual(1)
         })
@@ -166,7 +158,6 @@ describe('Stats', () => {
         render(<Stats />)
 
         await waitFor(() =>
-            // random_bot: 8/10 = 80%
             expect(screen.getByText('80%')).toBeInTheDocument()
         )
     })

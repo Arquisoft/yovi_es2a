@@ -4,8 +4,6 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import '@testing-library/jest-dom'
 import type { RankingEntry } from '../services/gameService'
 
-// ── Mocks ──────────────────────────────────────────────────────────────────
-
 vi.mock('../services/gameService', () => ({
     getRanking: vi.fn(),
 }))
@@ -16,7 +14,6 @@ vi.mock('react-router-dom', async () => {
     return { ...actual, useNavigate: () => mockNavigate }
 })
 
-// Navbar y AuthComprobation no son relevantes para estos tests
 vi.mock('../components/Navbar', () => ({
     default: () => <div data-testid="navbar" />,
 }))
@@ -28,7 +25,6 @@ import Ranking from '../pages/Ranking'
 import { getRanking } from '../services/gameService'
 import { MemoryRouter } from 'react-router-dom'
 
-// ── Datos de prueba ────────────────────────────────────────────────────────
 
 const rankingMock: RankingEntry[] = [
     { position: 1, username: 'bob',   score: 14.0, totalGames: 3,  wins: 2 },
@@ -44,7 +40,6 @@ function renderRanking() {
     )
 }
 
-// ── Tests ──────────────────────────────────────────────────────────────────
 
 describe('Ranking', () => {
 
@@ -58,7 +53,6 @@ describe('Ranking', () => {
         localStorage.clear()
     })
 
-    // ── Estado de carga ────────────────────────────────────────────────────
 
     it('muestra el indicador de carga mientras espera la respuesta', () => {
         vi.mocked(getRanking).mockReturnValue(new Promise(() => {}))
@@ -68,7 +62,6 @@ describe('Ranking', () => {
         expect(screen.getByText(/cargando ranking/i)).toBeInTheDocument()
     })
 
-    // ── Error de la API ────────────────────────────────────────────────────
 
     it('muestra el mensaje de error si la API falla', async () => {
         vi.mocked(getRanking).mockRejectedValue(new Error('Error de red'))
@@ -80,7 +73,6 @@ describe('Ranking', () => {
         )
     })
 
-    // ── Ranking vacío ──────────────────────────────────────────────────────
 
     it('muestra mensaje cuando no hay partidas registradas', async () => {
         vi.mocked(getRanking).mockResolvedValue([])
@@ -92,7 +84,6 @@ describe('Ranking', () => {
         )
     })
 
-    // ── Renderizado de la tabla ────────────────────────────────────────────
 
     it('muestra el título del ranking', async () => {
         renderRanking()

@@ -2,20 +2,15 @@ import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom'; // <--- SOLUCIÓN ERROR 1: Permite usar toBeInTheDocument
 
-// Ajustamos las rutas asumiendo que el test está en src/__tests__ 
-// y el componente en src/ o src/components/
 import FriendsList from '../components/FriendsList'; 
 import { getFriends } from '../services/gameService'; 
 
-// ─── 1. MOCKS DE DEPENDENCIAS ──────────────────────────────────────────────
 
-// SOLUCIÓN ERRORES 2-6: Aseguramos que la ruta del mock sea idéntica a la del import
 vi.mock('../services/gameService', () => ({
     getFriends: vi.fn(),
     removeFriend: vi.fn(),
 }));
 
-// Mock del componente hijo UserProfile para aislar el test
 vi.mock('../UserProfile', () => ({
     default: ({ user, action, onAction }: any) => (
         <div data-testid={`user-profile-${user.username}`}>
@@ -25,14 +20,12 @@ vi.mock('../UserProfile', () => ({
     )
 }));
 
-// Mock del LocalStorage
 const mockGetItem = vi.fn();
 Object.defineProperty(global, 'localStorage', {
     value: { getItem: mockGetItem },
     writable: true
 });
 
-// ─── 2. BATERÍA DE TESTS ───────────────────────────────────────────────────
 
 describe('FriendsList Component', () => {
     
@@ -50,7 +43,6 @@ describe('FriendsList Component', () => {
 
     test('muestra estado de carga y luego lista vacía si no tiene amigos', async () => {
         mockGetItem.mockReturnValue('iyan2');
-        // Forzamos el tipado para evitar quejas de TypeScript
         (getFriends as any).mockResolvedValueOnce([]); 
 
         render(<FriendsList />);

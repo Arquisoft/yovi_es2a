@@ -85,7 +85,6 @@ const Historic: React.FC = () => {
     return (
         <div className="historic-container">
 
-            {/* ── Cabecera ── */}
             <div className="historic-head">
                 <div>
                     <h2 className="historic-title">Historial</h2>
@@ -98,7 +97,6 @@ const Historic: React.FC = () => {
                 )}
             </div>
 
-            {/* ── Filtros ── */}
             <div className="historic-filters">
                 <div className="filter-row">
                     <select
@@ -162,7 +160,6 @@ const Historic: React.FC = () => {
                 </div>
             </div>
 
-            {/* ── Estados ── */}
             {loading && <p className="historic-status">Cargando historial...</p>}
             {error   && <p className="historic-status historic-error">Error: {error}</p>}
 
@@ -176,7 +173,6 @@ const Historic: React.FC = () => {
                 </div>
             )}
 
-            {/* ── Lista de tarjetas ── */}
             {!loading && !error && history.length > 0 && (
                 <div className="historic-list">
                     {history.map(record => {

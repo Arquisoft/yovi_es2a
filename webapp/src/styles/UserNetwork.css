@@ -1,4 +1,3 @@
-/* --- USERNETWORK.CSS (Estilo Cristal/Neón) --- */
 .usernetwork-container {
     width: 100%;
     min-height: 100vh;
@@ -9,7 +8,6 @@
     box-sizing: border-box;
 }
 
-/* La gran caja que envuelve todo */
 .usernetwork-card {
     background: rgba(15, 15, 20, 0.65);
     backdrop-filter: blur(12px);
@@ -58,7 +56,6 @@
     text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
 }
 
-/* Contenedor de las pestañas */
 .usernetwork-tabs {
     display: flex;
     gap: 0;
@@ -67,7 +64,6 @@
     overflow-x: auto;
 }
 
-/* Pestañas inactivas */
 .usernetwork-tab {
     background: none;
     border: none;

@@ -1,10 +1,8 @@
-/* ── Contenedor general ───────────────────────────────────────────────────── */
 .historic-container {
     width: 100%;
     padding: 0.25rem 0;
 }
 
-/* ── Cabecera ─────────────────────────────────────────────────────────────── */
 .historic-head {
     display: flex;
     align-items: flex-end;
@@ -16,7 +14,7 @@
     font-size: 1.15rem;
     font-weight: 700;
     margin: 0 0 0.2rem 0;
-    color: #ffffff; /* Texto blanco */
+    color: #ffffff; 
 }
 
 .historic-subtitle {

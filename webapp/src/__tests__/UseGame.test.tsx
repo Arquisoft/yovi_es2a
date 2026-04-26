@@ -4,7 +4,6 @@ import { act } from 'react'
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { useGame } from '../hooks/useGame'
 
-// ── Mocks de servicios ──────────────────────────────────────────────────────
 
 const mockApiState = {
     game_id: 'game-123',

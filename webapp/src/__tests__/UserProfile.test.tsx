@@ -1,12 +1,11 @@
 import { describe, test, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import '@testing-library/jest-dom'; // Necesario para .toBeInTheDocument()
+import '@testing-library/jest-dom'; 
 
-import UserProfile from '../components/UserProfile'; // Ajusta la ruta si es necesario
+import UserProfile from '../components/UserProfile'; 
 
 describe('UserProfile Component', () => {
-    // Definimos un usuario de prueba (mock) con los datos que espera la interfaz
     const mockUser = {
         username: 'testPlayer',
         stats: {
@@ -24,13 +23,11 @@ describe('UserProfile Component', () => {
     test('1. Renderiza correctamente la información básica del usuario', () => {
         render(<UserProfile user={mockUser} />);
 
-        // Comprobamos que el nombre y las estadísticas se pintan en pantalla
         expect(screen.getByText('testPlayer')).toBeInTheDocument();
         expect(screen.getByText(/10 partidas/i)).toBeInTheDocument();
         expect(screen.getByText(/7 victorias/i)).toBeInTheDocument();
         expect(screen.getByText(/70% win rate/i)).toBeInTheDocument();
         
-        // Por defecto action es 'none', así que no debería haber botón
         const button = screen.queryByRole('button');
         expect(button).not.toBeInTheDocument();
     });
@@ -47,12 +44,10 @@ describe('UserProfile Component', () => {
             />
         );
 
-        // Comprobamos que el texto del botón es el del caso 'agregar'
         const button = screen.getByRole('button', { name: /➕ Agregar amigo/i });
         expect(button).toBeInTheDocument();
-        expect(button).not.toHaveClass('remove'); // No debe tener la clase roja
+        expect(button).not.toHaveClass('remove'); 
 
-        // Simulamos el click
         await user.click(button);
         expect(onActionMock).toHaveBeenCalledTimes(1);
     });
@@ -69,14 +64,11 @@ describe('UserProfile Component', () => {
             />
         );
 
-        // Comprobamos que el texto es de remover
         const button = screen.getByRole('button', { name: /➖ Remover amigo/i });
         expect(button).toBeInTheDocument();
         
-        // Debe tener la clase 'remove' para pintarse de rojo (según tu className)
         expect(button).toHaveClass('remove');
 
-        // Simulamos el click
         await user.click(button);
         expect(onActionMock).toHaveBeenCalledTimes(1);
     });
@@ -93,7 +85,6 @@ describe('UserProfile Component', () => {
             />
         );
 
-        // El texto debería ser el personalizado, ignorando el switch case de 'agregar'
         const button = screen.getByRole('button', { name: /Aceptar solicitud/i });
         expect(button).toBeInTheDocument();
     });
@@ -103,11 +94,9 @@ describe('UserProfile Component', () => {
             <UserProfile 
                 user={mockUser} 
                 action="agregar" 
-                // Omitimos onAction a propósito
             />
         );
 
-        // La condición {action !== 'none' && onAction && ...} debería ocultar el botón
         const button = screen.queryByRole('button');
         expect(button).not.toBeInTheDocument();
     });

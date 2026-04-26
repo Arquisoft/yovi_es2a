@@ -1,10 +1,8 @@
-// src/__tests__/RegisterForm.test.tsx
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import '@testing-library/jest-dom'
 
-// Mock react-router-dom BEFORE importing AuthForm
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual<any>('react-router-dom')
@@ -31,7 +29,6 @@ describe('AuthForm', () => {
       </MemoryRouter>
     )
 
-    // Switch to register mode
     await user.click(screen.getByRole('button', { name: /register/i }))
     await user.type(screen.getByLabelText(/username/i), 'testuser')
     await user.type(screen.getByLabelText(/^password$/i), 'password123')

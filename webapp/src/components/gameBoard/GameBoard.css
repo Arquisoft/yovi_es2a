@@ -1,6 +1,4 @@
-/* --- GAMEBOARD.CSS (Estilo Oscuro/Neón) --- */
 
-/* Esta clase se la tienes que poner al div PRINCIPAL que envuelve todo el juego */
 .game-container {
     background: rgba(15, 15, 20, 0.65); 
     backdrop-filter: blur(12px); 
@@ -18,7 +16,6 @@
     align-items: center;
 }
 
-/* Cabecera del juego (Donde está el turno y el temporizador) */
 .game-header {
     display: flex;
     justify-content: space-between;
@@ -31,7 +28,6 @@
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Texto del Turno */
 .game-turn {
     font-size: 1.5rem;
     font-weight: bold;
@@ -39,14 +35,12 @@
     text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
 }
 
-/* Temporizador */
 .game-timer {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #ffcc00; /* Amarillo/Dorado Neón para urgencia */
+    color: #ffcc00; 
 }
 
-/* Botón de Rendirse */
 .btn-surrender {
     padding: 0.8rem 1.5rem;
     background-color: transparent;
@@ -64,14 +58,12 @@
     box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
 }
 
-/* --- EL TABLERO EN SÍ --- */
 .game-board {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-top: 1rem;
     padding: 1rem;
-    /* Dejamos el fondo totalmente transparente para que los hexágonos "floten" */
     background: transparent; 
 }
 

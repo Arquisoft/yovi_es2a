@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import type { TableCell, Player } from "../types/game";
 import type { ApiGameState } from "../types/gameApi";
 import { createGame, placeToken, resign as resignService, saveGameResult, timeout as timeoutService } from "../services/gameService"; // <-- SOLUCIÓN AL ERROR 2
-//  ────────────────────Tipos────────────────────────────────────────────────────────────
 
 // Opciones de configuración de la partida
 interface UseGameOptions {
