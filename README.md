@@ -61,14 +61,14 @@ El proyecto sigue una arquitectura basada en microservicios: cada módulo es un 
 
     docker compose up --build
 
-| Servicio    | URL                        |
-|-------------|----------------------------|
-| Aplicación  | http://localhost            |
-| Usuarios    | http://localhost:3000       |
-| Motor       | http://localhost:4000       |
-| Swagger     | http://localhost:3000/api-docs |
-| Prometheus  | http://localhost:9090       |
-| Grafana     | http://localhost:9091       |
+| Servicio    | URL - Local                     | URL - Remota                      | 
+|-------------|---------------------------------|-----------------------------------|  
+| Aplicación  | http://localhost                | http://68.221.24.159              | 
+| Usuarios    | http://localhost:3000           | http://68.221.24.159:3000         | 
+| Motor       | http://localhost:4000           | http://68.221.24.159:4000         | 
+| Swagger     | http://localhost:3000/api-docs  | http://68.221.24.159:3000/api-docs| 
+| Prometheus  | http://localhost:9090           | http://68.221.24.159:9090         | 
+| Grafana     | http://localhost:9091           | http://68.221.24.159:9091         | 
 
 
 ### En local
@@ -134,6 +134,12 @@ npm test           # tests unitarios con Vitest
 ```bash
 cd gamey
 cargo test
+```
+
+**E2E:**
+```bash
+cd webapp
+npm run test:e2e
 ```
 
 ---
