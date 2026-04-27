@@ -465,3 +465,17 @@ Tras la ejecución y análisis de la prueba de carga, el equipo extrae las sigui
 1. **Solidez Arquitectónica:** El servidor gestiona la concurrencia de 50 usuarios de manera correcta. No se han detectado fugas de memoria, caídas del servicio ni bloqueos de hilos. La latencia se mantiene estable independientemente de la carga de usuarios activos.
 2. **Seguridad y Condiciones de Carrera:** Como se adelantó previamente, la totalidad de los 200 errores (HTTP 422) son una consecuencia de la configuración de la simulación. Al establecer pausas muy cortas (apenas 1 segundo para "pensar la jugada") combinadas con la alta latencia de inyección, se generaron escenarios donde los usuarios virtuales enviaban movimientos a una velocidad sobrehumana. Esto provocó intentos de ocupar casillas que habían sido reclamadas por el rival escasos milisegundos antes. 
 El hecho de que el servidor respondiera con un 422 demuestra su robustez: el backend es capaz de auditar el estado del tablero en tiempo real, procesar la concurrencia correctamente y bloquear movimientos ilegales, validando así la integridad del sistema anti-trampas.
+
+=== Cobertura Global de Código (SonarCloud)
+
+Para tener una visión general, unificada y objetiva de la calidad del proyecto, se ha integrado **SonarCloud** como herramienta de análisis estático en nuestro pipeline de Integración Continua (GitHub Actions). Esta plataforma audita automáticamente cada subida de código a la rama principal.
+
+image::12_tests_global.png[Cobertura global en SonarCloud, align="center"]
+
+Como se puede observar en el reporte del panel de control, el proyecto cumple con los estándares de calidad exigidos:
+
+* **Quality Gate (Passed):** El código cumple todos los requisitos definidos para poder ser liberado a producción.
+* **Cobertura (Coverage):** Se ha alcanzado un **86.06%** de cobertura mediante tests automatizados.
+* **Mantenibilidad y Seguridad:** El análisis certifica que la arquitectura es sólida, reportando 0 vulnerabilidades críticas y un nivel de código duplicado ínfimo (0.52%).
+
+Este cómputo global demuestra que la combinación de pruebas unitarias (Vitest, Cargo) y pruebas E2E proporciona una red de seguridad real y medible para el sistema YOVI.
