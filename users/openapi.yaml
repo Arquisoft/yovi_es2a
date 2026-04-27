@@ -1,12 +1,22 @@
 openapi: 3.0.0
 info:
-  title: YOVI API (Users + Game Engine)
+  title: YOVI API (Usuarios + Motor de Juego)
   version: 1.0.0
   description: API completa para la gestión de usuarios, componente social y motor de juego.
+
+tags:
+  - name: Usuarios y Estadísticas
+    description: Gestión de cuentas, autenticación, historial de partidas y clasificaciones.
+  - name: Social y Grupos
+    description: Gestión de la lista de amigos y grupos de juego.
+  - name: Motor de Juego
+    description: Microservicio en Rust. Lógica del tablero, movimientos y bots.
+
 paths:
   /createuser:
     post:
-      summary: Creates a new user
+      tags: [Usuarios y Estadísticas]
+      summary: Crea un nuevo usuario
       requestBody:
         required: true
         content:
@@ -18,13 +28,14 @@ paths:
                 username: { type: string, example: "testuser" }
                 password: { type: string, example: "mypassword" }
       responses:
-        '201': { description: User created successfully }
-        '400': { description: Username or password missing }
-        '409': { description: Username already taken }
+        '201': { description: Usuario creado exitosamente }
+        '400': { description: Falta el nombre de usuario o contraseña }
+        '409': { description: El nombre de usuario ya está en uso }
 
   /login:
     post:
-      summary: Logs in an existing user
+      tags: [Usuarios y Estadísticas]
+      summary: Inicia sesión con un usuario existente
       requestBody:
         required: true
         content:
@@ -36,13 +47,14 @@ paths:
                 username: { type: string, example: "testuser" }
                 password: { type: string, example: "mypassword" }
       responses:
-        '200': { description: Login successful }
-        '400': { description: Username or password missing }
-        '401': { description: User not found or invalid password }
+        '200': { description: Inicio de sesión exitoso }
+        '400': { description: Falta el nombre de usuario o contraseña }
+        '401': { description: Usuario no encontrado o contraseña incorrecta }
 
   /savegame:
     post:
-      summary: Saves the result of a finished game
+      tags: [Usuarios y Estadísticas]
+      summary: Guarda el resultado de una partida terminada
       requestBody:
         required: true
         content:
@@ -56,50 +68,55 @@ paths:
                 resultado: { type: string, enum: ['1', '2'] }
                 size: { type: integer }
       responses:
-        '201': { description: Game saved successfully }
+        '201': { description: Partida guardada exitosamente }
 
   /history/{username}:
     get:
-      summary: Returns the game history of a user
+      tags: [Usuarios y Estadísticas]
+      summary: Devuelve el historial de partidas de un usuario
       parameters:
         - name: username
           in: path
           required: true
           schema: { type: string }
       responses:
-        '200': { description: Game history retrieved }
+        '200': { description: Historial de partidas recuperado }
 
   /stats/{username}:
     get:
-      summary: Returns aggregated stats of a user
+      tags: [Usuarios y Estadísticas]
+      summary: Devuelve las estadísticas agregadas de un usuario
       parameters:
         - name: username
           in: path
           required: true
           schema: { type: string }
       responses:
-        '200': { description: Stats calculated successfully }
+        '200': { description: Estadísticas calculadas exitosamente }
 
   /ranking:
     get:
-      summary: Returns the top 10 players by score
+      tags: [Usuarios y Estadísticas]
+      summary: Devuelve el top 10 de jugadores por puntuación
       responses:
-        '200': { description: Ranking retrieved successfully }
+        '200': { description: Ranking recuperado exitosamente }
 
   /user/{username}:
     get:
-      summary: Returns public data of a user
+      tags: [Usuarios y Estadísticas]
+      summary: Devuelve los datos públicos de un usuario
       parameters:
         - name: username
           in: path
           required: true
           schema: { type: string }
       responses:
-        '200': { description: User data retrieved }
+        '200': { description: Datos del usuario recuperados }
 
   /addfriend/{friendUsername}:
     post:
-      summary: Adds a user as a friend
+      tags: [Social y Grupos]
+      summary: Añade a un usuario como amigo
       parameters:
         - name: friendUsername
           in: path
@@ -110,11 +127,12 @@ paths:
           required: true
           schema: { type: string }
       responses:
-        '200': { description: Friend added successfully }
+        '200': { description: Amigo añadido exitosamente }
 
   /removefriend/{friendUsername}:
     delete:
-      summary: Removes a friend
+      tags: [Social y Grupos]
+      summary: Elimina a un amigo de la lista
       parameters:
         - name: friendUsername
           in: path
@@ -125,28 +143,31 @@ paths:
           required: true
           schema: { type: string }
       responses:
-        '200': { description: Friend removed successfully }
+        '200': { description: Amigo eliminado exitosamente }
 
   /friends/{username}:
     get:
-      summary: Returns the friend list of a user
+      tags: [Social y Grupos]
+      summary: Devuelve la lista de amigos de un usuario
       parameters:
         - name: username
           in: path
           required: true
           schema: { type: string }
       responses:
-        '200': { description: Friends list retrieved }
+        '200': { description: Lista de amigos recuperada }
 
   /groups:
     get:
-      summary: Returns all public groups
+      tags: [Social y Grupos]
+      summary: Devuelve todos los grupos públicos disponibles
       responses:
-        '200': { description: Groups retrieved }
+        '200': { description: Grupos recuperados }
 
   /creategroup:
     post:
-      summary: Creates a new group
+      tags: [Social y Grupos]
+      summary: Crea un nuevo grupo de juego
       parameters:
         - name: X-User
           in: header
@@ -162,22 +183,24 @@ paths:
                 name: { type: string }
                 description: { type: string }
       responses:
-        '200': { description: Group created successfully }
+        '200': { description: Grupo creado exitosamente }
 
   /group/{groupId}:
     get:
-      summary: Returns details of a specific group
+      tags: [Social y Grupos]
+      summary: Devuelve los detalles de un grupo específico
       parameters:
         - name: groupId
           in: path
           required: true
           schema: { type: string }
       responses:
-        '200': { description: Group details retrieved }
+        '200': { description: Detalles del grupo recuperados }
 
   /joingroup/{groupId}:
     post:
-      summary: Joins a public group
+      tags: [Social y Grupos]
+      summary: Une al usuario a un grupo público
       parameters:
         - name: groupId
           in: path
@@ -188,11 +211,12 @@ paths:
           required: true
           schema: { type: string }
       responses:
-        '200': { description: Joined group successfully }
+        '200': { description: Usuario unido al grupo exitosamente }
 
   /leavegroup/{groupId}:
     delete:
-      summary: Leaves a group
+      tags: [Social y Grupos]
+      summary: El usuario abandona un grupo
       parameters:
         - name: groupId
           in: path
@@ -203,22 +227,24 @@ paths:
           required: true
           schema: { type: string }
       responses:
-        '200': { description: Left group successfully }
+        '200': { description: Grupo abandonado exitosamente }
 
   /mygroups:
     get:
-      summary: Returns the groups the user belongs to
+      tags: [Social y Grupos]
+      summary: Devuelve los grupos a los que pertenece el usuario
       parameters:
         - name: X-User
           in: header
           required: true
           schema: { type: string }
       responses:
-        '200': { description: User's groups retrieved }
+        '200': { description: Grupos del usuario recuperados }
 
   /game/new:
     post:
-      summary: (Motor Rust) Crea una nueva partida
+      tags: [Motor de Juego]
+      summary: Crea una nueva partida en el motor
       requestBody:
         required: true
         content:
@@ -230,11 +256,12 @@ paths:
                 mode: { type: string }
                 bot: { type: string }
       responses:
-        '201': { description: Partida creada con UUID }
+        '201': { description: Partida creada y UUID generado }
           
   /game/{gameId}:
     get:
-      summary: (Motor Rust) Obtiene el estado de una partida
+      tags: [Motor de Juego]
+      summary: Obtiene el estado actual de una partida
       parameters:
         - name: gameId
           in: path
@@ -245,7 +272,8 @@ paths:
           
   /game/{gameId}/move:
     post:
-      summary: (Motor Rust) Realiza un movimiento o acción
+      tags: [Motor de Juego]
+      summary: Realiza un movimiento o acción en el tablero
       parameters:
         - name: gameId
           in: path
@@ -262,11 +290,12 @@ paths:
                 action: { type: string, enum: ['place', 'resign', 'timeout'] }
                 cell_index: { type: integer, nullable: true }
       responses:
-        '200': { description: Movimiento aceptado y nuevo estado }
+        '200': { description: Movimiento aceptado y nuevo estado generado }
           
   /play:
     get:
-      summary: (Motor Rust) API Pública para Bots externos (YEN)
+      tags: [Motor de Juego]
+      summary: API Pública para que los Bots externos (YEN) jueguen
       parameters:
         - name: position
           in: query
