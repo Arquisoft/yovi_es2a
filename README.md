@@ -4,8 +4,10 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_es2a&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_es2a)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_es2a&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_es2a)
 
-<img width="1376" height="768" alt="Imagen_juegoY" src="https://github.com/user-attachments/assets/4014a8b5-27c8-4d5a-8390-bbbdc7c847e4" />
+<img width="1392" height="768" alt="Gemini_Generated_Image_y0yhsfy0yhsfy0yh" src="https://github.com/user-attachments/assets/e8c917e1-3aa9-4350-8129-0b815e8d988b" />
+(generado por Gemini)
 
+-----------------
 Implementación web del juego de tablero Y con autenticación de usuarios, historial de partidas, estadísticas personales y monitorización en tiempo real.
 
 ---
