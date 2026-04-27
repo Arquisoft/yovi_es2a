@@ -542,6 +542,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_pruebas_end_to_end_e2e">12.2. Pruebas End-to-End (E2E)</a></li>
 <li><a href="#_grafana_y_prometheus">12.3. Grafana y Prometheus</a></li>
 <li><a href="#_pruebas_de_carga">12.4. Pruebas de Carga</a></li>
+<li><a href="#_cobertura_global_de_código_sonarcloud">12.5. Cobertura Global de Código (SonarCloud)</a></li>
 </ul>
 </li>
 <li><a href="#section-glossary">13. Glosario</a></li>
@@ -4130,8 +4131,38 @@ El hecho de que el servidor respondiera con un 422 demuestra su robustez: el bac
 </li>
 </ol>
 </div>
-<div style="page-break-after: always;"></div>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_cobertura_global_de_código_sonarcloud">12.5. Cobertura Global de Código (SonarCloud)</h3>
+<div class="paragraph">
+<p>Para tener una visión general, unificada y objetiva de la calidad del proyecto, se ha integrado <strong>SonarCloud</strong> como herramienta de análisis estático en nuestro pipeline de Integración Continua (GitHub Actions). Esta plataforma audita automáticamente cada subida de código a la rama principal.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="./images/12_tests_global.png" alt="Cobertura global en SonarCloud">
+</div>
+</div>
+<div class="paragraph">
+<p>Como se puede observar en el reporte del panel de control, el proyecto cumple con los estándares de calidad exigidos:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Quality Gate (Passed):</strong> El código cumple todos los requisitos definidos para poder ser liberado a producción.</p>
+</li>
+<li>
+<p><strong>Cobertura (Coverage):</strong> Se ha alcanzado un <strong>86.06%</strong> de cobertura mediante tests automatizados.</p>
+</li>
+<li>
+<p><strong>Mantenibilidad y Seguridad:</strong> El análisis certifica que la arquitectura es sólida, reportando 0 vulnerabilidades críticas y un nivel de código duplicado ínfimo (0.52%).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Este cómputo global demuestra que la combinación de pruebas unitarias (Vitest, Cargo) y pruebas E2E proporciona una red de seguridad real y medible para el sistema YOVI.</p>
+</div>
+<div style="page-break-after: always;"></div>
 </div>
 </div>
 </div>
